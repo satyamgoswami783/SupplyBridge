@@ -23,7 +23,7 @@ export const AppShell: React.FC = () => {
   }
 
   return (
-    <div className={`flex h-screen overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-dark-bg text-slate-100' : 'bg-surface-bg text-slate-900'}`}>
+    <div className={`flex h-screen overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-slate-950 text-slate-100 dark' : 'bg-surface-bg text-slate-900'}`}>
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header
