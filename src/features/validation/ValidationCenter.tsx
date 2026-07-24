@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShieldCheck, CheckCircle2, XCircle, Eye, AlertTriangle, RefreshCw, Loader2, Check, Info } from 'lucide-react'
+import { ShieldCheck, CheckCircle2, XCircle, Eye, AlertTriangle, RefreshCw, Loader2, Check, Info, PhoneForwarded } from 'lucide-react'
 import { SectionHeader, FilterBar, Tabs, Spinner } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
@@ -155,7 +155,7 @@ export const ValidationCenter: React.FC = () => {
         subtitle="Review, audit, and approve products before publishing to the master catalog"
         actions={
           <>
-            {selectedIds.length > 0 && (
+            {selectedIds.length > 0 && role !== 'operations_staff' && (
               <>
                 <button onClick={handleBulkApprove} className="btn-success btn-sm">
                   <CheckCircle2 size={14} /> Approve {selectedIds.length}
@@ -164,6 +164,14 @@ export const ValidationCenter: React.FC = () => {
                   <XCircle size={14} /> Reject {selectedIds.length}
                 </button>
               </>
+            )}
+            {selectedIds.length > 0 && role === 'operations_staff' && (
+              <button
+                onClick={() => setToastMessage({ text: `${selectedIds.length} issue(s) escalated to Catalog Manager.`, type: 'info' })}
+                className="btn-secondary btn-sm flex items-center gap-1.5"
+              >
+                <PhoneForwarded size={14} /> Escalate {selectedIds.length} Issue{selectedIds.length > 1 ? 's' : ''}
+              </button>
             )}
             <button onClick={handleRefresh} className="btn-secondary btn-sm flex items-center gap-1.5" disabled={isLoading}>
               <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
@@ -302,22 +310,34 @@ export const ValidationCenter: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex gap-2 flex-shrink-0" onClick={e => e.stopPropagation()}>
-                  <button
-                    onClick={() => handleApproveSingle(item.id, item.productName)}
-                    className="btn-success btn-sm flex items-center gap-1"
-                    disabled={item.status === 'approved'}
-                  >
-                    <CheckCircle2 size={13} /> Approve
-                  </button>
-                  <button
-                    onClick={() => handleRejectSingle(item.id, item.productName)}
-                    className="btn-danger btn-sm flex items-center gap-1"
-                    disabled={item.status === 'rejected'}
-                  >
-                    <XCircle size={13} /> Reject
-                  </button>
+                  {role !== 'operations_staff' && (
+                    <>
+                      <button
+                        onClick={() => handleApproveSingle(item.id, item.productName)}
+                        className="btn-success btn-sm flex items-center gap-1"
+                        disabled={item.status === 'approved'}
+                      >
+                        <CheckCircle2 size={13} /> Approve
+                      </button>
+                      <button
+                        onClick={() => handleRejectSingle(item.id, item.productName)}
+                        className="btn-danger btn-sm flex items-center gap-1"
+                        disabled={item.status === 'rejected'}
+                      >
+                        <XCircle size={13} /> Reject
+                      </button>
+                    </>
+                  )}
+                  {role === 'operations_staff' && (
+                    <button
+                      onClick={() => setToastMessage({ text: `Issue for "${item.productName}" escalated to Catalog Manager.`, type: 'info' })}
+                      className="btn-secondary btn-sm flex items-center gap-1 text-amber-700 border-amber-300 hover:bg-amber-50"
+                    >
+                      <PhoneForwarded size={13} /> Escalate
+                    </button>
+                  )}
                   <button onClick={() => handleOpenReview(item)} className="btn-secondary btn-sm flex items-center gap-1">
-                    <Eye size={13} /> Review
+                    <Eye size={13} /> View
                   </button>
                 </div>
               </div>
@@ -339,24 +359,38 @@ export const ValidationCenter: React.FC = () => {
               <button onClick={() => setReviewItem(null)} className="btn-secondary">
                 Close
               </button>
-              <button
-                onClick={() => {
-                  handleRejectSingle(reviewItem.id, reviewItem.productName)
-                  setReviewItem(null)
-                }}
-                className="btn-danger flex items-center gap-1.5"
-              >
-                <XCircle size={14} /> Reject Item
-              </button>
-              <button
-                onClick={() => {
-                  handleApproveSingle(reviewItem.id, reviewItem.productName)
-                  setReviewItem(null)
-                }}
-                className="btn-success flex items-center gap-1.5"
-              >
-                <CheckCircle2 size={14} /> Approve Item
-              </button>
+              {role === 'operations_staff' ? (
+                <button
+                  onClick={() => {
+                    setToastMessage({ text: `Issue for "${reviewItem.productName}" escalated to Catalog Manager.`, type: 'info' })
+                    setReviewItem(null)
+                  }}
+                  className="btn-secondary flex items-center gap-1.5 text-amber-700 border-amber-300 hover:bg-amber-50"
+                >
+                  <PhoneForwarded size={14} /> Escalate to Catalog Manager
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      handleRejectSingle(reviewItem.id, reviewItem.productName)
+                      setReviewItem(null)
+                    }}
+                    className="btn-danger flex items-center gap-1.5"
+                  >
+                    <XCircle size={14} /> Reject Item
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleApproveSingle(reviewItem.id, reviewItem.productName)
+                      setReviewItem(null)
+                    }}
+                    className="btn-success flex items-center gap-1.5"
+                  >
+                    <CheckCircle2 size={14} /> Approve Item
+                  </button>
+                </>
+              )}
             </>
           }
         >
