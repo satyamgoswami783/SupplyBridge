@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react'
 import type { UserRole, User } from '../types'
-import { Lock, Mail, Shield, Zap, ArrowRight, CheckCircle2, UserCheck } from 'lucide-react'
+import { Lock, Mail, Shield, Zap, ArrowRight, CheckCircle2, UserCheck, Layers, RefreshCw, Globe, Database } from 'lucide-react'
 
 interface AuthContextType {
   currentUser: User
@@ -89,120 +89,178 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   if (isLoggedOut) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
-        {/* Background glow effects */}
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-gradient-mesh relative overflow-hidden">
+        {/* Ambient background glow accents */}
+        <div className="absolute top-10 left-10 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
 
-        <div className="card max-w-lg w-full p-8 bg-slate-900/90 border-slate-800 text-white shadow-2xl backdrop-blur-xl relative z-10 rounded-3xl">
-          {/* Header Branding */}
-          <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-primary flex items-center justify-center mx-auto mb-3 shadow-glow-primary text-white">
-              <Zap size={28} />
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">SupplyBridge Enterprise</h1>
-            <p className="text-xs text-slate-400 mt-1">Middleware + PIM + Supplier Integration Platform</p>
-          </div>
+        {/* 2-Column Responsive Card */}
+        <div className="max-w-5xl w-full bg-white rounded-3xl border border-slate-200/90 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 relative z-10">
+          
+          {/* Left Column: Hero Visual & Showcase */}
+          <div className="lg:col-span-5 bg-gradient-to-br from-indigo-700 via-primary-700 to-violet-900 p-8 lg:p-10 text-white flex flex-col justify-between relative overflow-hidden">
+            {/* Background pattern */}
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
 
-          {/* Login Form */}
-          <form onSubmit={handleLoginSubmit} className="space-y-4">
-            <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1.5 flex items-center gap-1.5">
-                <Mail size={13} className="text-slate-400" /> Email Address
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="name@company.com"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
-              />
-            </div>
+            <div className="relative z-10">
+              {/* Brand Logo */}
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-black shadow-lg">
+                  <Zap size={22} />
+                </div>
+                <div>
+                  <h1 className="font-extrabold text-white text-lg tracking-tight">SupplyBridge</h1>
+                  <p className="text-2xs text-cyan-200 font-semibold uppercase tracking-wider">Enterprise Middleware & PIM</p>
+                </div>
+              </div>
 
-            <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1.5 flex items-center gap-1.5">
-                <Lock size={13} className="text-slate-400" /> Password
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
-              />
-            </div>
+              <h2 className="text-2xl font-black tracking-tight text-white mb-2 leading-tight">
+                Centralized Product & Supplier Integration
+              </h2>
+              <p className="text-xs text-indigo-100/80 leading-relaxed mb-6">
+                Automated multi-supplier data normalization, inventory synchronization & Shift4Shop publishing hub.
+              </p>
 
-            {/* Main Login Button */}
-            <button
-              type="submit"
-              disabled={isLoggingIn}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-primary hover:opacity-95 text-white font-bold text-sm shadow-glow-primary flex items-center justify-center gap-2 transition-all duration-200"
-            >
-              {isLoggingIn ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Authenticating...
-                </>
-              ) : (
-                <>
-                  Sign In to Dashboard <ArrowRight size={16} />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Divider */}
-          <div className="relative my-6 text-center">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-800" /></div>
-            <span className="relative px-3 bg-slate-900 text-2xs uppercase tracking-wider text-slate-500 font-semibold">
-              Or Auto-fill Quick Role Preset
-            </span>
-          </div>
-
-          {/* 5 Quick Role Preset Buttons */}
-          <div className="space-y-2">
-            {ROLE_PRESETS.map(preset => {
-              const isSelected = selectedRole === preset.role && email === preset.email
-              return (
-                <button
-                  key={preset.role}
-                  type="button"
-                  onClick={() => handleRoleSelect(preset)}
-                  className={`w-full p-3 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between group ${
-                    isSelected
-                      ? 'bg-slate-800 border-primary-500 ring-2 ring-primary-500/30'
-                      : 'bg-slate-800/40 border-slate-800 hover:bg-slate-800/80 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${preset.color} flex items-center justify-center text-white text-xs font-bold shadow-sm flex-shrink-0`}>
-                      {preset.label.charAt(0)}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-xs font-bold text-white group-hover:text-primary-300 transition-colors">
-                          {preset.label}
-                        </p>
-                        {isSelected && <span className="text-2xs bg-primary-500/20 text-primary-300 font-semibold px-2 py-0.5 rounded-full">Selected</span>}
-                      </div>
-                      <p className="text-2xs text-slate-400 truncate">{preset.email}</p>
-                    </div>
+              {/* Generated Hero Image Card */}
+              <div className="relative rounded-2xl overflow-hidden border border-white/20 shadow-2xl mb-6 group">
+                <img
+                  src="/login_hero.png"
+                  alt="SupplyBridge Middleware Infrastructure"
+                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-4">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-xs font-bold text-white">Live Core Data Sync Engine</span>
                   </div>
+                </div>
+              </div>
 
-                  <span className="text-xs text-slate-500 group-hover:text-slate-300 font-medium transition-colors">
-                    Click to fill →
-                  </span>
-                </button>
-              )
-            })}
+              {/* Feature Points */}
+              <div className="space-y-2.5">
+                {[
+                  { icon: <Database size={14} />, text: 'Single Source of Truth Master Catalog' },
+                  { icon: <RefreshCw size={14} />, text: 'Real-time Inventory & Pricing Pipeline' },
+                  { icon: <Globe size={14} />, text: 'Multi-Storefront Validation & Sync' },
+                ].map((f, i) => (
+                  <div key={i} className="flex items-center gap-2.5 text-xs text-indigo-100 font-semibold bg-white/10 backdrop-blur-xs px-3 py-2 rounded-xl">
+                    <span className="text-cyan-300">{f.icon}</span>
+                    <span>{f.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <p className="text-2xs text-indigo-200/60 mt-8 relative z-10">
+              SupplyBridge Platform Security v2.4 • ISO 27001 Certified
+            </p>
           </div>
 
-          {/* Footer note */}
-          <p className="text-2xs text-slate-500 text-center mt-6">
-            SupplyBridge Enterprise Middleware & Platform Security System © 2026
-          </p>
+          {/* Right Column: Interactive Login Form & Role Selector */}
+          <div className="lg:col-span-7 p-8 lg:p-10 bg-white flex flex-col justify-center">
+            <div className="max-w-md mx-auto w-full">
+              <div className="mb-6">
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Sign In</h2>
+                <p className="text-xs font-medium text-slate-500 mt-1">Enter your credentials or choose a quick demo role to autofill.</p>
+              </div>
+
+              {/* Login Form */}
+              <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center gap-1.5">
+                    <Mail size={13} className="text-slate-400" /> Email Address
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="name@supplybridge.io"
+                    className="input focus:ring-2 focus:ring-primary-500/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center gap-1.5">
+                    <Lock size={13} className="text-slate-400" /> Password
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="input focus:ring-2 focus:ring-primary-500/20"
+                  />
+                </div>
+
+                {/* Main Login Button */}
+                <button
+                  type="submit"
+                  disabled={isLoggingIn}
+                  className="btn-primary w-full py-3 text-sm font-bold shadow-md shadow-indigo-500/20 mt-2"
+                >
+                  {isLoggingIn ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Authenticating...
+                    </>
+                  ) : (
+                    <>
+                      Sign In to Dashboard <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* Divider */}
+              <div className="relative my-6 text-center">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+                <span className="relative px-3 bg-white text-2xs uppercase tracking-wider text-slate-400 font-bold">
+                  Or Auto-fill Quick Role Preset
+                </span>
+              </div>
+
+              {/* 5 Role Preset Buttons */}
+              <div className="space-y-2">
+                {ROLE_PRESETS.map(preset => {
+                  const isSelected = selectedRole === preset.role && email === preset.email
+                  return (
+                    <button
+                      key={preset.role}
+                      type="button"
+                      onClick={() => handleRoleSelect(preset)}
+                      className={`w-full p-2.5 rounded-xl border text-left transition-all duration-200 flex items-center justify-between group ${
+                        isSelected
+                          ? 'bg-primary-50/90 border-primary-500 ring-2 ring-primary-500/20'
+                          : 'bg-slate-50/70 border-slate-200/90 hover:bg-slate-100 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${preset.color} flex items-center justify-center text-white text-xs font-bold shadow-sm flex-shrink-0`}>
+                          {preset.label.charAt(0)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-bold text-slate-800 group-hover:text-primary-700 transition-colors">
+                              {preset.label}
+                            </p>
+                            {isSelected && <span className="text-2xs bg-primary-600 text-white font-bold px-2 py-0.5 rounded-full">Selected</span>}
+                          </div>
+                          <p className="text-2xs text-slate-500 truncate">{preset.email}</p>
+                        </div>
+                      </div>
+
+                      <span className="text-xs text-primary-600 font-bold opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">
+                        Fill →
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     )
