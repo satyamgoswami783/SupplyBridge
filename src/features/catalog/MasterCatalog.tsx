@@ -27,17 +27,19 @@ import {
 import { Badge } from '../../components/ui/Badge'
 import { SectionHeader, FilterBar, Tabs, ConfirmDialog } from '../../components/ui'
 import { Modal } from '../../components/ui/Modal'
-import { mockProducts } from '../../data/mockData'
 import { statusToVariant, timeAgo } from '../../utils'
 import type { Product, ProductStatus, ValidationStatus } from '../../types'
 
 import { useAuth } from '../../context/AuthContext'
+import { useSuppliers } from '../../context/SupplierContext'
+import { useProducts } from '../../context/ProductContext'
 
 export const MasterCatalog: React.FC = () => {
   const { role } = useAuth()
+  const { suppliersList } = useSuppliers()
+  const { productsList, setProductsList } = useProducts()
   const canManageCatalog = role === 'super_admin' || role === 'admin' || role === 'catalog_manager'
   const canDelete = role === 'super_admin' || role === 'admin'
-  const [productsList, setProductsList] = useState<Product[]>(mockProducts)
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -102,9 +104,7 @@ export const MasterCatalog: React.FC = () => {
     // Dropdown Supplier Filter
     let matchesSupplier = true
     if (supplierFilter !== 'all') {
-      if (supplierFilter === 's1') matchesSupplier = product.supplierName.includes('TechParts')
-      if (supplierFilter === 's2') matchesSupplier = product.supplierName.includes('GlobalSource')
-      if (supplierFilter === 's3') matchesSupplier = product.supplierName.includes('PrimeSup')
+      matchesSupplier = product.supplierName === supplierFilter
     }
 
     return matchesSearch && matchesTab && matchesStatus && matchesSupplier
@@ -428,9 +428,9 @@ export const MasterCatalog: React.FC = () => {
           onChange={e => { setSupplierFilter(e.target.value); setCurrentPage(1); }}
         >
           <option value="all">All Suppliers</option>
-          <option value="s1">TechParts International</option>
-          <option value="s2">GlobalSource Limited</option>
-          <option value="s3">PrimeSupply Corp</option>
+          {suppliersList.map(s => (
+            <option key={s.id} value={s.name}>{s.name}</option>
+          ))}
         </select>
         <select
           className="select input-sm w-auto min-w-[130px] font-medium"
@@ -800,14 +800,28 @@ export const MasterCatalog: React.FC = () => {
               />
             </div>
           </div>
-          <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1.5">Category *</label>
-            <input
-              className="input"
-              placeholder="e.g. Processors"
-              value={newProduct.categoryName}
-              onChange={e => setNewProduct({ ...newProduct, categoryName: e.target.value })}
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Category</label>
+              <input
+                className="input"
+                placeholder="e.g. Processors"
+                value={newProduct.categoryName}
+                onChange={e => setNewProduct({ ...newProduct, categoryName: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Supplier</label>
+              <select
+                className="select"
+                value={newProduct.supplierName}
+                onChange={e => setNewProduct({ ...newProduct, supplierName: e.target.value })}
+              >
+                {suppliersList.map(s => (
+                  <option key={s.id} value={s.name}>{s.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>

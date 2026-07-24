@@ -1,0 +1,25 @@
+import React, { createContext, useContext, useState } from 'react'
+import { mockProducts } from '../data/mockData'
+import type { Product } from '../types'
+
+interface ProductContextType {
+  productsList: Product[]
+  setProductsList: React.Dispatch<React.SetStateAction<Product[]>>
+}
+
+const ProductContext = createContext<ProductContextType | null>(null)
+
+export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [productsList, setProductsList] = useState<Product[]>(mockProducts)
+  return (
+    <ProductContext.Provider value={{ productsList, setProductsList }}>
+      {children}
+    </ProductContext.Provider>
+  )
+}
+
+export const useProducts = () => {
+  const ctx = useContext(ProductContext)
+  if (!ctx) throw new Error('useProducts must be used inside ProductProvider')
+  return ctx
+}

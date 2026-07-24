@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Bell, Search, ChevronDown, Menu, Sun, Moon, Zap, User, LogOut, Settings } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
@@ -23,6 +23,23 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
   const { currentUser, role, logout, openCurrentUserProfile } = useAuth()
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+
+  const notifRef = useRef<HTMLDivElement>(null)
+  const profileRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setShowNotifications(false)
+      }
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setShowProfileMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const notifications = [
     { id: 1, message: 'QuickShip sync failed — 256 items', time: '1 min ago', type: 'error' },
@@ -60,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
         </button>
 
         {/* Notifications */}
-        <div className="relative">
+        <div className="relative" ref={notifRef}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
             className="btn-icon relative dark:text-slate-300 dark:hover:bg-slate-800"
@@ -102,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
         </div>
 
         {/* User Profile dropdown */}
-        <div className="relative ml-1">
+        <div className="relative ml-1" ref={profileRef}>
           <button
             onClick={() => setShowProfileMenu(!showProfileMenu)}
             className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
