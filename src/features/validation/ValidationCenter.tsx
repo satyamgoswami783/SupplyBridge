@@ -149,7 +149,7 @@ export const ValidationCenter: React.FC = () => {
   }
 
   return (
-    <div className="relative">
+    <div className="relative pb-12 sm:pb-6">
       <SectionHeader
         title="Validation Center"
         subtitle="Review, audit, and approve products before publishing to the master catalog"
@@ -274,54 +274,63 @@ export const ValidationCenter: React.FC = () => {
               key={item.id}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="card p-5 hover:shadow-card-md transition-all cursor-pointer"
+              className="card p-4 sm:p-5 hover:shadow-card-md transition-all cursor-pointer"
               onClick={() => handleOpenReview(item)}
             >
-              <div className="flex items-start gap-4">
-                <input
-                  type="checkbox"
-                  className="rounded border-slate-300 mt-1 flex-shrink-0"
-                  checked={selectedIds.includes(item.id)}
-                  onChange={() => toggleSelect(item.id)}
-                  onClick={e => e.stopPropagation()}
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold text-slate-800">{item.productName}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        SKU: <code className="mono">{item.supplierSku}</code> · {item.supplierName} · {timeAgo(item.createdAt)}
-                      </p>
-                    </div>
-                    <Badge variant={statusToVariant(item.status)}>{item.status}</Badge>
-                  </div>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {item.errors.map((err, i) => (
-                      <div
-                        key={i}
-                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                          err.severity === 'error' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
-                        }`}
-                      >
-                        {err.severity === 'error' ? <XCircle size={11} /> : <AlertTriangle size={11} />}
-                        {errorTypeLabel[err.type] ?? err.type}
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="flex items-start gap-3 min-w-0 w-full flex-1">
+                  <input
+                    type="checkbox"
+                    className="rounded border-slate-300 mt-1 flex-shrink-0"
+                    checked={selectedIds.includes(item.id)}
+                    onChange={() => toggleSelect(item.id)}
+                    onClick={e => e.stopPropagation()}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                      <div className="min-w-0 pr-2">
+                        <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm sm:text-base leading-snug break-words">{item.productName}</p>
+                        <p className="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-1.5 break-all">
+                          <span>SKU:</span>
+                          <code className="mono">{item.supplierSku}</code>
+                          <span>·</span>
+                          <span className="font-medium text-slate-600 dark:text-slate-300">{item.supplierName}</span>
+                          <span>·</span>
+                          <span>{timeAgo(item.createdAt)}</span>
+                        </p>
                       </div>
-                    ))}
+                      <div className="flex-shrink-0 self-start sm:self-auto">
+                        <Badge variant={statusToVariant(item.status)}>{item.status}</Badge>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3">
+                      {item.errors.map((err, i) => (
+                        <div
+                          key={i}
+                          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+                            err.severity === 'error' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
+                          }`}
+                        >
+                          {err.severity === 'error' ? <XCircle size={11} className="flex-shrink-0" /> : <AlertTriangle size={11} className="flex-shrink-0" />}
+                          <span>{errorTypeLabel[err.type] ?? err.type}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-2 flex-shrink-0" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full md:w-auto justify-end pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800" onClick={e => e.stopPropagation()}>
                   {role !== 'operations_staff' && (
                     <>
                       <button
                         onClick={() => handleApproveSingle(item.id, item.productName)}
-                        className="btn-success btn-sm flex items-center gap-1"
+                        className="btn-success btn-sm flex items-center justify-center gap-1 flex-1 md:flex-none"
                         disabled={item.status === 'approved'}
                       >
                         <CheckCircle2 size={13} /> Approve
                       </button>
                       <button
                         onClick={() => handleRejectSingle(item.id, item.productName)}
-                        className="btn-danger btn-sm flex items-center gap-1"
+                        className="btn-danger btn-sm flex items-center justify-center gap-1 flex-1 md:flex-none"
                         disabled={item.status === 'rejected'}
                       >
                         <XCircle size={13} /> Reject
@@ -331,12 +340,12 @@ export const ValidationCenter: React.FC = () => {
                   {role === 'operations_staff' && (
                     <button
                       onClick={() => setToastMessage({ text: `Issue for "${item.productName}" escalated to Catalog Manager.`, type: 'info' })}
-                      className="btn-secondary btn-sm flex items-center gap-1 text-amber-700 border-amber-300 hover:bg-amber-50"
+                      className="btn-secondary btn-sm flex items-center justify-center gap-1 text-amber-700 border-amber-300 hover:bg-amber-50 flex-1 md:flex-none"
                     >
                       <PhoneForwarded size={13} /> Escalate
                     </button>
                   )}
-                  <button onClick={() => handleOpenReview(item)} className="btn-secondary btn-sm flex items-center gap-1">
+                  <button onClick={() => handleOpenReview(item)} className="btn-secondary btn-sm flex items-center justify-center gap-1 flex-1 md:flex-none">
                     <Eye size={13} /> View
                   </button>
                 </div>

@@ -130,9 +130,16 @@ export const ProductMapping: React.FC = () => {
   const [editSupplierMapping, setEditSupplierMapping] = useState<SupplierMappingItem | null>(null)
 
   // Form State
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    field1: string
+    field2: string
+    field3?: string
+    supplierName: string
+    dataType: string
+  }>({
     field1: '',
     field2: '',
+    field3: '',
     supplierName: 'TechParts Int.',
     dataType: 'String',
   })
@@ -168,41 +175,7 @@ export const ProductMapping: React.FC = () => {
     }, 1500)
   }
 
-const handleCreateNewRule = () => {
-  // TODO: implement rule creation logic
-}
-
-
-
-
-
-
-
-
-  // Save edited product mapping
-  const handleSaveProductEdit = () => {
-    if (!editProductMapping) return;
-    setProductMappings(prev =>
-      prev.map(p =>
-        p.id === editProductMapping.id
-          ? {
-              ...p,
-              masterSku: formData.field2 || p.masterSku,
-              masterName: formData.field3 || p.masterName,
-              status: 'mapped',
-              confidence: formData.field2 ? 95 : p.confidence,
-            }
-          : p
-      )
-    );
-    setEditProductMapping(null);
-    showNotification(`Product mapping updated for "${editProductMapping.supplierSku}"!`);
-  }
-
-
-
-
-
+  const handleCreateNewRule = () => {
     if (activeMapping === 'products') {
       const newP: ProductMappingItem = {
         id: `p_${Date.now()}`,
@@ -259,6 +232,26 @@ const handleCreateNewRule = () => {
     showNotification(`New mapping rule created for "${formData.field1}"!`)
   }
 
+  // Save edited product mapping
+  const handleSaveProductEdit = () => {
+    if (!editProductMapping) return;
+    setProductMappings(prev =>
+      prev.map(p =>
+        p.id === editProductMapping.id
+          ? {
+              ...p,
+              masterSku: formData.field2 || p.masterSku,
+              masterName: formData.field3 || p.masterName,
+              status: 'mapped',
+              confidence: formData.field2 ? 95 : p.confidence,
+            }
+          : p
+      )
+    );
+    setEditProductMapping(null);
+    showNotification(`Product mapping updated for "${editProductMapping.supplierSku}"!`);
+  }
+
   const handleOpenEditAttribute = (m: AttributeMappingItem) => {
     setEditAttributeMapping(m)
     setFormData({
@@ -304,7 +297,7 @@ const handleCreateNewRule = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Toast Notification Banner */}
       <AnimatePresence>
         {toastMessage && (
@@ -324,14 +317,14 @@ const handleCreateNewRule = () => {
         title={pageTitles[activeMapping]?.title || 'Product Mapping'}
         subtitle={pageTitles[activeMapping]?.subtitle || 'Manage schema mapping rules'}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <button
               onClick={handleAutoMap}
               disabled={isAutoMapping}
               className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
             >
               <RefreshCw size={14} className={isAutoMapping ? 'animate-spin text-primary-600' : ''} />
-              {isAutoMapping ? 'Auto-Mapping...' : 'Auto-Map High Confidence'}
+              {isAutoMapping ? 'Auto-Mapping...' : <><span className="hidden sm:inline">Auto-Map High Confidence</span><span className="sm:hidden">Auto-Map</span></>}
             </button>
             <button
               onClick={() => { setFormData({ field1: '', field2: '', supplierName: 'TechParts Int.', dataType: 'String' }); setAddModalOpen(true); }}
@@ -344,16 +337,16 @@ const handleCreateNewRule = () => {
       />
 
       {/* Stats Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
         {[
           { label: 'Product Rules',  value: productMappings.length, color: 'text-slate-800 dark:text-slate-100' },
           { label: 'Category Rules', value: categoryMappings.length, color: 'text-primary-600 dark:text-primary-400' },
           { label: 'Variant Rules',  value: variantMappings.length, color: 'text-violet-600 dark:text-violet-400' },
           { label: 'Attribute Rules',value: attributeMappings.length, color: 'text-emerald-600 dark:text-emerald-400' },
         ].map(s => (
-          <div key={s.label} className="card px-4 py-3 text-center">
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
+          <div key={s.label} className="card px-3 py-2.5 sm:px-4 sm:py-3 text-center">
+            <p className={`text-xl sm:text-2xl font-bold ${s.color}`}>{s.value}</p>
+            <p className="text-2xs sm:text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
@@ -396,12 +389,12 @@ const handleCreateNewRule = () => {
                   .filter(m => m.supplierSku.toLowerCase().includes(search.toLowerCase()) || m.masterSku.toLowerCase().includes(search.toLowerCase()))
                   .map(m => (
                     <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td><code className="mono font-semibold text-slate-800 dark:text-slate-200">{m.supplierSku}</code></td>
-                      <td><span className="text-xs text-slate-500">{m.supplierName}</span></td>
-                      <td className="text-center"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
-                      <td>{m.masterSku ? <code className="mono text-primary-700 font-semibold">{m.masterSku}</code> : <span className="text-slate-300 text-xs italic">Not mapped</span>}</td>
-                      <td><span className="text-sm text-slate-700 dark:text-slate-300 font-medium truncate block max-w-[200px]">{m.masterName || '—'}</span></td>
-                      <td>
+                      <td data-label="Supplier SKU"><code className="mono font-semibold text-slate-800 dark:text-slate-200">{m.supplierSku}</code></td>
+                      <td data-label="Supplier">{m.supplierName}</td>
+                      <td className="text-center mobile-hidden"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
+                      <td data-label="Master SKU">{m.masterSku ? <code className="mono text-primary-700 font-semibold">{m.masterSku}</code> : <span className="text-slate-300 text-xs italic">Not mapped</span>}</td>
+                      <td data-label="Product Name"><span className="text-sm text-slate-700 dark:text-slate-300 font-medium truncate block max-w-[200px]">{m.masterName || '—'}</span></td>
+                      <td data-label="Confidence">
                         {m.confidence > 0 && (
                           <div className="flex items-center gap-2">
                             <div className="w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -411,50 +404,17 @@ const handleCreateNewRule = () => {
                           </div>
                         )}
                       </td>
-                      <td><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
-                      <td className="text-right">
+                      <td data-label="Status"><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
+                      <td data-label="" className="text-right mobile-full">
                         <button
                           onClick={() => {
-                            setEditProductMapping(m)
-                            setFormData({ field1: m.supplierSku, field2: m.masterSku, supplierName: m.supplierName, dataType: 'String' })
+                            setEditProductMapping(m);
+                            setFormData({ field1: m.supplierSku, field2: m.masterSku, field3: m.masterName || '', supplierName: m.supplierName, dataType: 'String' });
                           }}
-                          className={m.status === 'unmapped' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
+                          className={`${m.status === 'unmapped' ? 'btn-primary' : 'btn-secondary'} btn-sm w-full md:w-auto`}
                         >
                           {m.status === 'unmapped' ? 'Map Now' : 'Edit Mapping'}
                         </button>
-                        {/* Trigger Edit Product Modal */}
-                        {editProductMapping && (
-                          <Modal
-                            open={true}
-                            onClose={() => setEditProductMapping(null)}
-                            title={`Edit Product Mapping: ${editProductMapping.supplierSku}`}
-                            subtitle={`Supplier: ${editProductMapping.supplierName}`}
-                            size="md"
-                            footer={
-                              <>
-                                <button onClick={() => setEditProductMapping(null)} className="btn-secondary">Cancel</button>
-                                <button onClick={handleSaveProductEdit} className="btn-primary flex items-center gap-1.5 shadow-md shadow-indigo-500/20">
-                                  <Save size={14} /> Save Product Mapping
-                                </button>
-                              </>
-                            }
-                          >
-                            <div className="space-y-4">
-                              <div>
-                                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Supplier Raw SKU *</label>
-                                <input className="input font-mono" value={formData.field1} readOnly />
-                              </div>
-                              <div>
-                                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Target Master SKU</label>
-                                <input className="input font-mono" value={formData.field2} onChange={e => setFormData({ ...formData, field2: e.target.value })} />
-                              </div>
-                              <div>
-                                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Product Name</label>
-                                <input className="input" placeholder="Enter product name" value={formData.field3 || ''} onChange={e => setFormData({ ...formData, field3: e.target.value })} />
-                              </div>
-                            </div>
-                          </Modal>
-                        
                       </td>
                     </tr>
                   ))}
@@ -482,18 +442,18 @@ const handleCreateNewRule = () => {
               <tbody>
                 {categoryMappings.map(m => (
                   <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td><span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{m.supplierCategory}</span></td>
-                    <td><span className="text-xs text-slate-500">{m.supplierName}</span></td>
-                    <td className="text-center"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
-                    <td><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.masterCategory || <span className="text-slate-300 italic">Not mapped</span>}</span></td>
-                    <td><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
-                    <td className="text-right">
+                    <td data-label="Category"><span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{m.supplierCategory}</span></td>
+                    <td data-label="Supplier">{m.supplierName}</td>
+                    <td className="text-center mobile-hidden"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
+                    <td data-label="Master Category"><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.masterCategory || <span className="text-slate-300 italic">Not mapped</span>}</span></td>
+                    <td data-label="Status"><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
+                    <td data-label="" className="text-right mobile-full">
                       <button
                         onClick={() => {
                           setEditCategoryMapping(m)
                           setFormData({ field1: m.supplierCategory, field2: m.masterCategory, supplierName: m.supplierName, dataType: 'String' })
                         }}
-                        className={m.status === 'unmapped' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
+                        className={`${m.status === 'unmapped' ? 'btn-primary' : 'btn-secondary'} btn-sm w-full md:w-auto`}
                       >
                         {m.status === 'unmapped' ? 'Map Category' : 'Edit Target'}
                       </button>
@@ -525,19 +485,19 @@ const handleCreateNewRule = () => {
               <tbody>
                 {variantMappings.map(m => (
                   <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td><code className="mono font-semibold text-slate-800 dark:text-slate-200">{m.supplierVariantKey}</code></td>
-                    <td><span className="text-xs text-slate-500">{m.supplierName}</span></td>
-                    <td className="text-center"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
-                    <td><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.masterVariantDimension}</span></td>
-                    <td><span className="text-xs text-slate-600 font-mono">{m.mappedValues || '—'}</span></td>
-                    <td><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
-                    <td className="text-right">
+                    <td data-label="Variant Key"><code className="mono font-semibold text-slate-800 dark:text-slate-200">{m.supplierVariantKey}</code></td>
+                    <td data-label="Supplier">{m.supplierName}</td>
+                    <td className="text-center mobile-hidden"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
+                    <td data-label="Dimension"><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.masterVariantDimension}</span></td>
+                    <td data-label="Mapped Values"><span className="text-xs text-slate-600 font-mono">{m.mappedValues || '—'}</span></td>
+                    <td data-label="Status"><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
+                    <td data-label="" className="text-right mobile-full">
                       <button
                         onClick={() => {
                           setEditVariantMapping(m)
                           setFormData({ field1: m.supplierVariantKey, field2: m.masterVariantDimension, supplierName: m.supplierName, dataType: 'String' })
                         }}
-                        className={m.status === 'unmapped' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
+                        className={`${m.status === 'unmapped' ? 'btn-primary' : 'btn-secondary'} btn-sm w-full md:w-auto`}
                       >
                         {m.status === 'unmapped' ? 'Map Variant' : 'Edit Dimension'}
                       </button>
@@ -569,16 +529,16 @@ const handleCreateNewRule = () => {
               <tbody>
                 {attributeMappings.map(m => (
                   <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td><code className="mono font-bold text-slate-800 dark:text-slate-200">{m.supplierAttribute}</code></td>
-                    <td><span className="text-xs text-slate-500">{m.supplierName}</span></td>
-                    <td className="text-center"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
-                    <td><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.masterAttribute}</span></td>
-                    <td><Badge variant="neutral">{m.dataType}</Badge></td>
-                    <td><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
-                    <td className="text-right">
+                    <td data-label="Attribute"><code className="mono font-bold text-slate-800 dark:text-slate-200">{m.supplierAttribute}</code></td>
+                    <td data-label="Supplier">{m.supplierName}</td>
+                    <td className="text-center mobile-hidden"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
+                    <td data-label="Master Field"><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.masterAttribute}</span></td>
+                    <td data-label="Type"><Badge variant="neutral">{m.dataType}</Badge></td>
+                    <td data-label="Status"><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
+                    <td data-label="" className="text-right mobile-full">
                       <button
                         onClick={() => handleOpenEditAttribute(m)}
-                        className={m.status === 'unmapped' ? 'btn-primary btn-sm font-bold cursor-pointer' : 'btn-secondary btn-sm font-bold cursor-pointer'}
+                        className={`${m.status === 'unmapped' ? 'btn-primary' : 'btn-secondary'} btn-sm font-bold cursor-pointer w-full md:w-auto`}
                       >
                         {m.status === 'unmapped' ? 'Map Attribute' : 'Edit Rule'}
                       </button>
@@ -609,18 +569,18 @@ const handleCreateNewRule = () => {
               <tbody>
                 {supplierMappings.map(m => (
                   <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td><code className="mono font-semibold text-slate-800 dark:text-slate-200">{m.feedId}</code></td>
-                    <td><span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{m.supplierName}</span></td>
-                    <td><Badge variant="info">{m.protocol}</Badge></td>
-                    <td><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.assignedEntity || <span className="text-slate-300 italic">Unassigned</span>}</span></td>
-                    <td><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
-                    <td className="text-right">
+                    <td data-label="Feed ID"><code className="mono font-semibold text-slate-800 dark:text-slate-200">{m.feedId}</code></td>
+                    <td data-label="Supplier">{m.supplierName}</td>
+                    <td data-label="Protocol"><Badge variant="info">{m.protocol}</Badge></td>
+                    <td data-label="Entity"><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.assignedEntity || <span className="text-slate-300 italic">Unassigned</span>}</span></td>
+                    <td data-label="Status"><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
+                    <td data-label="" className="text-right mobile-full">
                       <button
                         onClick={() => {
                           setEditSupplierMapping(m)
                           setFormData({ field1: m.feedId, field2: m.assignedEntity, supplierName: m.supplierName, dataType: 'String' })
                         }}
-                        className={m.status === 'unmapped' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
+                        className={`${m.status === 'unmapped' ? 'btn-primary' : 'btn-secondary'} btn-sm w-full md:w-auto`}
                       >
                         {m.status === 'unmapped' ? 'Assign Entity' : 'Edit Feed Link'}
                       </button>
@@ -702,6 +662,40 @@ const handleCreateNewRule = () => {
           )}
         </div>
       </Modal>
+
+      {/* --- EDIT PRODUCT MAPPING MODAL --- */}
+      {editProductMapping && (
+        <Modal
+          open={true}
+          onClose={() => setEditProductMapping(null)}
+          title={`Edit Product Mapping: ${editProductMapping.supplierSku}`}
+          subtitle={`Supplier: ${editProductMapping.supplierName}`}
+          size="md"
+          footer={
+            <>
+              <button onClick={() => setEditProductMapping(null)} className="btn-secondary">Cancel</button>
+              <button onClick={handleSaveProductEdit} className="btn-primary flex items-center gap-1.5 shadow-md shadow-indigo-500/20">
+                <Save size={14} /> Save Product Mapping
+              </button>
+            </>
+          }
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Supplier Raw SKU *</label>
+              <input className="input font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" value={formData.field1} readOnly />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Target Master SKU</label>
+              <input className="input font-mono" value={formData.field2} onChange={e => setFormData({ ...formData, field2: e.target.value })} />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Product Name</label>
+              <input className="input" placeholder="Enter product name" value={formData.field3 || ''} onChange={e => setFormData({ ...formData, field3: e.target.value })} />
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {/* --- EDIT ATTRIBUTE MAPPING MODAL --- */}
       {editAttributeMapping && (

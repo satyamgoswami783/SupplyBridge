@@ -146,13 +146,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   if (isLoggedOut) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-gradient-mesh relative overflow-hidden">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-3 sm:p-6 lg:p-8 pb-24 sm:pb-12 bg-gradient-mesh relative overflow-y-auto">
         {/* Ambient background glow accents */}
         <div className="absolute top-10 left-10 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
 
         {/* 2-Column Responsive Card */}
-        <div className="max-w-5xl w-full bg-white rounded-3xl border border-slate-200/90 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 relative z-10">
+        <div className="max-w-5xl w-full bg-white rounded-3xl border border-slate-200/90 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 relative z-10 my-auto mb-16 sm:mb-8">
           
           {/* Left Column: FULL DISPLAY HERO IMAGE COVER */}
           <div className="lg:col-span-5 relative min-h-[450px] lg:min-h-full flex flex-col justify-between p-8 lg:p-10 text-white overflow-hidden">
@@ -210,7 +210,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           </div>
 
           {/* Right Column: Interactive Login Form & Role Selector */}
-          <div className="lg:col-span-7 p-8 lg:p-10 bg-white flex flex-col justify-center">
+          <div className="lg:col-span-7 p-5 sm:p-8 lg:p-10 bg-white flex flex-col justify-center">
             <div className="max-w-md mx-auto w-full">
               <div className="mb-6">
                 <h2 className="text-2xl font-black text-slate-900 tracking-tight">Sign In</h2>
@@ -275,7 +275,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               </div>
 
               {/* 5 Role Preset Buttons */}
-              <div className="space-y-2">
+              <div className="space-y-2 pb-2">
                 {ROLE_PRESETS.map(preset => {
                   const isSelected = selectedRole === preset.role && email === preset.email
                   return (
@@ -283,28 +283,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                       key={preset.role}
                       type="button"
                       onClick={() => handleRoleSelect(preset)}
-                      className={`w-full p-2.5 rounded-xl border text-left transition-all duration-200 flex items-center justify-between group ${
+                      className={`w-full p-2.5 sm:p-3 rounded-xl border text-left transition-all duration-200 flex items-center justify-between gap-3 group ${
                         isSelected
                           ? 'bg-primary-50/90 border-primary-500 ring-2 ring-primary-500/20'
                           : 'bg-slate-50/70 border-slate-200/90 hover:bg-slate-100 hover:border-slate-300'
                       }`}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${preset.color} flex items-center justify-center text-white text-xs font-bold shadow-sm flex-shrink-0`}>
                           {preset.label.charAt(0)}
                         </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="text-xs font-bold text-slate-800 group-hover:text-primary-700 transition-colors">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <p className="text-xs font-bold text-slate-800 group-hover:text-primary-700 transition-colors truncate">
                               {preset.label}
                             </p>
-                            {isSelected && <span className="text-2xs bg-primary-600 text-white font-bold px-2 py-0.5 rounded-full">Selected</span>}
+                            {isSelected && <span className="text-2xs bg-primary-600 text-white font-bold px-1.5 py-0.5 rounded-full flex-shrink-0">Selected</span>}
                           </div>
                           <p className="text-2xs text-slate-500 truncate">{preset.email}</p>
                         </div>
                       </div>
 
-                      <span className="text-xs text-primary-600 font-bold opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">
+                      <span className="text-xs text-primary-600 font-bold opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all flex-shrink-0 ml-1">
                         Fill →
                       </span>
                     </button>
