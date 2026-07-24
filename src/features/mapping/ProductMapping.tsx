@@ -130,9 +130,16 @@ export const ProductMapping: React.FC = () => {
   const [editSupplierMapping, setEditSupplierMapping] = useState<SupplierMappingItem | null>(null)
 
   // Form State
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    field1: string
+    field2: string
+    field3?: string
+    supplierName: string
+    dataType: string
+  }>({
     field1: '',
     field2: '',
+    field3: '',
     supplierName: 'TechParts Int.',
     dataType: 'String',
   })
@@ -408,7 +415,7 @@ export const ProductMapping: React.FC = () => {
                         <button
                           onClick={() => {
                             setEditProductMapping(m)
-                            setFormData({ field1: m.supplierSku, field2: m.masterSku, supplierName: m.supplierName, dataType: 'String' })
+                            setFormData({ field1: m.supplierSku, field2: m.masterSku, field3: m.masterName, supplierName: m.supplierName, dataType: 'String' })
                           }}
                           className={m.status === 'unmapped' ? 'btn-primary btn-sm font-bold cursor-pointer' : 'btn-secondary btn-sm font-bold cursor-pointer'}
                         >
@@ -885,6 +892,71 @@ export const ProductMapping: React.FC = () => {
                 placeholder="e.g. TechParts International Inc."
                 value={formData.field2}
                 onChange={e => setFormData({ ...formData, field2: e.target.value })}
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* --- EDIT PRODUCT MAPPING MODAL --- */}
+      {editProductMapping && (
+        <Modal
+          open
+          onClose={() => setEditProductMapping(null)}
+          title={editProductMapping.status === 'unmapped' ? 'Map Product SKU' : 'Edit Product Mapping'}
+          subtitle={`Supplier: ${editProductMapping.supplierName}`}
+          size="md"
+          footer={
+            <>
+              <button onClick={() => setEditProductMapping(null)} className="btn-secondary">Cancel</button>
+              <button
+                onClick={() => {
+                  setProductMappings(prev =>
+                    prev.map(p =>
+                      p.id === editProductMapping.id
+                        ? {
+                            ...p,
+                            masterSku: formData.field2.toUpperCase(),
+                            masterName: formData.field3 || 'Mapped Product Item',
+                            status: formData.field2 ? 'mapped' : 'unmapped',
+                            confidence: p.confidence || 95
+                          }
+                        : p
+                    )
+                  )
+                  setEditProductMapping(null)
+                  showNotification(`Product mapping saved for "${editProductMapping.supplierSku}"`)
+                }}
+                className="btn-primary flex items-center gap-1.5"
+              >
+                <Save size={14} /> Save Product Mapping
+              </button>
+            </>
+          }
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Supplier Product SKU (Raw)</label>
+              <input className="input font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" readOnly value={editProductMapping.supplierSku} />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Target Master SKU *</label>
+              <input
+                className="input font-mono font-semibold"
+                placeholder="e.g. MB-X570-001"
+                value={formData.field2}
+                onChange={e => setFormData({ ...formData, field2: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Master Product Name</label>
+              <input
+                className="input font-semibold"
+                placeholder="e.g. AMD X570 ATX Gaming Motherboard"
+                value={formData.field3 || ''}
+                onChange={e => setFormData({ ...formData, field3: e.target.value })}
               />
             </div>
           </div>
