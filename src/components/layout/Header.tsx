@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Bell, Search, ChevronDown, Menu, Sun, Moon, Zap, User, LogOut, Settings } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { getInitials } from '../../utils'
@@ -76,14 +77,25 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
               </div>
               <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-72 overflow-y-auto">
                 {notifications.map(n => (
-                  <div key={n.id} className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer">
+                  <Link
+                    key={n.id}
+                    to="/notifications"
+                    onClick={() => setShowNotifications(false)}
+                    className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer block text-left"
+                  >
                     <p className="text-sm text-slate-700 dark:text-slate-200">{n.message}</p>
                     <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{n.time}</p>
-                  </div>
+                  </Link>
                 ))}
               </div>
               <div className="px-4 py-2.5 border-t border-slate-100 dark:border-slate-800 text-center">
-                <button className="text-xs text-primary-600 dark:text-primary-400 font-medium hover:text-primary-700">View all notifications</button>
+                <Link
+                  to="/notifications"
+                  onClick={() => setShowNotifications(false)}
+                  className="text-xs text-primary-600 dark:text-primary-400 font-medium hover:text-primary-700 block w-full py-1"
+                >
+                  View all notifications
+                </Link>
               </div>
             </div>
           )}
