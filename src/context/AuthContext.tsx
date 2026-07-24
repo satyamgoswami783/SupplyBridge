@@ -40,9 +40,15 @@ const ROLE_PRESETS: { role: UserRole; label: string; email: string; desc: string
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [role, setRole] = useState<UserRole>('super_admin')
+  const [role, setRoleState] = useState<UserRole>(() => {
+    const savedRole = localStorage.getItem('supplybridge_role') as UserRole
+    return (savedRole && demoUsers[savedRole]) ? savedRole : 'super_admin'
+  })
+
   const [viewProfileUser, setViewProfileUser] = useState<User | null>(null)
-  const [isLoggedOut, setIsLoggedOut] = useState(false)
+  const [isLoggedOut, setIsLoggedOutState] = useState<boolean>(() => {
+    return localStorage.getItem('supplybridge_is_logged_out') === 'true'
+  })
 
   // Login form states
   const [email, setEmail] = useState('alex@supplybridge.io')
@@ -52,13 +58,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const currentUser = demoUsers[role]
 
+  const setRole = (newRole: UserRole) => {
+    localStorage.setItem('supplybridge_role', newRole)
+    setRoleState(newRole)
+  }
+
   const hasPermission = (module: string): boolean => {
     const perms = rolePermissions[role]
     return perms.includes('*') || perms.includes(module)
   }
 
   const logout = () => {
-    setIsLoggedOut(true)
+    localStorage.setItem('supplybridge_is_logged_out', 'true')
+    setIsLoggedOutState(true)
   }
 
   const openCurrentUserProfile = () => {
@@ -82,7 +94,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setTimeout(() => {
       setRole(matchedRole)
-      setIsLoggedOut(false)
+      localStorage.setItem('supplybridge_is_logged_out', 'false')
+      setIsLoggedOutState(false)
       setIsLoggingIn(false)
     }, 400)
   }
