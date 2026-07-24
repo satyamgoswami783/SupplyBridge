@@ -19,6 +19,7 @@ import { Badge } from '../../components/ui/Badge'
 import { mockDashboardMetrics, mockSyncChartData, mockProductsBySupplier, mockActivities } from '../../data/mockData'
 import { formatNumber } from '../../utils'
 import { useAuth } from '../../context/AuthContext'
+import { useSuppliers } from '../../context/SupplierContext'
 import type { UserRole } from '../../types'
 
 
@@ -70,6 +71,7 @@ export const Dashboard: React.FC = () => {
   ]
 
   const { role, currentUser } = useAuth()
+  const { suppliersList } = useSuppliers()
   const roleInfo = ROLE_DESCRIPTIONS[role] || ROLE_DESCRIPTIONS.integration_manager
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [lastUpdated, setLastUpdated] = useState('Updated just now')
@@ -507,12 +509,9 @@ export const Dashboard: React.FC = () => {
               onChange={e => setSelectedSupplier(e.target.value)}
               className="select w-full"
             >
-              <option>TechParts International</option>
-              <option>PrimeSupply Corp</option>
-              <option>AcmeDistributors</option>
-              <option>EastWest Imports</option>
-              <option>QuickShip LLC</option>
-              <option>NovaTech Supplies</option>
+              {suppliersList.map(s => (
+                <option key={s.id} value={s.name}>{s.name}</option>
+              ))}
             </select>
           </div>
 
