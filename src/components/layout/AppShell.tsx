@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
+import { UserProfileModal } from '../ui/UserProfileModal'
 
 export const AppShell: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -34,6 +35,9 @@ export const AppShell: React.FC = () => {
           </motion.div>
         </main>
       </div>
+
+      {/* Interactive Global User Profile Modal */}
+      <UserProfileModal />
     </div>
   )
 }

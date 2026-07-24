@@ -5,11 +5,10 @@ import {
   LayoutDashboard, Truck, Plug, Database, Package, Tag, Award,
   Layers, ArrowLeftRight, ShieldCheck, RefreshCw, DollarSign,
   Image, Store, Globe, Briefcase, Download, FileText, Activity,
-  BarChart3, Users, UserCog, Lock, Settings, ChevronDown,
-  ChevronRight, Zap, X, Menu
+  BarChart3, Users, UserCog, Lock, Settings, ChevronRight, Zap, X, LogOut, User
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { cn } from '../../utils'
+import { cn, getInitials } from '../../utils'
 
 interface NavItem {
   id: string
@@ -123,7 +122,7 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
-  const { hasPermission } = useAuth()
+  const { hasPermission, currentUser, logout, openCurrentUserProfile } = useAuth()
 
   const visibleItems = NAV_ITEMS.filter(item => {
     if (item.module && !hasPermission(item.module)) return false
@@ -169,13 +168,56 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             </NavLink>
           )
         })}
+
+        {/* Profile & Logout Section at the end of sidebar menu */}
+        <div className="pt-3 mt-3 border-t border-slate-800/80 space-y-1">
+          <button
+            onClick={() => { onClose(); openCurrentUserProfile(); }}
+            className="sidebar-item w-full text-slate-300 hover:bg-slate-800 hover:text-white"
+          >
+            <User size={18} className="opacity-70" />
+            <span>My Profile</span>
+          </button>
+
+          <button
+            onClick={() => { onClose(); logout(); }}
+            className="sidebar-item w-full text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 font-semibold"
+          >
+            <LogOut size={18} className="text-rose-400 opacity-90" />
+            <span>Logout</span>
+          </button>
+        </div>
       </nav>
 
-      {/* Footer */}
-      <div className="px-3 py-3 border-t border-slate-800">
-        <div className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-slate-800 cursor-pointer transition-colors">
+      {/* User Profile Footer Card */}
+      <div className="p-3 border-t border-slate-800 bg-slate-900/90 space-y-2">
+        <div
+          onClick={openCurrentUserProfile}
+          className="flex items-center gap-3 p-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 transition-colors cursor-pointer group"
+          title="Click to view profile"
+        >
+          <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center text-xs font-bold text-white shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform">
+            {getInitials(currentUser.name)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-white truncate group-hover:text-primary-300 transition-colors">{currentUser.name}</p>
+            <p className="text-2xs text-slate-400 truncate capitalize">{currentUser.role.replace('_', ' ')}</p>
+          </div>
+          <User size={14} className="text-slate-400 group-hover:text-white transition-colors" />
+        </div>
+
+        {/* Direct Logout Button in Sidebar Footer */}
+        <button
+          onClick={logout}
+          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold border border-rose-500/20 transition-all duration-200"
+        >
+          <LogOut size={14} />
+          Logout
+        </button>
+
+        <div className="flex items-center gap-2 px-2 pt-1">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-slow" />
-          <span className="text-xs text-slate-500">All Systems Operational</span>
+          <span className="text-2xs text-slate-500">All Systems Operational</span>
         </div>
       </div>
     </div>
