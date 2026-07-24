@@ -276,8 +276,8 @@ export const ValidationCenter: React.FC = () => {
               className="card p-5 hover:shadow-card-md transition-all cursor-pointer"
               onClick={() => handleOpenReview(item)}
             >
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <div className="flex items-start gap-3 w-full">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3 w-full flex-1 min-w-0">
                   <input
                     type="checkbox"
                     className="rounded border-slate-300 mt-1 flex-shrink-0"

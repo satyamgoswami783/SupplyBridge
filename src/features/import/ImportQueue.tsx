@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Download, CheckCircle2, XCircle, RefreshCw, RotateCcw, AlertCircle, FileSpreadsheet, Clock, ArrowDownCircle, UploadCloud, Eye, FileCode, Play } from 'lucide-react'
+import { Download, CheckCircle2, XCircle, RefreshCw, RotateCcw, AlertCircle, FileSpreadsheet, Clock, ArrowDownCircle, UploadCloud, Eye, Zap, Layers } from 'lucide-react'
 import { SectionHeader, FilterBar, Tabs, ProgressBar, EmptyState } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
@@ -42,7 +42,7 @@ export const ImportQueue: React.FC = () => {
 
   const showNotification = (msg: string) => {
     setToastMessage(msg)
-    setTimeout(() => setToastMessage(null), 3000)
+    setTimeout(() => setToastMessage(null), 3500)
   }
 
   const handleFileDrop = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,6 +110,24 @@ export const ImportQueue: React.FC = () => {
     }, 2000)
   }
 
+  const handleRetryAllFailed = () => {
+    showNotification('Re-queueing all failed feed imports...')
+    setTimeout(() => {
+      setImportsList(prev =>
+        prev.map(item =>
+          item.status === 'failed'
+            ? { ...item, status: 'completed', processedRecords: item.totalRecords, failedRecords: 0, errorMessage: undefined }
+            : item
+        )
+      )
+      showNotification('All failed feed imports ingested successfully!')
+    }, 1800)
+  }
+
+  const handleSetHighPriority = (id: string, sName: string) => {
+    showNotification(`Prioritized feed import batch for ${sName} to top of queue!`)
+  }
+
   const handleCancel = (id: string, sName: string) => {
     setImportsList(prev =>
       prev.map(item =>
@@ -159,8 +177,10 @@ export const ImportQueue: React.FC = () => {
     return matchTab && matchSearch
   })
 
+  const failedCount = importsList.filter(i => i.status === 'failed').length
+
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-7 sm:space-y-8">
       {/* Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
@@ -180,7 +200,7 @@ export const ImportQueue: React.FC = () => {
         title="Import Queue & Supplier Feed Ingestion"
         subtitle="Upload supplier catalog feeds (CSV, XML, Excel) and track background ingestion queues in real-time"
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={handleExportQueueCSV}
               className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
@@ -188,9 +208,18 @@ export const ImportQueue: React.FC = () => {
             >
               <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" /> Export Queue
             </button>
+            {failedCount > 0 && (
+              <button
+                onClick={handleRetryAllFailed}
+                className="btn-secondary btn-sm text-rose-600 hover:bg-rose-50 border-rose-200 flex items-center gap-1.5 font-bold cursor-pointer"
+                title="Retry all failed imports"
+              >
+                <RotateCcw size={14} /> Retry Failed ({failedCount})
+              </button>
+            )}
             <button
               onClick={() => setUploadModalOpen(true)}
-              className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20"
+              className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer"
             >
               <UploadCloud size={14} /> Upload Supplier Feed
             </button>
@@ -198,32 +227,34 @@ export const ImportQueue: React.FC = () => {
         }
       />
 
-      {/* KPI Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      {/* KPI Summary Cards — High Resolution & Responsive Layout */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
         {[
-          { label: 'Total Ingestion SKUs', value: importsList.reduce((s, q) => s + q.totalRecords, 0).toLocaleString(), color: 'text-slate-900 dark:text-slate-100', icon: <ArrowDownCircle size={18} className="text-slate-700 dark:text-slate-300" /> },
-          { label: 'Currently Processing',  value: importsList.filter(q => q.status === 'processing').length, color: 'text-cyan-600 dark:text-cyan-400', icon: <RefreshCw size={18} className="animate-spin text-cyan-600" /> },
-          { label: 'Pending Queue',     value: importsList.filter(q => q.status === 'pending').length, color: 'text-amber-600 dark:text-amber-400', icon: <Clock size={18} className="text-amber-600" /> },
-          { label: 'Failed Ingestions', value: importsList.filter(q => q.status === 'failed').length, color: 'text-rose-600 dark:text-rose-400', icon: <XCircle size={18} className="text-rose-600" /> },
-        ].map(s => (
-          <div key={s.label} className="card p-4 flex items-center gap-3.5">
-            <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800">
-              {s.icon}
-            </div>
+          { label: 'TOTAL INGESTION SKUS', value: importsList.reduce((s, q) => s + q.totalRecords, 0).toLocaleString(), color: 'text-slate-900 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800', icon: <ArrowDownCircle size={20} className="text-slate-700 dark:text-slate-300" /> },
+          { label: 'CURRENTLY PROCESSING', value: importsList.filter(q => q.status === 'processing').length, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200/80 dark:border-cyan-900/50', icon: <RefreshCw size={20} className="animate-spin text-cyan-600" /> },
+          { label: 'PENDING QUEUE',         value: importsList.filter(q => q.status === 'pending').length,    color: 'text-amber-600 dark:text-amber-400',  bg: 'bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50',  icon: <Clock size={20} className="text-amber-600" /> },
+          { label: 'FAILED INGESTIONS',     value: importsList.filter(q => q.status === 'failed').length,     color: 'text-rose-600 dark:text-rose-400',   bg: 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50',   icon: <XCircle size={20} className="text-rose-600" /> },
+        ].map((s, i) => (
+          <div key={i} className={`p-5 rounded-2xl shadow-xs min-h-[115px] flex items-center justify-between border transition-all duration-200 ${s.bg}`}>
             <div>
-              <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-              <p className="text-xs text-slate-400 font-semibold mt-0.5">{s.label}</p>
+              <p className="text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-1">{s.label}</p>
+              <p className={`text-2xl lg:text-3xl font-black ${s.color}`}>{s.value}</p>
+            </div>
+            <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-xs border border-slate-100 dark:border-slate-700">
+              {s.icon}
             </div>
           </div>
         ))}
       </div>
 
-      <Tabs tabs={tabs} active={tab} onChange={setTab} />
-      <FilterBar search={search} onSearch={setSearch} placeholder="Search supplier feeds by name or format..." />
-
       <div className="space-y-4">
+        <Tabs tabs={tabs} active={tab} onChange={setTab} />
+        <FilterBar search={search} onSearch={setSearch} placeholder="Search supplier feeds by name or format..." />
+      </div>
+
+      <div className="space-y-5 lg:space-y-6">
         {filtered.length === 0 && (
-          <div className="card p-12 text-center text-slate-400">
+          <div className="card p-12 text-center text-slate-400 border border-slate-200/90 dark:border-slate-800">
             <EmptyState
               icon={<Download size={28} className="text-slate-300" />}
               title="No import jobs found"
@@ -232,7 +263,7 @@ export const ImportQueue: React.FC = () => {
           </div>
         )}
         {filtered.map(item => (
-          <div key={item.id} className="card p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+          <div key={item.id} className="card p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all border border-slate-200/90 dark:border-slate-800">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3.5 flex-1 min-w-0">
                 <div
@@ -248,6 +279,7 @@ export const ImportQueue: React.FC = () => {
                 >
                   <Download size={18} />
                 </div>
+
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     <p className="font-bold text-slate-800 dark:text-slate-100 text-sm">{item.supplierName}</p>
@@ -294,11 +326,20 @@ export const ImportQueue: React.FC = () => {
               <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
                 <button
                   onClick={() => setPreviewItem(item)}
-                  className="btn-ghost btn-sm font-bold flex items-center gap-1 text-primary-600 dark:text-primary-400"
+                  className="btn-ghost btn-sm font-bold flex items-center gap-1 text-primary-600 dark:text-primary-400 cursor-pointer"
                   title="Preview Imported Sample Records Data"
                 >
                   <Eye size={14} /> Preview Data
                 </button>
+                {item.status === 'pending' && (
+                  <button
+                    onClick={() => handleSetHighPriority(item.id, item.supplierName)}
+                    className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer text-amber-600 hover:bg-amber-50"
+                    title="Set High Priority Queue"
+                  >
+                    <Zap size={13} /> High Priority
+                  </button>
+                )}
                 {item.status === 'failed' && (
                   <button
                     onClick={() => handleRetry(item.id, item.supplierName)}
@@ -310,7 +351,7 @@ export const ImportQueue: React.FC = () => {
                 {item.status === 'processing' && (
                   <button
                     onClick={() => handleCancel(item.id, item.supplierName)}
-                    className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50 flex items-center gap-1.5 font-bold cursor-pointer"
+                    className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1.5 font-bold cursor-pointer"
                   >
                     <XCircle size={13} /> Cancel
                   </button>
