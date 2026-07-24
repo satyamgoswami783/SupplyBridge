@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Globe, RefreshCw, ExternalLink, CheckCircle2, XCircle, AlertTriangle, Plus, Edit2, Trash2 } from 'lucide-react'
 import { SectionHeader, HealthIndicator, ProgressBar, ConfirmDialog } from '../../components/ui'
@@ -9,6 +10,8 @@ import { statusToVariant, timeAgo } from '../../utils'
 import type { Store } from '../../types'
 
 export const StoreManagement: React.FC = () => {
+  const navigate = useNavigate()
+
   const [storesList, setStoresList] = useState<Store[]>(mockStores)
   const [selectedStore, setSelectedStore] = useState<Store | null>(null)
   const [addOpen, setAddOpen] = useState(false)
@@ -55,15 +58,11 @@ export const StoreManagement: React.FC = () => {
     }, 1500)
   }
 
+  // Route to Website Sync status page inside app cleanly without broken external DNS error
   const handleOpenStoreWebsite = (store: Store, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (store.url.includes('supplybridge.io') || store.url.includes('3dcart.com')) {
-      // Demo URL handling — open internal Store Details Drawer / Modal instead of broken link
-      setSelectedStore(store)
-      showNotification(`Viewing details for ${store.name} (${store.url})`)
-    } else {
-      window.open(store.url.startsWith('http') ? store.url : `https://${store.url}`, '_blank')
-    }
+    navigate('/sync/website')
+    showNotification(`Navigated to Website Sync status for ${store.name}`)
   }
 
   const handleOpenAdd = () => {
@@ -147,7 +146,7 @@ export const StoreManagement: React.FC = () => {
   }
 
   return (
-    <div className="relative">
+    <div className="relative space-y-6">
       {/* Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
@@ -167,36 +166,36 @@ export const StoreManagement: React.FC = () => {
         title="Store Management"
         subtitle="Manage Shift4Shop websites and multi-store catalog synchronization status"
         actions={
-          <button onClick={handleOpenAdd} className="btn-primary btn-sm flex items-center gap-1.5">
+          <button onClick={handleOpenAdd} className="btn-primary btn-sm flex items-center gap-1.5 cursor-pointer">
             <Plus size={14} /> Add Store Connection
           </button>
         }
       />
 
       {/* Summary KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label: 'Total Stores', value: storesList.length, color: 'text-slate-800' },
           { label: 'Active Stores', value: storesList.filter(s => s.status === 'active').length, color: 'text-emerald-600' },
           { label: 'Synced Stores', value: storesList.filter(s => s.syncStatus === 'synced').length, color: 'text-primary-600' },
           { label: 'Sync Issues', value: storesList.filter(s => s.status === 'error' || s.syncStatus === 'failed').length, color: 'text-rose-600' },
         ].map(s => (
-          <div key={s.label} className="card px-4 py-3 text-center">
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
+          <div key={s.label} className="card px-4 py-3.5 text-center">
+            <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+            <p className="text-xs text-slate-400 font-semibold mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
 
       {/* Store Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
         {storesList.map(store => {
           const isSyncingThis = syncingStoreId === store.id || store.syncStatus === 'syncing'
 
           return (
             <div
               key={store.id}
-              className="card p-5 hover:shadow-card-md transition-all flex flex-col justify-between"
+              className="card p-5 hover:shadow-card-md transition-all flex flex-col justify-between border border-slate-200"
             >
               <div>
                 <div className="flex items-start justify-between mb-4">
@@ -225,10 +224,10 @@ export const StoreManagement: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <p className="font-bold text-slate-800 text-sm hover:text-primary-600 transition-colors">
+                      <p className="font-bold text-slate-900 text-sm hover:text-primary-600 transition-colors">
                         {store.name}
                       </p>
-                      <p className="text-xs text-slate-400">{store.platform}</p>
+                      <p className="text-xs text-slate-400 font-medium">{store.platform}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -253,18 +252,18 @@ export const StoreManagement: React.FC = () => {
                 </div>
 
                 <div
-                  className="space-y-2 text-sm bg-slate-50 p-3 rounded-xl border border-slate-100 cursor-pointer"
+                  className="space-y-2 text-sm bg-slate-50/80 p-3 rounded-xl border border-slate-100 cursor-pointer"
                   onClick={() => setSelectedStore(store)}
                 >
                   <div className="flex justify-between text-slate-600 text-xs">
                     <span>Assigned Products</span>
-                    <span className="font-semibold text-slate-800">
+                    <span className="font-bold text-slate-900">
                       {store.productCount.toLocaleString()} SKUs
                     </span>
                   </div>
                   <div className="flex justify-between text-slate-600 text-xs">
                     <span>Store Region</span>
-                    <span className="text-slate-700 font-medium">{store.region || '—'}</span>
+                    <span className="text-slate-700 font-semibold">{store.region || '—'}</span>
                   </div>
                   <div className="flex justify-between text-slate-600 text-xs">
                     <span>Last Sync Date</span>
@@ -279,7 +278,7 @@ export const StoreManagement: React.FC = () => {
               <div className="flex gap-2 mt-4 pt-4 border-t border-slate-100">
                 <button
                   disabled={isSyncingThis}
-                  className="btn-primary btn-sm flex-1 flex items-center justify-center gap-1.5"
+                  className="btn-primary btn-sm flex-1 flex items-center justify-center gap-1.5 cursor-pointer font-bold"
                   onClick={e => {
                     e.stopPropagation()
                     handleSyncStore(store.id, store.name)
@@ -290,8 +289,8 @@ export const StoreManagement: React.FC = () => {
                 </button>
                 <button
                   onClick={e => handleOpenStoreWebsite(store, e)}
-                  className="btn-secondary btn-sm flex items-center justify-center"
-                  title={`View website details: ${store.url}`}
+                  className="btn-secondary btn-sm flex items-center justify-center cursor-pointer"
+                  title="View Website Sync Status"
                 >
                   <ExternalLink size={14} />
                 </button>
@@ -314,7 +313,7 @@ export const StoreManagement: React.FC = () => {
               <button onClick={() => setSelectedStore(null)} className="btn-secondary">Close</button>
               <button
                 onClick={() => handleSyncStore(selectedStore.id, selectedStore.name)}
-                className="btn-primary flex items-center gap-1.5"
+                className="btn-primary flex items-center gap-1.5 cursor-pointer"
               >
                 <RefreshCw size={14} /> Sync Catalog Now
               </button>
@@ -332,20 +331,20 @@ export const StoreManagement: React.FC = () => {
                 { label: 'Last Sync', value: selectedStore.lastSync ? timeAgo(selectedStore.lastSync) : 'Never' },
               ].map(item => (
                 <div key={item.label} className="bg-slate-50 rounded-xl p-3">
-                  <p className="text-xs text-slate-400 mb-1 font-medium">{item.label}</p>
-                  <div className="text-sm font-semibold text-slate-800">{item.value}</div>
+                  <p className="text-xs text-slate-400 mb-1 font-semibold">{item.label}</p>
+                  <div className="text-sm font-bold text-slate-800">{item.value}</div>
                 </div>
               ))}
             </div>
 
             <div>
-              <p className="text-xs font-semibold text-slate-600 mb-2">Store Endpoint URL</p>
+              <p className="text-xs font-bold text-slate-700 mb-2">Store Endpoint URL</p>
               <div className="flex items-center gap-2 p-3 bg-slate-100 rounded-xl font-mono text-xs">
                 <code className="text-slate-700 flex-1">{selectedStore.url}</code>
                 <button
                   onClick={e => handleOpenStoreWebsite(selectedStore, e)}
                   className="btn-icon"
-                  title="View Store"
+                  title="View Sync Status"
                 >
                   <ExternalLink size={14} />
                 </button>
@@ -370,7 +369,7 @@ export const StoreManagement: React.FC = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Store Name *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Store Name *</label>
             <input
               className="input"
               placeholder="e.g. SupplyBridge EU Store"
@@ -379,7 +378,7 @@ export const StoreManagement: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Store URL *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Store URL *</label>
             <input
               className="input"
               placeholder="https://yourstore.3dcart.com"
@@ -388,9 +387,9 @@ export const StoreManagement: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Platform</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Platform</label>
             <select
-              className="select"
+              className="select font-medium"
               value={formData.platform}
               onChange={e => setFormData({ ...formData, platform: e.target.value })}
             >
@@ -399,9 +398,9 @@ export const StoreManagement: React.FC = () => {
             </select>
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Region</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Region</label>
             <select
-              className="select"
+              className="select font-medium"
               value={formData.region}
               onChange={e => setFormData({ ...formData, region: e.target.value })}
             >
@@ -411,7 +410,7 @@ export const StoreManagement: React.FC = () => {
             </select>
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">REST API Key *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">REST API Key *</label>
             <input
               className="input font-mono text-xs"
               type="password"
@@ -438,7 +437,7 @@ export const StoreManagement: React.FC = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Store Name *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Store Name *</label>
             <input
               className="input"
               value={formData.name}
@@ -446,7 +445,7 @@ export const StoreManagement: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Store URL *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Store URL *</label>
             <input
               className="input"
               value={formData.url}
@@ -454,9 +453,9 @@ export const StoreManagement: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Region</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Region</label>
             <select
-              className="select"
+              className="select font-medium"
               value={formData.region}
               onChange={e => setFormData({ ...formData, region: e.target.value })}
             >

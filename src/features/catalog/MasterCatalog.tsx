@@ -18,7 +18,11 @@ import {
   Tag,
   DollarSign,
   Boxes,
-  Check
+  Check,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  SlidersHorizontal
 } from 'lucide-react'
 import { Badge } from '../../components/ui/Badge'
 import { SectionHeader, FilterBar, Tabs, ConfirmDialog } from '../../components/ui'
@@ -75,69 +79,66 @@ export const MasterCatalog: React.FC = () => {
   }
 
   // --- Filtering ---
-  const filtered = productsList.filter(p => {
-    const matchSearch =
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.sku.toLowerCase().includes(search.toLowerCase()) ||
-      (p.brand && p.brand.toLowerCase().includes(search.toLowerCase()))
+  const filteredProducts = productsList.filter(product => {
+    // Search filter
+    const matchesSearch =
+      product.name.toLowerCase().includes(search.toLowerCase()) ||
+      product.sku.toLowerCase().includes(search.toLowerCase()) ||
+      (product.brand && product.brand.toLowerCase().includes(search.toLowerCase()))
 
-    const matchTab =
-      tab === 'all'
-        ? true
-        : tab === 'published'
-        ? p.status === 'published'
-        : tab === 'validation_required'
-        ? p.validationStatus === 'failed' || p.status === 'validation_required'
-        : tab === 'draft'
-        ? p.status === 'draft'
-        : tab === 'failed'
-        ? p.status === 'failed' || p.validationStatus === 'failed'
-        : true
+    // Tab filter
+    let matchesTab = true
+    if (tab === 'published') matchesTab = product.status === 'published'
+    if (tab === 'needs_validation') matchesTab = product.validationStatus === 'failed'
+    if (tab === 'draft') matchesTab = product.status === 'draft'
+    if (tab === 'failed') matchesTab = product.status === 'failed'
 
-    const matchStatus = statusFilter === 'all' || p.status === statusFilter
-    const matchSupplier =
-      supplierFilter === 'all' || p.supplierId === supplierFilter
+    // Dropdown Status Filter
+    let matchesStatus = true
+    if (statusFilter !== 'all') {
+      matchesStatus = product.status === statusFilter
+    }
 
-    return matchSearch && matchTab && matchStatus && matchSupplier
+    // Dropdown Supplier Filter
+    let matchesSupplier = true
+    if (supplierFilter !== 'all') {
+      if (supplierFilter === 's1') matchesSupplier = product.supplierName.includes('TechParts')
+      if (supplierFilter === 's2') matchesSupplier = product.supplierName.includes('GlobalSource')
+      if (supplierFilter === 's3') matchesSupplier = product.supplierName.includes('PrimeSup')
+    }
+
+    return matchesSearch && matchesTab && matchesStatus && matchesSupplier
   })
 
-  // Dynamic Tabs Count
-  const tabs = [
-    { id: 'all', label: 'All Products', count: productsList.length },
-    { id: 'published', label: 'Published', count: productsList.filter(p => p.status === 'published').length },
-    { id: 'validation_required', label: 'Needs Validation', count: productsList.filter(p => p.validationStatus === 'failed').length },
-    { id: 'draft', label: 'Draft', count: productsList.filter(p => p.status === 'draft').length },
-    { id: 'failed', label: 'Failed', count: productsList.filter(p => p.status === 'failed').length },
-  ]
-
-  // Pagination calculations
-  const totalPages = Math.ceil(filtered.length / pageSize) || 1
-  const paginatedProducts = filtered.slice(
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1
+  const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   )
 
-  // --- Selection Handlers ---
+  // --- Multi-select Handlers ---
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIds(paginatedProducts.map(p => p.id))
+      const pageIds = paginatedProducts.map(p => p.id)
+      setSelectedIds(Array.from(new Set([...selectedIds, ...pageIds])))
     } else {
-      setSelectedIds([])
+      const pageIds = paginatedProducts.map(p => p.id)
+      setSelectedIds(selectedIds.filter(id => !pageIds.includes(id)))
     }
   }
 
   const handleSelectOne = (id: string) => {
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    )
+    if (selectedIds.includes(id)) {
+      setSelectedIds(selectedIds.filter(i => i !== id))
+    } else {
+      setSelectedIds([...selectedIds, id])
+    }
   }
 
-  // --- Bulk Handlers ---
+  // --- Bulk Actions ---
   const handleBulkPublish = () => {
-    if (selectedIds.length === 0) {
-      alert('Please select at least one product.')
-      return
-    }
+    if (selectedIds.length === 0) return
     setProductsList(prev =>
       prev.map(p =>
         selectedIds.includes(p.id)
@@ -150,26 +151,18 @@ export const MasterCatalog: React.FC = () => {
   }
 
   const handleBulkValidate = () => {
-    if (selectedIds.length === 0) {
-      alert('Please select at least one product.')
-      return
-    }
+    if (selectedIds.length === 0) return
     setProductsList(prev =>
       prev.map(p =>
-        selectedIds.includes(p.id)
-          ? { ...p, validationStatus: 'passed' }
-          : p
+        selectedIds.includes(p.id) ? { ...p, validationStatus: 'passed' } : p
       )
     )
-    showNotification(`Validation passed for ${selectedIds.length} products!`)
+    showNotification(`${selectedIds.length} products validated cleanly!`)
     setSelectedIds([])
   }
 
   const handleBulkDelete = () => {
-    if (selectedIds.length === 0) {
-      alert('Please select at least one product.')
-      return
-    }
+    if (selectedIds.length === 0) return
     setDeleteConfirmOpen(true)
   }
 
@@ -180,23 +173,28 @@ export const MasterCatalog: React.FC = () => {
     setDeleteConfirmOpen(false)
   }
 
-  // --- Create Product Handler ---
+  // --- Single Actions ---
+  const handleSingleDelete = (id: string, name: string) => {
+    setProductsList(prev => prev.filter(p => p.id !== id))
+    showNotification(`Product "${name}" deleted.`)
+  }
+
+  // --- Create Product ---
   const handleCreateProduct = () => {
     if (!newProduct.name.trim() || !newProduct.sku.trim()) {
-      alert('Please enter Product Name and SKU.')
+      alert('Please fill out Name and SKU.')
       return
     }
 
     const created: Product = {
       id: `p_${Date.now()}`,
-      sku: newProduct.sku.toUpperCase(),
+      masterId: `MSTR-${newProduct.sku.toUpperCase()}`,
       masterSku: newProduct.sku.toUpperCase(),
       supplierSku: newProduct.sku.toUpperCase(),
+      sku: newProduct.sku.toUpperCase(),
       name: newProduct.name,
-      description: 'Master Catalog Product',
       brand: newProduct.brand || 'Generic',
-      categoryId: 'cat1',
-      categoryName: newProduct.categoryName || 'General Hardware',
+      categoryName: newProduct.categoryName || 'General',
       supplierId: 's1',
       supplierName: newProduct.supplierName,
       pricing: {
@@ -325,9 +323,36 @@ export const MasterCatalog: React.FC = () => {
 
   const newSupplierVal = (val: string, fallback: string) => (val.trim() ? val : fallback)
 
+  const handleExportCatalogCSV = () => {
+    showNotification('Generating Master Catalog CSV export...')
+    const csvHeaders = 'SKU,Product Name,Supplier,Category,Brand,Retail Price,Cost Price,Stock,Status,Validation\n'
+    const csvRows = productsList.map(p =>
+      `"${p.sku}","${p.name.replace(/"/g, '""')}","${p.supplierName}","${p.categoryName || ''}","${p.brand || ''}",${p.pricing.retailPrice},${p.pricing.costPrice},${p.inventory.availableStock},"${p.status}","${p.validationStatus}"`
+    ).join('\n')
+    const csvContent = csvHeaders + csvRows
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `SupplyBridge_Master_Catalog_${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    showNotification('Master Catalog CSV file downloaded!')
+  }
+
+  const tabs = [
+    { id: 'all', label: 'All Products', count: productsList.length },
+    { id: 'published', label: 'Published', count: productsList.filter(p => p.status === 'published').length },
+    { id: 'needs_validation', label: 'Needs Validation', count: productsList.filter(p => p.validationStatus === 'failed').length },
+    { id: 'draft', label: 'Draft', count: productsList.filter(p => p.status === 'draft').length },
+    { id: 'failed', label: 'Failed', count: productsList.filter(p => p.status === 'failed').length },
+  ]
+
   return (
-    <div className="relative">
-      {/* Toast Notification */}
+    <div className="relative space-y-6">
+      {/* Toast Notification Banner */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
@@ -347,6 +372,13 @@ export const MasterCatalog: React.FC = () => {
         subtitle="Single source of truth for all product data across suppliers and stores"
         actions={
           <>
+            <button
+              onClick={handleExportCatalogCSV}
+              className="btn-secondary btn-sm flex items-center gap-1.5 cursor-pointer"
+              title="Download Catalog CSV File"
+            >
+              <Download size={14} className="text-emerald-600" /> Export CSV
+            </button>
             <button
               onClick={() => {
                 setSearch('')
@@ -371,18 +403,18 @@ export const MasterCatalog: React.FC = () => {
       />
 
       {/* Summary KPI Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
         {[
-          { label: 'Total', value: productsList.length.toLocaleString(), color: 'text-slate-800' },
+          { label: 'Total Products', value: productsList.length.toLocaleString(), color: 'text-slate-800' },
           { label: 'Published', value: productsList.filter(p => p.status === 'published').length.toLocaleString(), color: 'text-emerald-600' },
           { label: 'Needs Validation', value: productsList.filter(p => p.validationStatus === 'failed').length.toLocaleString(), color: 'text-amber-600' },
-          { label: 'Failed', value: productsList.filter(p => p.status === 'failed').length.toLocaleString(), color: 'text-rose-600' },
+          { label: 'Failed Sync', value: productsList.filter(p => p.status === 'failed').length.toLocaleString(), color: 'text-rose-600' },
           { label: 'Suppliers', value: '27', color: 'text-primary-600' },
-          { label: 'Stores', value: '7', color: 'text-violet-600' },
+          { label: 'Connected Stores', value: '7', color: 'text-violet-600' },
         ].map(s => (
-          <div key={s.label} className="card px-4 py-3 text-center">
-            <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
+          <div key={s.label} className="card p-3.5 text-center">
+            <p className={`text-xl font-black ${s.color}`}>{s.value}</p>
+            <p className="text-xs text-slate-400 font-semibold mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
@@ -391,7 +423,7 @@ export const MasterCatalog: React.FC = () => {
 
       <FilterBar search={search} onSearch={v => { setSearch(v); setCurrentPage(1); }} placeholder="Search by product name, SKU, or brand...">
         <select
-          className="select input-sm w-auto min-w-[130px]"
+          className="select input-sm w-auto min-w-[140px] font-medium"
           value={supplierFilter}
           onChange={e => { setSupplierFilter(e.target.value); setCurrentPage(1); }}
         >
@@ -401,7 +433,7 @@ export const MasterCatalog: React.FC = () => {
           <option value="s3">PrimeSupply Corp</option>
         </select>
         <select
-          className="select input-sm w-auto min-w-[120px]"
+          className="select input-sm w-auto min-w-[130px] font-medium"
           value={statusFilter}
           onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }}
         >
@@ -413,51 +445,60 @@ export const MasterCatalog: React.FC = () => {
         </select>
       </FilterBar>
 
-      {/* Bulk Actions Toolbar */}
-      <div className="flex items-center gap-2 mb-4 p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-        <input
-          type="checkbox"
-          className="rounded border-slate-300 text-primary-600 focus:ring-primary-500"
-          checked={
-            paginatedProducts.length > 0 &&
-            paginatedProducts.every(p => selectedIds.includes(p.id))
-          }
-          onChange={e => handleSelectAll(e.target.checked)}
-        />
-        <span className="text-xs font-semibold text-slate-700">
-          Select Page ({selectedIds.length} selected)
-        </span>
-        <div className="h-4 w-px bg-slate-300 mx-1" />
-        <button
-          onClick={handleBulkPublish}
-          className="btn-ghost btn-sm text-emerald-700 hover:bg-emerald-50 font-semibold"
-        >
-          Bulk Publish
-        </button>
-        <button
-          onClick={handleBulkValidate}
-          className="btn-ghost btn-sm text-amber-700 hover:bg-amber-50 font-semibold"
-        >
-          Bulk Validate
-        </button>
-        <button
-          onClick={handleBulkDelete}
-          className="btn-ghost btn-sm text-rose-700 hover:bg-rose-50 font-semibold"
-        >
-          Bulk Delete
-        </button>
-      </div>
+      {/* Bulk Actions Toolbar — Display cleanly when items selected */}
+      <AnimatePresence>
+        {selectedIds.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="flex items-center gap-2 p-3 bg-primary-50/80 border border-primary-200 rounded-xl shadow-sm overflow-hidden"
+          >
+            <input
+              type="checkbox"
+              className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+              checked={
+                paginatedProducts.length > 0 &&
+                paginatedProducts.every(p => selectedIds.includes(p.id))
+              }
+              onChange={e => handleSelectAll(e.target.checked)}
+            />
+            <span className="text-xs font-bold text-primary-900">
+              {selectedIds.length} item{selectedIds.length > 1 ? 's' : ''} selected
+            </span>
+            <div className="h-4 w-px bg-primary-200 mx-1" />
+            <button
+              onClick={handleBulkPublish}
+              className="btn-secondary btn-sm bg-white text-emerald-700 hover:bg-emerald-50 border-emerald-200 font-semibold"
+            >
+              Bulk Publish
+            </button>
+            <button
+              onClick={handleBulkValidate}
+              className="btn-secondary btn-sm bg-white text-amber-700 hover:bg-amber-50 border-amber-200 font-semibold"
+            >
+              Bulk Validate
+            </button>
+            <button
+              onClick={handleBulkDelete}
+              className="btn-secondary btn-sm bg-white text-rose-700 hover:bg-rose-50 border-rose-200 font-semibold"
+            >
+              Bulk Delete
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Product Table */}
-      <div className="card overflow-hidden">
+      <div className="card overflow-hidden border border-slate-200 shadow-card">
         <div className="table-container">
           <table className="table">
             <thead>
               <tr>
-                <th className="w-8">
+                <th className="w-10 text-center">
                   <input
                     type="checkbox"
-                    className="rounded border-slate-300"
+                    className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
                     checked={
                       paginatedProducts.length > 0 &&
                       paginatedProducts.every(p => selectedIds.includes(p.id))
@@ -465,6 +506,7 @@ export const MasterCatalog: React.FC = () => {
                     onChange={e => handleSelectAll(e.target.checked)}
                   />
                 </th>
+
                 <th>Product</th>
                 <th>SKU</th>
                 <th>Supplier</th>
@@ -477,10 +519,10 @@ export const MasterCatalog: React.FC = () => {
                 <th className="text-center">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100">
               {paginatedProducts.length === 0 && (
                 <tr>
-                  <td colSpan={11} className="text-center py-16 text-slate-400">
+                  <td colSpan={11} className="text-center py-16 text-slate-400 font-medium">
                     No products found matching your filter criteria.
                   </td>
                 </tr>
@@ -492,21 +534,21 @@ export const MasterCatalog: React.FC = () => {
                   <tr
                     key={product.id}
                     className={`cursor-pointer transition-colors ${
-                      isSelected ? 'bg-primary-50/40' : 'hover:bg-slate-50'
+                      isSelected ? 'bg-primary-50/50' : 'hover:bg-slate-50/80'
                     }`}
                     onClick={() => setViewProduct(product)}
                   >
-                    <td onClick={e => e.stopPropagation()}>
+                    <td className="text-center" onClick={e => e.stopPropagation()}>
                       <input
                         type="checkbox"
-                        className="rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+                        className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
                         checked={isSelected}
                         onChange={() => handleSelectOne(product.id)}
                       />
                     </td>
                     <td>
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0 border border-slate-200 overflow-hidden">
+                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0 border border-slate-200 overflow-hidden shadow-2xs">
                           {product.images.length > 0 ? (
                             <img
                               src={product.images[0].url}
@@ -514,39 +556,43 @@ export const MasterCatalog: React.FC = () => {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <Package size={16} className="text-slate-400" />
+                            <Package size={18} className="text-slate-400" />
                           )}
                         </div>
-                        <div>
-                          <p className="font-semibold text-slate-800 text-sm max-w-[200px] truncate">
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-900 text-sm max-w-[220px] truncate leading-snug">
                             {product.name}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-slate-400 font-medium mt-0.5">
                             {product.brand || '—'}
                           </p>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <code className="mono text-xs">{product.sku}</code>
+                      <code className="mono text-xs font-semibold px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-lg text-slate-800 whitespace-nowrap inline-block tracking-tight">
+                        {product.sku}
+                      </code>
                     </td>
                     <td>
-                      <span className="text-xs text-slate-600">
+                      <span className="text-xs text-slate-700 font-medium whitespace-nowrap">
                         {product.supplierName}
                       </span>
                     </td>
                     <td>
-                      <span className="text-xs text-slate-600">
+                      <span className="text-xs text-slate-600 font-medium whitespace-nowrap">
                         {product.categoryName || '—'}
                       </span>
                     </td>
                     <td>
-                      <span className="font-semibold text-slate-800">
-                        ${product.pricing.retailPrice.toFixed(2)}
-                      </span>
-                      <span className="text-2xs text-emerald-600 ml-1 font-semibold">
-                        +{product.pricing.margin.toFixed(1)}%
-                      </span>
+                      <div className="whitespace-nowrap">
+                        <span className="font-bold text-slate-900 text-sm">
+                          ${product.pricing.retailPrice.toFixed(2)}
+                        </span>
+                        <span className="text-2xs text-emerald-600 ml-1.5 font-bold">
+                          +{product.pricing.margin.toFixed(1)}%
+                        </span>
+                      </div>
                     </td>
                     <td>
                       <Badge variant={statusToVariant(product.inventory.status)}>
@@ -564,7 +610,7 @@ export const MasterCatalog: React.FC = () => {
                       </Badge>
                     </td>
                     <td>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-slate-400 font-mono whitespace-nowrap">
                         {timeAgo(product.updatedAt)}
                       </span>
                     </td>
@@ -575,18 +621,31 @@ export const MasterCatalog: React.FC = () => {
                       >
                         <button
                           onClick={() => setViewProduct(product)}
-                          className="btn-icon"
-                          title="View Product"
+                          className="btn-icon text-slate-400 hover:text-slate-700"
+                          title="View Details"
                         >
                           <Eye size={14} />
                         </button>
-                        <button
-                          onClick={() => handleOpenEdit(product)}
-                          className="btn-icon"
-                          title="Edit Product"
-                        >
-                          <Edit2 size={14} />
-                        </button>
+
+                        {canManageCatalog && (
+                          <button
+                            onClick={() => handleOpenEdit(product)}
+                            className="btn-icon text-slate-400 hover:text-primary-600"
+                            title="Edit Product"
+                          >
+                            <Edit2 size={14} />
+                          </button>
+                        )}
+
+                        {canDelete && (
+                          <button
+                            onClick={() => handleSingleDelete(product.id, product.name)}
+                            className="btn-icon text-rose-400 hover:text-rose-600 hover:bg-rose-50"
+                            title="Delete Product"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -596,57 +655,114 @@ export const MasterCatalog: React.FC = () => {
           </table>
         </div>
 
-        {/* Working Pagination Footer */}
-        <div className="px-4 py-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-slate-500 font-medium">
-            Showing <span className="font-semibold text-slate-800">{paginatedProducts.length}</span> of <span className="font-semibold text-slate-800">{filtered.length}</span> products (Page {currentPage} of {totalPages})
-          </p>
+        {/* Pagination Footer */}
+        <div className="px-4 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-slate-600 font-medium">
+            <span>Showing</span>
+            <span className="font-bold text-slate-900">
+              {filteredProducts.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}
+            </span>
+            <span>to</span>
+            <span className="font-bold text-slate-900">
+              {Math.min(currentPage * pageSize, filteredProducts.length)}
+            </span>
+            <span>of</span>
+            <span className="font-bold text-slate-900">{filteredProducts.length}</span>
+            <span>products</span>
+          </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
-              <span className="text-2xs text-slate-400 font-semibold uppercase">Rows:</span>
-              <select
-                className="select input-sm w-auto py-1 text-xs"
-                value={pageSize}
-                onChange={e => {
-                  setPageSize(Number(e.target.value))
-                  setCurrentPage(1)
-                }}
-              >
-                <option value={5}>5 per page</option>
-                <option value={10}>10 per page</option>
-                <option value={25}>25 per page</option>
-                <option value={50}>50 per page</option>
-              </select>
-            </div>
-
-            <div className="flex gap-1">
-              <button
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="btn-secondary btn-sm disabled:opacity-40"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages || totalPages === 0}
-                className="btn-secondary btn-sm disabled:opacity-40"
-              >
-                Next
-              </button>
-            </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="btn-secondary btn-sm flex items-center gap-1 disabled:opacity-40 cursor-pointer"
+            >
+              <ChevronLeft size={14} /> Previous
+            </button>
+            <span className="text-slate-700 font-bold px-2">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="btn-secondary btn-sm flex items-center gap-1 disabled:opacity-40 cursor-pointer"
+            >
+              Next <ChevronRight size={14} />
+            </button>
           </div>
         </div>
       </div>
 
-      {/* --- ADD PRODUCT MODAL --- */}
+      {/* Product Detail Modal */}
+      {viewProduct && (
+        <Modal
+          open
+          onClose={() => setViewProduct(null)}
+          title={viewProduct.name}
+          subtitle={`SKU: ${viewProduct.sku} • Supplier: ${viewProduct.supplierName}`}
+          size="lg"
+          footer={
+            <>
+              <button onClick={() => setViewProduct(null)} className="btn-secondary">Close</button>
+              {canManageCatalog && (
+                <button
+                  onClick={() => {
+                    const target = viewProduct
+                    setViewProduct(null)
+                    handleOpenEdit(target)
+                  }}
+                  className="btn-primary flex items-center gap-1.5"
+                >
+                  <Edit2 size={14} /> Edit Product
+                </button>
+              )}
+            </>
+          }
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div className="w-16 h-16 rounded-xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center">
+                {viewProduct.images.length > 0 ? (
+                  <img src={viewProduct.images[0].url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <Package size={24} className="text-slate-400" />
+                )}
+              </div>
+              <div className="flex-1">
+                <h4 className="font-bold text-slate-900 text-base">{viewProduct.name}</h4>
+                <p className="text-xs text-slate-500 font-mono mt-0.5">Master SKU: {viewProduct.masterId}</p>
+                <div className="flex gap-2 mt-2">
+                  <Badge variant={statusToVariant(viewProduct.status)}>{viewProduct.status}</Badge>
+                  <Badge variant={statusToVariant(viewProduct.validationStatus)}>{viewProduct.validationStatus}</Badge>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {[
+                { label: 'Retail Price', value: `$${viewProduct.pricing.retailPrice.toFixed(2)}` },
+                { label: 'Cost Price', value: `$${viewProduct.pricing.costPrice.toFixed(2)}` },
+                { label: 'Margin', value: `${viewProduct.pricing.margin.toFixed(1)}%` },
+                { label: 'Available Stock', value: viewProduct.inventory.availableStock.toLocaleString() },
+                { label: 'Category', value: viewProduct.categoryName || 'General' },
+                { label: 'Brand', value: viewProduct.brand || '—' },
+              ].map(item => (
+                <div key={item.label} className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <p className="text-2xs text-slate-400 font-semibold mb-1 uppercase tracking-wider">{item.label}</p>
+                  <p className="text-sm font-bold text-slate-800">{item.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Add Product Modal */}
       <Modal
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
-        title="Add New Master Product"
-        subtitle="Create a new SKU in the centralized PIM catalog"
-        size="lg"
+        title="Add New Catalog Product"
+        subtitle="Create a new Master SKU in SupplyBridge PIM"
         footer={
           <>
             <button onClick={() => setAddModalOpen(false)} className="btn-secondary">Cancel</button>
@@ -655,72 +771,82 @@ export const MasterCatalog: React.FC = () => {
         }
       >
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Product Name *</label>
+            <input
+              className="input"
+              placeholder="e.g. AMD Ryzen 9 7950X Processor"
+              value={newProduct.name}
+              onChange={e => setNewProduct({ ...newProduct, name: e.target.value })}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Product Title *</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Master SKU *</label>
               <input
-                className="input"
-                placeholder="e.g. UltraFast SSD Drive 2TB"
-                value={newProduct.name}
-                onChange={e => setNewProduct({ ...newProduct, name: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Master SKU *</label>
-              <input
-                className="input uppercase"
-                placeholder="e.g. TPI-SSD-2000"
+                className="input font-mono uppercase"
+                placeholder="CPU-RYZEN-7950X"
                 value={newProduct.sku}
                 onChange={e => setNewProduct({ ...newProduct, sku: e.target.value })}
               />
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Brand</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Brand</label>
               <input
                 className="input"
-                placeholder="Brand Name"
+                placeholder="e.g. AMD"
                 value={newProduct.brand}
                 onChange={e => setNewProduct({ ...newProduct, brand: e.target.value })}
               />
             </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Category</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Category</label>
               <input
                 className="input"
-                placeholder="Category"
+                placeholder="e.g. Processors"
                 value={newProduct.categoryName}
                 onChange={e => setNewProduct({ ...newProduct, categoryName: e.target.value })}
               />
             </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
             <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Retail Price ($)</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Supplier</label>
+              <select
+                className="select"
+                value={newProduct.supplierName}
+                onChange={e => setNewProduct({ ...newProduct, supplierName: e.target.value })}
+              >
+                <option value="TechParts International">TechParts International</option>
+                <option value="GlobalSource Limited">GlobalSource Limited</option>
+                <option value="PrimeSupply Corp">PrimeSupply Corp</option>
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Retail Price ($)</label>
               <input
-                className="input"
                 type="number"
+                className="input"
                 value={newProduct.retailPrice}
                 onChange={e => setNewProduct({ ...newProduct, retailPrice: Number(e.target.value) })}
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Cost Price ($)</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Cost Price ($)</label>
               <input
-                className="input"
                 type="number"
+                className="input"
                 value={newProduct.costPrice}
                 onChange={e => setNewProduct({ ...newProduct, costPrice: Number(e.target.value) })}
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Initial Stock</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Stock</label>
               <input
-                className="input"
                 type="number"
+                className="input"
                 value={newProduct.stock}
                 onChange={e => setNewProduct({ ...newProduct, stock: Number(e.target.value) })}
               />
@@ -763,13 +889,12 @@ export const MasterCatalog: React.FC = () => {
         </div>
       </Modal>
 
-      {/* --- EDIT PRODUCT MODAL --- */}
+      {/* Edit Product Modal */}
       <Modal
         open={editModalOpen}
         onClose={() => setEditModalOpen(false)}
-        title="Edit Master Product"
-        subtitle={`Updating SKU: ${editingProduct?.sku}`}
-        size="lg"
+        title="Edit Catalog Product"
+        subtitle={`Updating Master SKU: ${editingProduct?.sku}`}
         footer={
           <>
             <button onClick={() => setEditModalOpen(false)} className="btn-secondary">Cancel</button>
@@ -778,49 +903,56 @@ export const MasterCatalog: React.FC = () => {
         }
       >
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Product Name *</label>
+            <input
+              className="input"
+              value={newProduct.name}
+              onChange={e => setNewProduct({ ...newProduct, name: e.target.value })}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Product Title</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Master SKU *</label>
               <input
-                className="input"
-                value={newProduct.name}
-                onChange={e => setNewProduct({ ...newProduct, name: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Master SKU</label>
-              <input
-                className="input uppercase"
+                className="input font-mono uppercase"
                 value={newProduct.sku}
                 onChange={e => setNewProduct({ ...newProduct, sku: e.target.value })}
               />
             </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
             <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Retail Price ($)</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Brand</label>
               <input
                 className="input"
+                value={newProduct.brand}
+                onChange={e => setNewProduct({ ...newProduct, brand: e.target.value })}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Retail Price ($)</label>
+              <input
                 type="number"
+                className="input"
                 value={newProduct.retailPrice}
                 onChange={e => setNewProduct({ ...newProduct, retailPrice: Number(e.target.value) })}
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Cost Price ($)</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Cost Price ($)</label>
               <input
-                className="input"
                 type="number"
+                className="input"
                 value={newProduct.costPrice}
                 onChange={e => setNewProduct({ ...newProduct, costPrice: Number(e.target.value) })}
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Available Stock</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Stock</label>
               <input
-                className="input"
                 type="number"
+                className="input"
                 value={newProduct.stock}
                 onChange={e => setNewProduct({ ...newProduct, stock: Number(e.target.value) })}
               />
@@ -863,7 +995,7 @@ export const MasterCatalog: React.FC = () => {
         </div>
       </Modal>
 
-      {/* --- CONFIRM BULK DELETE DIALOG --- */}
+      {/* Confirm Bulk Delete Dialog */}
       <ConfirmDialog
         open={deleteConfirmOpen}
         onClose={() => setDeleteConfirmOpen(false)}
@@ -873,6 +1005,7 @@ export const MasterCatalog: React.FC = () => {
         confirmLabel="Yes, Delete Products"
         danger
       />
+
 
       {/* --- PRODUCT DETAIL DRAWER / MODAL --- */}
       {viewProduct && (

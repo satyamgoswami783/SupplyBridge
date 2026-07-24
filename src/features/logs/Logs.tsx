@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { mockLogs } from '../../data/mockData';
-import type { LogEntry, LogLevel } from '../../types';
+import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { mockLogs } from '../../data/mockData'
+import type { LogEntry, LogLevel } from '../../types'
 import {
   AlertCircle,
   Info,
@@ -9,68 +10,189 @@ import {
   Search,
   RefreshCw,
   ChevronRight,
-  ChevronDown
-} from 'lucide-react';
+  ChevronDown,
+  Download,
+  FileCode,
+  FileSpreadsheet,
+  Activity,
+  Terminal
+} from 'lucide-react'
 
 export const Logs: React.FC = () => {
-  const [logs, setLogs] = useState<LogEntry[]>(mockLogs);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedLevel, setSelectedLevel] = useState<string>('all');
-  const [selectedType, setSelectedType] = useState<string>('all');
-  const [expandedLog, setExpandedLog] = useState<string | null>(null);
+  const [logs, setLogs] = useState<LogEntry[]>(mockLogs)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedLevel, setSelectedLevel] = useState<string>('all')
+  const [selectedType, setSelectedType] = useState<string>('all')
+  const [expandedLog, setExpandedLog] = useState<string | null>(null)
+
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+
+  const showNotification = (msg: string) => {
+    setToastMessage(msg)
+    setTimeout(() => setToastMessage(null), 3000)
+  }
+
+  const handleRefreshLogs = () => {
+    setIsRefreshing(true)
+    showNotification('Refreshing system logs...')
+
+    setTimeout(() => {
+      const freshLog: LogEntry = {
+        id: `log_${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        level: 'info',
+        type: 'system',
+        message: 'System audit logs refreshed by administrator',
+        details: 'Manual refresh triggered. All supplier feed channels and active background sync traces verified.',
+      }
+
+      setLogs([freshLog, ...mockLogs])
+      setIsRefreshing(false)
+      showNotification('System logs refreshed successfully!')
+    }, 1000)
+  }
+
+  const handleExportLogsJSON = () => {
+    showNotification('Exporting logs JSON file...')
+    const jsonString = JSON.stringify(filteredLogs, null, 2)
+    const blob = new Blob([jsonString], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `SupplyBridge_System_Logs_${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    showNotification('System logs JSON file downloaded!')
+  }
+
+  const handleExportLogsCSV = () => {
+    showNotification('Exporting logs CSV file...')
+    const csvHeaders = 'Log ID,Timestamp,Level,Type,Supplier,Message,Details\n'
+    const csvRows = filteredLogs.map(l =>
+      `"${l.id}","${l.timestamp}","${l.level}","${l.type}","${l.supplierName || ''}","${l.message.replace(/"/g, '""')}","${(l.details || '').replace(/"/g, '""')}"`
+    ).join('\n')
+    const csvContent = csvHeaders + csvRows
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `SupplyBridge_System_Logs_${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    showNotification('System logs CSV file downloaded!')
+  }
 
   const getLevelBadge = (level: LogLevel) => {
     switch (level) {
       case 'error':
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-rose-50 text-rose-700 border border-rose-100 shadow-sm"><AlertCircle size={14} /> Error</span>;
+        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg bg-rose-50 text-rose-700 border border-rose-200/80 shadow-2xs"><AlertCircle size={14} /> Error</span>
       case 'warning':
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-amber-50 text-amber-700 border border-amber-100 shadow-sm"><AlertTriangle size={14} /> Warning</span>;
+        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg bg-amber-50 text-amber-700 border border-amber-200/80 shadow-2xs"><AlertTriangle size={14} /> Warning</span>
       case 'success':
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm"><CheckCircle2 size={14} /> Success</span>;
+        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-2xs"><CheckCircle2 size={14} /> Success</span>
       default:
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-sky-50 text-sky-700 border border-sky-100 shadow-sm"><Info size={14} /> Info</span>;
+        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg bg-sky-50 text-sky-700 border border-sky-200/80 shadow-2xs"><Info size={14} /> Info</span>
     }
-  };
+  }
 
   const filteredLogs = logs.filter(log => {
     const matchesSearch = log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (log.supplierName && log.supplierName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (log.details && log.details.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesLevel = selectedLevel === 'all' || log.level === selectedLevel;
-    const matchesType = selectedType === 'all' || log.type === selectedType;
-    return matchesSearch && matchesLevel && matchesType;
-  });
+      (log.details && log.details.toLowerCase().includes(searchTerm.toLowerCase()))
+    const matchesLevel = selectedLevel === 'all' || log.level === selectedLevel
+    const matchesType = selectedType === 'all' || log.type === selectedType
+    return matchesSearch && matchesLevel && matchesType
+  })
 
   const toggleExpand = (id: string) => {
-    setExpandedLog(expandedLog === id ? null : id);
-  };
+    setExpandedLog(expandedLog === id ? null : id)
+  }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="relative space-y-6">
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold"
+          >
+            <CheckCircle2 size={16} className="text-emerald-400" />
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">System Logs</h1>
-          <p className="text-slate-500 text-sm mt-1">Monitor background syncs, API calls, and integration events.</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">System Audit Logs</h1>
+          <p className="text-slate-500 text-xs font-medium mt-1">Monitor background syncs, API requests, feed imports, and system events in real time.</p>
         </div>
-        <button
-          onClick={() => setLogs(mockLogs)}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 active:scale-98 transition duration-200 shadow-sm"
-        >
-          <RefreshCw size={16} /> Refresh Logs
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleExportLogsCSV}
+            className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
+            title="Download Logs as CSV"
+          >
+            <FileSpreadsheet size={14} className="text-emerald-600" /> Export CSV
+          </button>
+          <button
+            onClick={handleExportLogsJSON}
+            className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
+            title="Download Logs as JSON"
+          >
+            <FileCode size={14} className="text-indigo-600" /> Export JSON
+          </button>
+          <button
+            onClick={handleRefreshLogs}
+            disabled={isRefreshing}
+            className="btn-primary btn-sm flex items-center gap-2 font-bold cursor-pointer"
+          >
+            <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+            {isRefreshing ? 'Refreshing...' : 'Refresh Logs'}
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      {/* KPI Stats Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Log Entries', value: logs.length, color: 'text-slate-900', bg: 'bg-white', icon: <Terminal size={18} className="text-slate-700" /> },
+          { label: 'Error Traces', value: logs.filter(l => l.level === 'error').length, color: 'text-rose-700', bg: 'bg-rose-50/80 border-rose-100', icon: <AlertCircle size={18} className="text-rose-600" /> },
+          { label: 'Warnings Recorded', value: logs.filter(l => l.level === 'warning').length, color: 'text-amber-700', bg: 'bg-amber-50/80 border-amber-100', icon: <AlertTriangle size={18} className="text-amber-600" /> },
+          { label: 'System Successes', value: logs.filter(l => l.level === 'success' || l.level === 'info').length, color: 'text-emerald-700', bg: 'bg-emerald-50/80 border-emerald-100', icon: <CheckCircle2 size={18} className="text-emerald-600" /> },
+        ].map(s => (
+          <div key={s.label} className={`card p-4 flex items-center gap-3.5 border ${s.bg}`}>
+            <div className="p-2.5 rounded-xl bg-white shadow-2xs">
+              {s.icon}
+            </div>
+            <div>
+              <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+              <p className="text-xs text-slate-500 font-semibold mt-0.5">{s.label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
         {/* Filters */}
         <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input
               type="text"
-              placeholder="Search logs by message, supplier, details..."
+              placeholder="Search logs by message, supplier name, details..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition duration-200"
+              className="input pl-10 pr-4 py-2 text-sm font-medium"
             />
           </div>
 
@@ -78,7 +200,7 @@ export const Logs: React.FC = () => {
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
-              className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition duration-200"
+              className="select input-sm w-auto min-w-[130px] font-medium"
             >
               <option value="all">All Levels</option>
               <option value="info">Info</option>
@@ -90,7 +212,7 @@ export const Logs: React.FC = () => {
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition duration-200"
+              className="select input-sm w-auto min-w-[130px] font-medium"
             >
               <option value="all">All Types</option>
               <option value="sync">Sync</option>
@@ -111,42 +233,42 @@ export const Logs: React.FC = () => {
               <div
                 key={log.id}
                 onClick={() => toggleExpand(log.id)}
-                className={`group cursor-pointer hover:bg-slate-50 transition duration-200 ${expandedLog === log.id ? 'bg-slate-50' : ''}`}
+                className={`group cursor-pointer hover:bg-slate-50/80 transition duration-200 ${expandedLog === log.id ? 'bg-slate-50' : ''}`}
               >
                 <div className="p-4 flex items-start gap-4">
-                  <div className="pt-0.5 text-slate-400 group-hover:text-slate-600 transition">
+                  <div className="pt-1 text-slate-400 group-hover:text-slate-600 transition">
                     {expandedLog === log.id ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1.5">
                       {getLevelBadge(log.level)}
-                      <span className="px-2 py-0.5 text-xs font-medium bg-slate-100 text-slate-600 rounded-md uppercase tracking-wider">{log.type}</span>
+                      <span className="px-2.5 py-0.5 text-xs font-bold bg-slate-100 text-slate-700 rounded-md uppercase tracking-wider border border-slate-200">{log.type}</span>
                       {log.supplierName && (
-                        <span className="text-xs text-slate-500 font-medium">
+                        <span className="text-xs text-slate-600 font-semibold">
                           • {log.supplierName}
                         </span>
                       )}
-                      <span className="text-xs text-slate-400 ml-auto">
+                      <span className="text-xs text-slate-400 ml-auto font-mono">
                         {new Date(log.timestamp).toLocaleString()}
                       </span>
                     </div>
 
-                    <p className="text-sm font-medium text-slate-700 leading-relaxed truncate">{log.message}</p>
+                    <p className="text-sm font-bold text-slate-800 leading-relaxed truncate">{log.message}</p>
 
                     {expandedLog === log.id && (
-                      <div className="mt-4 p-4 rounded-xl bg-slate-900 text-slate-300 font-mono text-xs leading-relaxed overflow-x-auto shadow-inner">
-                        <div className="mb-2 text-slate-500 font-bold border-b border-slate-800 pb-1.5 flex justify-between">
-                          <span>LOG DETAILS (ID: {log.id})</span>
+                      <div className="mt-4 p-4 rounded-xl bg-slate-900 text-slate-300 font-mono text-xs leading-relaxed overflow-x-auto shadow-inner border border-slate-800">
+                        <div className="mb-2 text-slate-400 font-bold border-b border-slate-800 pb-1.5 flex justify-between">
+                          <span>LOG TRACE DETAILS (ID: {log.id})</span>
                           <span>Timestamp: {log.timestamp}</span>
                         </div>
                         {log.details ? (
                           <p className="whitespace-pre-wrap">{log.details}</p>
                         ) : (
-                          <p className="text-slate-500 italic">No additional details available for this log entry.</p>
+                          <p className="text-slate-500 italic">No additional execution trace logs recorded for this event.</p>
                         )}
-                        {log.jobId && <div className="mt-2 text-primary-400"><span className="text-slate-500">Related Job ID:</span> {log.jobId}</div>}
-                        {log.userId && <div className="mt-1 text-primary-400"><span className="text-slate-500">Triggered By User ID:</span> {log.userId}</div>}
+                        {log.jobId && <div className="mt-2 text-primary-400"><span className="text-slate-500 font-bold">Related Job ID:</span> {log.jobId}</div>}
+                        {log.userId && <div className="mt-1 text-primary-400"><span className="text-slate-500 font-bold">Triggered By User ID:</span> {log.userId}</div>}
                       </div>
                     )}
                   </div>
@@ -154,13 +276,13 @@ export const Logs: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="p-12 text-center">
+            <div className="p-16 text-center">
               <AlertCircle className="mx-auto text-slate-300 mb-3" size={32} />
-              <p className="text-sm font-medium text-slate-500">No logs found matching your filters.</p>
+              <p className="text-sm font-bold text-slate-500">No logs found matching your filter criteria.</p>
             </div>
           )}
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

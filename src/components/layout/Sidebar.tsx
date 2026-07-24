@@ -6,7 +6,7 @@ import {
   Layers, ArrowLeftRight, ShieldCheck, RefreshCw, DollarSign,
   Image, Store, Globe, Briefcase, Download, FileText, Activity,
   BarChart3, Users, UserCog, Lock, Settings, ChevronDown,
-  ChevronRight, Zap, X, Menu, User, LogOut
+  ChevronRight, Zap, X, Menu, User, LogOut, Sliders
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { cn, getInitials } from '../../utils'
@@ -36,10 +36,11 @@ const NAV_ITEMS: NavItem[] = [
   {
     id: 'mapping', label: 'Product Mapping', icon: <ArrowLeftRight size={18} />, module: 'mapping',
     children: [
-      { id: 'product-mapping',  label: 'Product Mapping',  icon: <Package size={16} />,       path: '/mapping/products',   module: 'mapping' },
-      { id: 'category-mapping', label: 'Category Mapping', icon: <Tag size={16} />,           path: '/mapping/categories', module: 'mapping' },
-      { id: 'variant-mapping',  label: 'Variant Mapping',  icon: <Layers size={16} />,        path: '/mapping/variants',   module: 'mapping' },
-      { id: 'supplier-mapping', label: 'Supplier Mapping', icon: <Truck size={16} />,         path: '/mapping/suppliers',  module: 'mapping' },
+      { id: 'product-mapping',   label: 'Product Mapping',   icon: <Package size={16} />,       path: '/mapping/products',   module: 'mapping' },
+      { id: 'category-mapping',  label: 'Category Mapping',  icon: <Tag size={16} />,           path: '/mapping/categories', module: 'mapping' },
+      { id: 'variant-mapping',   label: 'Variant Mapping',   icon: <Layers size={16} />,        path: '/mapping/variants',   module: 'mapping' },
+      { id: 'attribute-mapping', label: 'Attribute Mapping', icon: <Sliders size={16} />,      path: '/mapping/attributes', module: 'mapping' },
+      { id: 'supplier-mapping',  label: 'Supplier Mapping',  icon: <Truck size={16} />,         path: '/mapping/suppliers',  module: 'mapping' },
     ],
   },
   { id: 'validation',     label: 'Validation Center',       icon: <ShieldCheck size={18} />,  path: '/validation',      module: 'validation' },
