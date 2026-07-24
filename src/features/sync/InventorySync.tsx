@@ -5,10 +5,10 @@ import {
   Search, ShieldCheck, Database, AlertCircle, Settings, PlayCircle,
   Clock, ArrowRight, Download, Sliders, AlertTriangle, Layers, Activity
 } from 'lucide-react'
-import { SectionHeader, HealthIndicator, ProgressBar, FilterBar } from '../../components/ui'
+import { SectionHeader, HealthIndicator, ProgressBar } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { mockSyncChartData } from '../../data/mockData'
 
 interface InventoryItem {
@@ -183,18 +183,18 @@ export const InventorySync: React.FC = () => {
         }
       />
 
-      {/* Summary Telemetry KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      {/* Summary Telemetry KPI Cards — High Resolution & Responsive Layout */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4.5">
         {[
-          { label: 'Total In-Stock Items', value: '78,450 SKUs', color: 'text-slate-800 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800', sub: 'Across 25 suppliers' },
-          { label: 'Pending Sync Queue',    value: items.filter(i => i.status === 'pending').length * 114 + 116, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/50', sub: 'Queued for website push' },
-          { label: 'Inventory Health',     value: '99.2%', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/50', sub: 'Pipeline operational' },
-          { label: 'Low Stock Warnings',   value: '142 SKUs', color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/50', sub: 'Below buffer threshold' },
+          { label: 'TOTAL IN-STOCK ITEMS', value: '78,450 SKUs', color: 'text-slate-900 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800', sub: 'Across 25 connected suppliers' },
+          { label: 'PENDING SYNC QUEUE',    value: (items.filter(i => i.status === 'pending').length * 114 + 116).toString(), color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50', sub: 'Queued for storefront push' },
+          { label: 'INVENTORY HEALTH',     value: '99.2%', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50', sub: 'Pipeline fully operational' },
+          { label: 'LOW STOCK WARNINGS',   value: '142 SKUs', color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50', sub: 'Below safety buffer threshold' },
         ].map((card, i) => (
-          <div key={i} className={`card p-4.5 rounded-2xl shadow-xs ${card.bg}`}>
-            <p className="text-2xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{card.label}</p>
-            <p className={`text-2xl font-black ${card.color}`}>{card.value}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">{card.sub}</p>
+          <div key={i} className={`p-5 rounded-2xl shadow-xs min-h-[120px] flex flex-col justify-between transition-all duration-200 ${card.bg}`}>
+            <p className="text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">{card.label}</p>
+            <p className={`text-2xl lg:text-3xl font-black tracking-tight my-1 ${card.color}`}>{card.value}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">{card.sub}</p>
           </div>
         ))}
       </div>
@@ -202,14 +202,14 @@ export const InventorySync: React.FC = () => {
       {/* Supplier Sync Progress & 7-Day Trend Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Supplier Pipeline Progress */}
-        <div className="card p-5 border border-slate-200 dark:border-slate-800">
+        <div className="card p-5 border border-slate-200/90 dark:border-slate-800 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Layers size={16} className="text-primary-600 dark:text-primary-400" /> Supplier Stock Feeds Pipeline
             </h3>
             <Badge variant="primary" dot>Live Feeds</Badge>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {[
               { name: 'TechParts International', products: 18420, pending: 0, progress: 100, status: 'healthy' as const, lastSync: '4 min ago' },
               { name: 'GlobalSource Limited',    products: 14800, pending: 120, progress: 85, status: 'degraded' as const, lastSync: '12 min ago' },
@@ -217,52 +217,58 @@ export const InventorySync: React.FC = () => {
               { name: 'AcmeDistributors',        products: 9800, pending: 222,  progress: 45, status: 'critical' as const, lastSync: '3 hr ago' },
               { name: 'QuickShip LLC',           products: 7300, pending: 0,    progress: 100, status: 'healthy' as const, lastSync: '5 min ago' },
             ].map(s => (
-              <div key={s.name} className="flex items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{s.name}</span>
-                    <span className="text-2xs text-slate-400 font-mono flex-shrink-0 ml-2">{s.lastSync}</span>
-                  </div>
-                  <ProgressBar value={s.progress} color={s.progress === 100 ? 'emerald' : s.progress > 50 ? 'primary' : 'rose'} />
-                  <div className="flex justify-between mt-1">
-                    <span className="text-2xs text-slate-500 dark:text-slate-400 font-medium">{s.products.toLocaleString()} SKUs in catalog</span>
-                    {s.pending > 0 && <span className="text-2xs text-amber-600 dark:text-amber-400 font-bold">{s.pending} pending push</span>}
+              <div key={s.name} className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{s.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xs text-slate-400 font-mono">{s.lastSync}</span>
+                    <HealthIndicator status={s.status} label={s.status === 'healthy' ? 'OK' : s.status === 'degraded' ? 'Lag' : 'Error'} />
                   </div>
                 </div>
-                <HealthIndicator status={s.status} label={s.status === 'healthy' ? 'OK' : s.status === 'degraded' ? 'Lag' : 'Error'} />
+                <ProgressBar value={s.progress} color={s.progress === 100 ? 'emerald' : s.progress > 50 ? 'primary' : 'rose'} />
+                <div className="flex items-center justify-between text-2xs">
+                  <span className="text-slate-500 dark:text-slate-400 font-medium">{s.products.toLocaleString()} SKUs in catalog</span>
+                  {s.pending > 0 ? (
+                    <span className="text-amber-600 dark:text-amber-400 font-bold">{s.pending} pending push</span>
+                  ) : (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">100% Synced</span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Inventory 7-Day Trend Chart */}
-        <div className="card p-5 border border-slate-200 dark:border-slate-800">
+        <div className="card p-5 border border-slate-200/90 dark:border-slate-800 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Activity size={16} className="text-primary-600 dark:text-primary-400" /> Stock Sync Volume — 7 Day Trend
             </h3>
             <span className="text-xs text-slate-400 font-medium">Daily API PUT Updates</span>
           </div>
-          <ResponsiveContainer width="100%" height={230}>
-            <AreaChart data={mockSyncChartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="invGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }} />
-              <Area type="monotone" dataKey="inventory" name="Stock Updates" stroke="#4f46e5" strokeWidth={2} fill="url(#invGrad)" dot={false} />
-            </AreaChart>
-          </ResponsiveContainer>
+          <div className="w-full h-[260px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={mockSyncChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="invGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }} />
+                <Area type="monotone" dataKey="inventory" name="Stock Updates" stroke="#4f46e5" strokeWidth={2.5} fill="url(#invGrad)" dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
       {/* Main Filter & Table Section */}
-      <div className="card p-5 border border-slate-200 dark:border-slate-800">
+      <div className="card p-5 border border-slate-200/90 dark:border-slate-800">
         {/* Search & Status Filters */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="relative flex-1 max-w-md">
@@ -296,17 +302,17 @@ export const InventorySync: React.FC = () => {
           <table className="table">
             <thead>
               <tr>
-                <th>Product Title</th>
-                <th>Master SKU</th>
-                <th>Supplier Source</th>
-                <th>Supplier Stock</th>
-                <th>Safety Buffer</th>
-                <th>Available Stock</th>
-                <th>Shift4Shop Live</th>
-                <th>Variance</th>
-                <th>Sync Status</th>
-                <th>Last Sync</th>
-                <th className="text-right">Action</th>
+                <th className="whitespace-nowrap">Product Title</th>
+                <th className="whitespace-nowrap">Master SKU</th>
+                <th className="whitespace-nowrap">Supplier Source</th>
+                <th className="whitespace-nowrap">Supplier Stock</th>
+                <th className="whitespace-nowrap">Safety Buffer</th>
+                <th className="whitespace-nowrap">Available Stock</th>
+                <th className="whitespace-nowrap">Shift4Shop Live</th>
+                <th className="whitespace-nowrap">Variance</th>
+                <th className="whitespace-nowrap">Sync Status</th>
+                <th className="whitespace-nowrap">Last Sync</th>
+                <th className="text-right whitespace-nowrap">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -316,13 +322,13 @@ export const InventorySync: React.FC = () => {
                 return (
                   <tr key={row.id}>
                     <td>
-                      <p className="font-bold text-slate-800 dark:text-slate-100 text-xs leading-snug max-w-xs line-clamp-1">{row.name}</p>
+                      <p className="font-bold text-slate-800 dark:text-slate-100 text-xs leading-normal max-w-xs">{row.name}</p>
                     </td>
                     <td>
-                      <code className="mono">{row.sku}</code>
+                      <code className="mono text-xs">{row.sku}</code>
                     </td>
                     <td>
-                      <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold">{row.supplier}</span>
+                      <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold whitespace-nowrap">{row.supplier}</span>
                     </td>
                     <td>
                       <span className="font-bold text-slate-700 dark:text-slate-300">{row.supplierStock.toLocaleString()}</span>
@@ -339,25 +345,25 @@ export const InventorySync: React.FC = () => {
                       </span>
                     </td>
                     <td>
-                      <span className={`flex items-center gap-1 text-xs font-bold ${row.variance > 0 ? 'text-amber-600 dark:text-amber-400' : row.variance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'}`}>
+                      <span className={`flex items-center gap-1 text-xs font-bold whitespace-nowrap ${row.variance > 0 ? 'text-amber-600 dark:text-amber-400' : row.variance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'}`}>
                         {row.variance > 0 ? <TrendingUp size={13} /> : row.variance < 0 ? <TrendingDown size={13} /> : null}
                         {row.variance > 0 ? `+${row.variance}` : row.variance === 0 ? '0 (Synced)' : row.variance}
                       </span>
                     </td>
-                    <td>
+                    <td className="whitespace-nowrap">
                       {row.status === 'synced' && <Badge variant="success" dot>Synced</Badge>}
                       {row.status === 'pending' && <Badge variant="warning" dot>Pending Push</Badge>}
                       {row.status === 'error' && <Badge variant="danger" dot>Sync Error</Badge>}
                       {row.status === 'out_of_stock' && <Badge variant="neutral">Out of Stock</Badge>}
                     </td>
-                    <td>
+                    <td className="whitespace-nowrap">
                       <span className="text-2xs text-slate-500 dark:text-slate-400 font-mono">{row.lastSync}</span>
                     </td>
-                    <td className="text-right">
+                    <td className="text-right whitespace-nowrap">
                       <button
                         onClick={() => handleSyncSingle(row.id, row.name)}
                         disabled={isSyncingRow}
-                        className="btn-secondary btn-sm inline-flex items-center gap-1 font-bold text-2xs py-1 px-2 cursor-pointer"
+                        className="btn-secondary btn-sm inline-flex items-center gap-1 font-bold text-2xs py-1 px-2.5 cursor-pointer"
                         title="Force sync stock level to Shift4Shop"
                       >
                         <RefreshCw size={12} className={isSyncingRow ? 'animate-spin text-primary-600' : ''} />
