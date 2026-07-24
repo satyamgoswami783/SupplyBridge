@@ -181,25 +181,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             </NavLink>
           )
         })}
-
-        {/* Profile & Logout Section at bottom of menu */}
-        <div className="pt-3 mt-3 border-t border-slate-800/80 space-y-1">
-          <button
-            onClick={() => { onClose(); openCurrentUserProfile(); }}
-            className="sidebar-item w-full text-slate-300 hover:bg-slate-800/80 hover:text-white"
-          >
-            <User size={18} className="opacity-70" />
-            <span>My Profile</span>
-          </button>
-
-          <button
-            onClick={() => { onClose(); logout(); }}
-            className="sidebar-item w-full text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 font-bold"
-          >
-            <LogOut size={18} className="text-rose-400 opacity-90" />
-            <span>Logout</span>
-          </button>
-        </div>
       </nav>
 
       {/* User Profile Footer Card */}
@@ -216,17 +197,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             <p className="text-xs font-bold text-white truncate group-hover:text-cyan-300 transition-colors">{currentUser.name}</p>
             <p className="text-2xs text-slate-400 truncate font-medium capitalize">{currentUser.role.replace('_', ' ')}</p>
           </div>
-          <User size={14} className="text-slate-400 group-hover:text-white transition-colors" />
         </div>
-
-        {/* Direct Logout Button in Sidebar Footer */}
-        <button
-          onClick={logout}
-          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold border border-rose-500/20 transition-all duration-200 shadow-glow-rose"
-        >
-          <LogOut size={14} />
-          Logout
-        </button>
 
         <div className="flex items-center justify-between px-2 pt-1">
           <span className="text-2xs text-slate-500 font-semibold uppercase tracking-wider">System Status</span>
