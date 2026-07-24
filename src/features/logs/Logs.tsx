@@ -198,65 +198,59 @@ export const Logs: React.FC = () => {
                 <th className="py-3 px-4 w-28">Timestamp</th>
                 <th className="py-3 px-4 w-24">Type</th>
                 <th className="py-3 px-4">Event Message</th>
-                <th className="py-3 px-4 w-44">Source Context</th>
-                <th className="py-3 px-4 w-20 text-center">Actions</th>
+                <th className="py-3 px-4 w-40">Source Context</th>
+                <th className="py-3 px-4 w-16 text-center">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 text-xs">
               {filteredLogs.length > 0 ? (
                 filteredLogs.map(log => (
-                  <tr key={log.id} className="hover:bg-slate-50 transition-colors text-xs text-slate-700">
+                  <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3.5 px-4 text-center">
                       <div className="flex justify-center">{getLevelIcon(log.level)}</div>
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap text-slate-500 font-mono">
+                    <td className="py-3.5 px-4 text-slate-500 font-mono">
                       {format(new Date(log.timestamp), 'yyyy-MM-dd HH:mm:ss')}
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span className={`px-2 py-0.5 rounded text-xxs font-mono font-semibold uppercase border ${getTypeColor(log.type)}`}>
+                    <td className="py-3.5 px-4">
+                      <span className={`px-2 py-0.5 rounded text-3xs font-bold border uppercase ${getTypeColor(log.type)}`}>
                         {log.type}
                       </span>
                     </td>
                     <td className="py-3.5 px-4">
-                      <div className="font-medium text-slate-900 truncate max-w-md sm:max-w-xl" title={log.message}>
-                        {log.message}
-                      </div>
+                      <p className="font-semibold text-slate-800 leading-snug">{log.message}</p>
                       {log.details && (
-                        <div className="text-slate-400 truncate max-w-md sm:max-w-xl mt-0.5 text-xxs">
-                          {log.details}
-                        </div>
+                        <p className="text-xxs text-slate-400 mt-0.5 line-clamp-1">{log.details}</p>
                       )}
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap text-slate-500">
+                    <td className="py-3.5 px-4">
                       {log.supplierName ? (
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-slate-800 truncate max-w-[150px]">{log.supplierName}</span>
-                          {log.jobId && <span className="text-xxs text-slate-400">Job: <code className="mono">{log.jobId}</code></span>}
-                        </div>
-                      ) : log.userName ? (
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-slate-800">{log.userName}</span>
-                          {log.ip && <span className="text-xxs text-slate-400">IP: {log.ip}</span>}
+                        <div>
+                          <p className="font-semibold text-slate-700">{log.supplierName}</p>
+                          {log.jobId && <p className="text-3xs text-slate-400">Job: <code className="font-mono">{log.jobId}</code></p>}
                         </div>
                       ) : (
-                        <span className="text-slate-400 italic">System Core</span>
+                        <span className="text-slate-400 italic">System Scope</span>
                       )}
                     </td>
                     <td className="py-3.5 px-4 text-center">
                       <button
                         onClick={() => setSelectedLog(log)}
-                        className="btn-icon mx-auto text-slate-400 hover:bg-primary-600 hover:text-white transition-all duration-200"
+                        className="btn-icon hover:bg-primary-600 hover:text-white transition-all duration-200"
                         title="View Details"
                       >
-                        <Eye size={14} />
+                        <Eye size={13} />
                       </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400 font-medium">
-                    No log events found matching your criteria.
+                  <td colSpan={6} className="py-12 text-center text-slate-400">
+                    <div className="flex flex-col items-center gap-2">
+                      <SlidersHorizontal size={24} className="text-slate-300" />
+                      <p className="font-medium">No logs matched the selected filters</p>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -265,94 +259,73 @@ export const Logs: React.FC = () => {
         </div>
       </div>
 
-      {/* Log Detail Modal */}
+      {/* Log Detail Diagnostics Modal */}
       <Modal
         open={selectedLog !== null}
         onClose={() => setSelectedLog(null)}
-        title="Log Event Details"
-        subtitle={`ID: ${selectedLog?.id || ''}`}
-        size="md"
-        footer={
-          <button onClick={() => setSelectedLog(null)} className="btn-primary btn-sm">
-            Close Details
-          </button>
-        }
+        title="Event Diagnostics & Metadata"
       >
         {selectedLog && (
           <div className="space-y-4 text-xs">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xxs font-semibold text-slate-400 uppercase tracking-wider block">Timestamp</label>
-                <div className="font-mono text-slate-700 mt-1">
-                  {format(new Date(selectedLog.timestamp), 'yyyy-MM-dd HH:mm:ss.SSS XXX')}
-                </div>
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                {getLevelIcon(selectedLog.level)}
+                <span className="font-bold text-sm text-slate-800 uppercase">{selectedLog.type} Event</span>
               </div>
-              <div>
-                <label className="text-xxs font-semibold text-slate-400 uppercase tracking-wider block">Severity Level</label>
-                <div className="mt-1">{getLevelBadge(selectedLog.level)}</div>
-              </div>
+              {getLevelBadge(selectedLog.level)}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xxs font-semibold text-slate-400 uppercase tracking-wider block">Category Type</label>
-                <div className="mt-1">
-                  <span className={`px-2 py-0.5 rounded text-xxs font-mono font-semibold uppercase border ${getTypeColor(selectedLog.type)}`}>
-                    {selectedLog.type}
-                  </span>
-                </div>
-              </div>
-              {selectedLog.jobId && (
-                <div>
-                  <label className="text-xxs font-semibold text-slate-400 uppercase tracking-wider block">Job ID Context</label>
-                  <div className="font-mono text-slate-700 mt-1">{selectedLog.jobId}</div>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="text-xxs font-semibold text-slate-400 uppercase tracking-wider block">Message</label>
-              <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-slate-800 font-semibold mt-1">
+            <div className="space-y-2">
+              <h4 className="font-semibold text-slate-800">Event Message</h4>
+              <p className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-slate-700 font-medium leading-relaxed">
                 {selectedLog.message}
-              </div>
+              </p>
             </div>
 
             {selectedLog.details && (
-              <div>
-                <label className="text-xxs font-semibold text-slate-400 uppercase tracking-wider block">Extended Diagnostics / Output</label>
-                <pre className="bg-slate-900 text-slate-200 border border-slate-800 rounded-xl p-3.5 font-mono overflow-x-auto mt-1 whitespace-pre-wrap max-h-48 scrollbar-thin">
+              <div className="space-y-2">
+                <h4 className="font-semibold text-slate-800">Diagnostic Details</h4>
+                <pre className="p-3 bg-slate-900 text-slate-200 rounded-xl font-mono leading-relaxed overflow-x-auto">
                   {selectedLog.details}
                 </pre>
               </div>
             )}
 
-            {(selectedLog.supplierId || selectedLog.supplierName) && (
-              <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                <label className="text-xxs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Supplier Reference</label>
-                <div className="grid grid-cols-2 gap-2 text-xxs">
+            <div className="grid grid-cols-2 gap-4 bg-slate-50/50 p-3.5 rounded-xl border border-slate-100/50">
+              <div className="space-y-2">
+                <h4 className="font-semibold text-slate-800">Metadata Context</h4>
+                <div className="space-y-1 text-slate-500">
                   <div>
-                    <span className="text-slate-400">Name:</span> <span className="font-medium text-slate-700">{selectedLog.supplierName}</span>
+                    <span className="text-slate-400">Event ID:</span> <code className="font-mono text-slate-600">{selectedLog.id}</code>
                   </div>
                   <div>
-                    <span className="text-slate-400">ID:</span> <code className="font-mono text-slate-600">{selectedLog.supplierId}</code>
+                    <span className="text-slate-400">Timestamp:</span> <span className="text-slate-600">{selectedLog.timestamp}</span>
                   </div>
+                  {selectedLog.jobId && (
+                    <div>
+                      <span className="text-slate-400">Job ID Reference:</span> <code className="font-mono text-slate-600">{selectedLog.jobId}</code>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
 
-            {(selectedLog.userId || selectedLog.userName) && (
-              <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                <label className="text-xxs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">User Context</label>
-                <div className="grid grid-cols-2 gap-2 text-xxs">
+              <div className="space-y-2">
+                <h4 className="font-semibold text-slate-800">Trigger Context</h4>
+                <div className="space-y-1 text-slate-500">
                   <div>
-                    <span className="text-slate-400">User:</span> <span className="font-medium text-slate-700">{selectedLog.userName}</span>
+                    <span className="text-slate-400">Target Supplier:</span> <span className="text-slate-600 font-semibold">{selectedLog.supplierName || 'System'}</span>
                   </div>
+                  {selectedLog.userId && (
+                    <div>
+                      <span className="text-slate-400">Triggered User:</span> <code className="font-mono text-slate-600">{selectedLog.userId}</code>
+                    </div>
+                  )}
                   <div>
                     <span className="text-slate-400">IP address:</span> <code className="font-mono text-slate-600">{selectedLog.ip}</code>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         )}
       </Modal>

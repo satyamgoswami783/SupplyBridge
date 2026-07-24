@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldCheck, CheckCircle2, XCircle, Eye, AlertTriangle, RefreshCw, Loader2, Check, Info } from 'lucide-react'
 import { SectionHeader, FilterBar, Tabs, Spinner } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { mockValidationItems } from '../../data/mockData'
 import { statusToVariant, timeAgo } from '../../utils'
-import type { ValidationItem } from '../../types'
+import type { ValidationItem, ValidationStatus } from '../../types'
+import { useAuth } from '../../context/AuthContext'
 
 export const ValidationCenter: React.FC = () => {
-  // Main state for validation items
+  const { role } = useAuth()
   const [items, setItems] = useState<ValidationItem[]>(mockValidationItems)
   const [tab, setTab] = useState('pending')
   const [search, setSearch] = useState('')
@@ -20,7 +21,6 @@ export const ValidationCenter: React.FC = () => {
   const [reviewNotes, setReviewNotes] = useState('')
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   
-  // Loading & Toast States
   const [isLoading, setIsLoading] = useState(false)
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null)
 
@@ -46,7 +46,7 @@ export const ValidationCenter: React.FC = () => {
     { id: 'review',   label: 'In Review',        count: items.filter(v => v.status === 'review').length },
     { id: 'approved', label: 'Approved',          count: items.filter(v => v.status === 'approved').length },
     { id: 'rejected', label: 'Rejected',          count: items.filter(v => v.status === 'rejected').length },
-    { id: 'all',      label: 'All',               count: items.length },
+    { id: 'all',      label: 'All Items',         count: items.length },
   ]
 
   // Filter items based on tab, search, supplier, and error type
@@ -57,7 +57,8 @@ export const ValidationCenter: React.FC = () => {
     // Search Filter (by Product Name or Supplier SKU)
     const matchSearch =
       v.productName.toLowerCase().includes(search.toLowerCase()) ||
-      v.supplierSku.toLowerCase().includes(search.toLowerCase())
+      v.supplierSku.toLowerCase().includes(search.toLowerCase()) ||
+      v.supplierName.toLowerCase().includes(search.toLowerCase())
 
     // Supplier Filter
     const matchSupplier = selectedSupplier === 'All Suppliers' || v.supplierName === selectedSupplier
@@ -90,31 +91,32 @@ export const ValidationCenter: React.FC = () => {
     setSelectedIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]))
 
   // Handlers for action flows
-
   const handleRefresh = () => {
     setIsLoading(true)
     setTimeout(() => {
       setItems(mockValidationItems)
       setSelectedIds([])
       setIsLoading(false)
-      setToastMessage({ text: 'Validation list successfully refreshed.', type: 'success' })
+      setToastMessage({ text: 'Validation queue refreshed.', type: 'success' })
     }, 800)
   }
 
-  const handleApproveSingle = (id: string) => {
+  const handleApproveSingle = (id: string, name?: string) => {
     setItems(prev =>
       prev.map(item => (item.id === id ? { ...item, status: 'approved' } : item))
     )
-    setToastMessage({ text: 'Product approved successfully.', type: 'success' })
+    setToastMessage({ text: `Product "${name || 'Item'}" approved successfully.`, type: 'success' })
     setSelectedIds(prev => prev.filter(x => x !== id))
+    if (reviewItem?.id === id) setReviewItem(null)
   }
 
-  const handleRejectSingle = (id: string) => {
+  const handleRejectSingle = (id: string, name?: string) => {
     setItems(prev =>
       prev.map(item => (item.id === id ? { ...item, status: 'rejected' } : item))
     )
-    setToastMessage({ text: 'Product rejected.', type: 'info' })
+    setToastMessage({ text: `Product "${name || 'Item'}" rejected.`, type: 'info' })
     setSelectedIds(prev => prev.filter(x => x !== id))
+    if (reviewItem?.id === id) setReviewItem(null)
   }
 
   const handleBulkApprove = () => {
@@ -122,7 +124,7 @@ export const ValidationCenter: React.FC = () => {
     setItems(prev =>
       prev.map(item => (selectedIds.includes(item.id) ? { ...item, status: 'approved' } : item))
     )
-    setToastMessage({ text: `${selectedIds.length} products approved successfully.`, type: 'success' })
+    setToastMessage({ text: `${selectedIds.length} items approved successfully.`, type: 'success' })
     setSelectedIds([])
   }
 
@@ -131,7 +133,7 @@ export const ValidationCenter: React.FC = () => {
     setItems(prev =>
       prev.map(item => (selectedIds.includes(item.id) ? { ...item, status: 'rejected' } : item))
     )
-    setToastMessage({ text: `${selectedIds.length} products rejected.`, type: 'info' })
+    setToastMessage({ text: `${selectedIds.length} items rejected.`, type: 'info' })
     setSelectedIds([])
   }
 
@@ -147,10 +149,10 @@ export const ValidationCenter: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="relative">
       <SectionHeader
         title="Validation Center"
-        subtitle="Review and approve products before they enter the master catalog"
+        subtitle="Review, audit, and approve products before publishing to the master catalog"
         actions={
           <>
             {selectedIds.length > 0 && (
@@ -165,27 +167,34 @@ export const ValidationCenter: React.FC = () => {
             )}
             <button onClick={handleRefresh} className="btn-secondary btn-sm flex items-center gap-1.5" disabled={isLoading}>
               <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
-              Refresh
+              Refresh Queue
             </button>
           </>
         }
       />
 
       {/* Floating Status Notification Toast */}
-      {toastMessage && (
-        <div className={`fixed bottom-5 right-5 z-50 p-4 rounded-xl shadow-lg border text-xs flex items-center gap-2 font-semibold transition-all ${
-          toastMessage.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
-          toastMessage.type === 'error' ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-blue-50 text-blue-800 border-blue-200'
-        }`}>
-          {toastMessage.type === 'success' ? <CheckCircle2 size={16} className="text-emerald-600" /> : <Info size={16} />}
-          {toastMessage.text}
-        </div>
-      )}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={`fixed bottom-5 right-5 z-50 p-4 rounded-xl shadow-lg border text-xs flex items-center gap-2 font-semibold transition-all ${
+              toastMessage.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
+              toastMessage.type === 'error' ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-blue-50 text-blue-800 border-blue-200'
+            }`}
+          >
+            {toastMessage.type === 'success' ? <CheckCircle2 size={16} className="text-emerald-600" /> : <Info size={16} />}
+            {toastMessage.text}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Error Summary Cards */}
+      {/* Error Summary KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         {[
-          { label: 'Pending', value: items.filter(v => v.status === 'pending').length, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Pending Review', value: items.filter(v => v.status === 'pending').length, color: 'text-amber-600', bg: 'bg-amber-50' },
           { label: 'In Review', value: items.filter(v => v.status === 'review').length, color: 'text-cyan-600', bg: 'bg-cyan-50' },
           { label: 'Missing Images', value: getErrorCount('missing_image'), color: 'text-rose-600', bg: 'bg-rose-50' },
           { label: 'Duplicate SKU', value: getErrorCount('duplicate_sku'), color: 'text-violet-600', bg: 'bg-violet-50' },
@@ -200,7 +209,8 @@ export const ValidationCenter: React.FC = () => {
       </div>
 
       <Tabs tabs={tabs} active={tab} onChange={setTab} />
-      <FilterBar search={search} onSearch={setSearch} placeholder="Search products...">
+      
+      <FilterBar search={search} onSearch={setSearch} placeholder="Search product name or SKU...">
         <select
           className="select input-sm w-auto min-w-[130px]"
           value={selectedSupplier}
@@ -226,16 +236,16 @@ export const ValidationCenter: React.FC = () => {
         </select>
       </FilterBar>
 
-      {/* Bulk select bar */}
-      <div className="flex items-center gap-2 mb-4">
+      {/* Bulk Select Bar */}
+      <div className="flex items-center gap-2 mb-4 p-2 bg-slate-50 rounded-xl border border-slate-200">
         <input
           type="checkbox"
-          className="rounded border-slate-300"
-          checked={filtered.length > 0 && selectedIds.length === filtered.length}
+          className="rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+          checked={filtered.length > 0 && filtered.every(v => selectedIds.includes(v.id))}
           onChange={e => setSelectedIds(e.target.checked ? filtered.map(v => v.id) : [])}
         />
-        <span className="text-sm text-slate-500">
-          {selectedIds.length > 0 ? `${selectedIds.length} selected` : 'Select all'}
+        <span className="text-xs font-semibold text-slate-700">
+          {selectedIds.length > 0 ? `${selectedIds.length} items selected` : 'Select All Items'}
         </span>
       </div>
 
@@ -248,7 +258,7 @@ export const ValidationCenter: React.FC = () => {
         ) : filtered.length === 0 ? (
           <div className="card p-16 text-center text-slate-400">
             <ShieldCheck size={36} className="mx-auto mb-3 text-emerald-400" />
-            <p className="font-medium text-slate-600">No items in this category</p>
+            <p className="font-medium text-slate-600">No items in this validation tab</p>
           </div>
         ) : (
           filtered.map(item => (
@@ -293,20 +303,20 @@ export const ValidationCenter: React.FC = () => {
                 </div>
                 <div className="flex gap-2 flex-shrink-0" onClick={e => e.stopPropagation()}>
                   <button
-                    onClick={() => handleApproveSingle(item.id)}
-                    className="btn-success btn-sm"
+                    onClick={() => handleApproveSingle(item.id, item.productName)}
+                    className="btn-success btn-sm flex items-center gap-1"
                     disabled={item.status === 'approved'}
                   >
                     <CheckCircle2 size={13} /> Approve
                   </button>
                   <button
-                    onClick={() => handleRejectSingle(item.id)}
-                    className="btn-danger btn-sm"
+                    onClick={() => handleRejectSingle(item.id, item.productName)}
+                    className="btn-danger btn-sm flex items-center gap-1"
                     disabled={item.status === 'rejected'}
                   >
                     <XCircle size={13} /> Reject
                   </button>
-                  <button onClick={() => handleOpenReview(item)} className="btn-secondary btn-sm">
+                  <button onClick={() => handleOpenReview(item)} className="btn-secondary btn-sm flex items-center gap-1">
                     <Eye size={13} /> Review
                   </button>
                 </div>
@@ -331,21 +341,21 @@ export const ValidationCenter: React.FC = () => {
               </button>
               <button
                 onClick={() => {
-                  handleRejectSingle(reviewItem.id)
+                  handleRejectSingle(reviewItem.id, reviewItem.productName)
                   setReviewItem(null)
                 }}
-                className="btn-danger"
+                className="btn-danger flex items-center gap-1.5"
               >
-                <XCircle size={14} /> Reject
+                <XCircle size={14} /> Reject Item
               </button>
               <button
                 onClick={() => {
-                  handleApproveSingle(reviewItem.id)
+                  handleApproveSingle(reviewItem.id, reviewItem.productName)
                   setReviewItem(null)
                 }}
-                className="btn-success"
+                className="btn-success flex items-center gap-1.5"
               >
-                <CheckCircle2 size={14} /> Approve
+                <CheckCircle2 size={14} /> Approve Item
               </button>
             </>
           }
@@ -373,7 +383,7 @@ export const ValidationCenter: React.FC = () => {
               <textarea
                 className="input"
                 rows={3}
-                placeholder="Add notes for this review decision..."
+                placeholder="Add audit notes for this validation review decision..."
                 value={reviewNotes}
                 onChange={e => setReviewNotes(e.target.value)}
               />
