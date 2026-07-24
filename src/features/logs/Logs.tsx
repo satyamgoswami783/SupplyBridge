@@ -10,7 +10,10 @@ import {
   Search,
   RefreshCw,
   ChevronRight,
-  ChevronDown
+  ChevronDown,
+  Download,
+  FileCode,
+  FileSpreadsheet
 } from 'lucide-react'
 
 export const Logs: React.FC = () => {
@@ -46,6 +49,41 @@ export const Logs: React.FC = () => {
       setIsRefreshing(false)
       showNotification('System logs refreshed successfully!')
     }, 1000)
+  }
+
+  const handleExportLogsJSON = () => {
+    showNotification('Exporting logs JSON file...')
+    const jsonString = JSON.stringify(filteredLogs, null, 2)
+    const blob = new Blob([jsonString], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `SupplyBridge_System_Logs_${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    showNotification('System logs JSON file downloaded!')
+  }
+
+  const handleExportLogsCSV = () => {
+    showNotification('Exporting logs CSV file...')
+    const csvHeaders = 'Log ID,Timestamp,Level,Type,Supplier,Message,Details\n'
+    const csvRows = filteredLogs.map(l =>
+      `"${l.id}","${l.timestamp}","${l.level}","${l.type}","${l.supplierName || ''}","${l.message.replace(/"/g, '""')}","${(l.details || '').replace(/"/g, '""')}"`
+    ).join('\n')
+    const csvContent = csvHeaders + csvRows
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `SupplyBridge_System_Logs_${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    showNotification('System logs CSV file downloaded!')
   }
 
   const getLevelBadge = (level: LogLevel) => {
@@ -96,14 +134,30 @@ export const Logs: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">System Logs</h1>
           <p className="text-slate-500 text-sm mt-1">Monitor background syncs, API calls, and integration events in real time.</p>
         </div>
-        <button
-          onClick={handleRefreshLogs}
-          disabled={isRefreshing}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 active:scale-98 transition duration-200 shadow-sm disabled:opacity-60 cursor-pointer"
-        >
-          <RefreshCw size={16} className={isRefreshing ? 'animate-spin text-primary-600' : ''} />
-          {isRefreshing ? 'Refreshing Logs...' : 'Refresh Logs'}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleExportLogsCSV}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 active:scale-98 transition duration-200 shadow-sm cursor-pointer"
+            title="Download Logs as CSV"
+          >
+            <FileSpreadsheet size={14} className="text-emerald-600" /> Export CSV
+          </button>
+          <button
+            onClick={handleExportLogsJSON}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 active:scale-98 transition duration-200 shadow-sm cursor-pointer"
+            title="Download Logs as JSON"
+          >
+            <FileCode size={14} className="text-indigo-600" /> Export JSON
+          </button>
+          <button
+            onClick={handleRefreshLogs}
+            disabled={isRefreshing}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 active:scale-98 transition duration-200 shadow-sm disabled:opacity-60 cursor-pointer"
+          >
+            <RefreshCw size={16} className={isRefreshing ? 'animate-spin text-primary-600' : ''} />
+            {isRefreshing ? 'Refreshing Logs...' : 'Refresh Logs'}
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
