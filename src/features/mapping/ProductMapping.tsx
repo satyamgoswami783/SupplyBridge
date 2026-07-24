@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react'
+<<<<<<< HEAD
 import { useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeftRight, Link2, CheckCircle2, AlertCircle, Plus, RefreshCw, Edit2, Trash2, Tag, Layers, Truck, Package, Sliders } from 'lucide-react'
 import { SectionHeader, FilterBar, Tabs, EmptyState } from '../../components/ui'
+=======
+import { useLocation } from 'react-router-dom'
+import { ArrowLeftRight, Link2, CheckCircle2, AlertCircle, Plus, RefreshCw, Layers, Truck, Image, Tag, Package } from 'lucide-react'
+import { SectionHeader, FilterBar, Tabs } from '../../components/ui'
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 
@@ -67,6 +73,7 @@ const INITIAL_CATEGORY_MAPPINGS: CategoryMappingItem[] = [
   { id: '4', supplierCategory: 'Industrial > Cooling', supplierName: 'AcmeDistributors', masterCategory: '', status: 'unmapped' },
 ]
 
+<<<<<<< HEAD
 const INITIAL_VARIANT_MAPPINGS: VariantMappingItem[] = [
   { id: 'v1', supplierVariantKey: 'col_val_hex', supplierName: 'TechParts Int.', masterVariantDimension: 'Color', mappedValues: 'Black, Red, Blue, White', status: 'mapped' },
   { id: 'v2', supplierVariantKey: 'cap_gb_val', supplierName: 'GlobalSource Ltd.', masterVariantDimension: 'Storage Capacity', mappedValues: '128GB, 256GB, 512GB, 1TB', status: 'mapped' },
@@ -83,10 +90,25 @@ const INITIAL_SUPPLIER_MAPPINGS: SupplierMappingItem[] = [
   { id: 's1', feedId: 'TP-FTP-MAIN', supplierName: 'TechParts Int.', protocol: 'FTP / CSV', assignedEntity: 'TechParts International Inc.', status: 'mapped' },
   { id: 's2', feedId: 'GS-API-REST', supplierName: 'GlobalSource Ltd.', protocol: 'REST API / JSON', assignedEntity: 'GlobalSource Limited LLC', status: 'mapped' },
   { id: 's3', feedId: 'ACME-SFTP-FEED', supplierName: 'AcmeDistributors', protocol: 'SFTP / XML', assignedEntity: '', status: 'unmapped' },
+=======
+const MOCK_SUPPLIER_MAPPINGS = [
+  { id: '1', supplierName: 'TechParts International', code: 'TP-INT-01', type: 'REST API', mappedFields: 34, totalFields: 36, syncFreq: 'Every 6 Hours', status: 'mapped' },
+  { id: '2', supplierName: 'GlobalSource Limited', code: 'GS-LTD-02', type: 'SFTP (CSV)', mappedFields: 28, totalFields: 30, syncFreq: 'Every 12 Hours', status: 'mapped' },
+  { id: '3', supplierName: 'AcmeDistributors', code: 'ACME-03', type: 'FTP (XML)', mappedFields: 18, totalFields: 25, syncFreq: 'Daily Midnight', status: 'review' },
+  { id: '4', supplierName: 'QuickShip Supply Co.', code: 'QS-SUP-04', type: 'Excel Upload', mappedFields: 0, totalFields: 24, syncFreq: 'Manual Upload', status: 'unmapped' },
+]
+
+const MOCK_VARIANT_MAPPINGS = [
+  { id: '1', supplierOption: 'Color: Matte Black', supplierName: 'TechParts Int.', masterAttribute: 'Color: Midnight Black', status: 'mapped', confidence: 95 },
+  { id: '2', supplierOption: 'Size: 32GB Kit (2x16GB)', supplierName: 'TechParts Int.', masterAttribute: 'Capacity: 32GB (2x16GB)', status: 'mapped', confidence: 99 },
+  { id: '3', supplierOption: 'Storage: 2000GB SSD', supplierName: 'GlobalSource Ltd.', masterAttribute: 'Capacity: 2TB', status: 'mapped', confidence: 94 },
+  { id: '4', supplierOption: 'Color: Space Gray', supplierName: 'GlobalSource Ltd.', masterAttribute: '', status: 'unmapped', confidence: 0 },
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
 ]
 
 export const ProductMapping: React.FC = () => {
   const location = useLocation()
+<<<<<<< HEAD
   const navigate = useNavigate()
 
   const [productMappings, setProductMappings] = useState<ProductMappingItem[]>(INITIAL_PRODUCT_MAPPINGS)
@@ -117,6 +139,9 @@ export const ProductMapping: React.FC = () => {
     navigate(targetPath)
   }
 
+=======
+  const [activeMapping, setActiveMapping] = useState('products')
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
   const [search, setSearch] = useState('')
   const [supplierFilter, setSupplierFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -226,12 +251,28 @@ export const ProductMapping: React.FC = () => {
     showNotification(`New mapping rule created for "${formData.field1}"!`)
   }
 
+  // Sync tab with URL route
+  useEffect(() => {
+    const path = location.pathname
+    if (path.includes('categories')) setActiveMapping('categories')
+    else if (path.includes('variants')) setActiveMapping('variants')
+    else if (path.includes('suppliers')) setActiveMapping('supplier')
+    else setActiveMapping('products')
+  }, [location.pathname])
+
   const tabs = [
+<<<<<<< HEAD
     { id: 'products',   label: 'Product Mapping',  count: productMappings.length },
     { id: 'categories', label: 'Category Mapping',  count: categoryMappings.length },
     { id: 'variants',   label: 'Variant Mapping',   count: variantMappings.length },
     { id: 'attributes', label: 'Attribute Mapping', count: attributeMappings.length },
     { id: 'suppliers',  label: 'Supplier Mapping',  count: supplierMappings.length },
+=======
+    { id: 'products',   label: 'Product Mapping',  count: 6 },
+    { id: 'categories', label: 'Category Mapping',  count: 4 },
+    { id: 'variants',   label: 'Variant Mapping',   count: 4 },
+    { id: 'supplier',   label: 'Supplier Mapping',  count: 4 },
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
   ]
 
   const pageTitles: Record<string, { title: string; subtitle: string }> = {
@@ -243,6 +284,7 @@ export const ProductMapping: React.FC = () => {
   }
 
   return (
+<<<<<<< HEAD
     <div className="relative">
       {/* Toast Notification Banner */}
       <AnimatePresence>
@@ -289,14 +331,36 @@ export const ProductMapping: React.FC = () => {
           { label: 'Category Rules', value: categoryMappings.length, color: 'text-primary-600' },
           { label: 'Variant Rules',  value: variantMappings.length, color: 'text-violet-600' },
           { label: 'Attribute Rules',value: attributeMappings.length, color: 'text-emerald-600' },
+=======
+    <div className="space-y-4">
+      <SectionHeader
+        title="Product & Supplier Mapping"
+        subtitle="Map supplier catalog structures, SKUs, categories, and attributes to master platform schemas"
+        actions={
+          <div className="flex gap-2">
+            <button className="btn-secondary btn-sm"><RefreshCw size={14} /> Auto-Map Rules</button>
+            <button className="btn-primary btn-sm"><Plus size={14} /> Add Mapping Rule</button>
+          </div>
+        }
+      />
+
+      {/* Compact Mapping KPI Summary Bar */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: 'Total Mappings', value: '54', color: 'text-slate-800 dark:text-slate-100' },
+          { label: 'Mapped & Verified', value: '41', color: 'text-emerald-600 dark:text-emerald-400' },
+          { label: 'Unmapped Items',   value: '9',  color: 'text-rose-600 dark:text-rose-400' },
+          { label: 'Needs Review',     value: '4',  color: 'text-amber-600 dark:text-amber-400' },
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
         ].map(s => (
-          <div key={s.label} className="card px-4 py-3 text-center">
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
+          <div key={s.label} className="card px-4 py-2.5 text-center">
+            <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
+            <p className="text-2xs text-slate-500 font-medium mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
 
+<<<<<<< HEAD
       <Tabs tabs={tabs} active={activeMapping} onChange={handleTabChange} />
 
       <FilterBar search={search} onSearch={setSearch} placeholder={`Search ${activeMapping} mappings...`}>
@@ -313,23 +377,52 @@ export const ProductMapping: React.FC = () => {
       </FilterBar>
 
       {/* --- TAB 1: PRODUCT SKU MAPPING --- */}
+=======
+      <Tabs tabs={tabs} active={activeMapping} onChange={setActiveMapping} />
+
+      <FilterBar search={search} onSearch={setSearch} placeholder="Search SKUs, categories, or suppliers...">
+        <select className="select input-sm w-auto min-w-[140px]">
+          <option>All Suppliers</option>
+          <option>TechParts International</option>
+          <option>GlobalSource Limited</option>
+          <option>AcmeDistributors</option>
+        </select>
+        <select className="select input-sm w-auto min-w-[130px]">
+          <option>All Status</option>
+          <option>Mapped</option>
+          <option>Unmapped</option>
+          <option>Needs Review</option>
+        </select>
+      </FilterBar>
+
+      {/* Product Mapping Table */}
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
       {activeMapping === 'products' && (
         <div className="card overflow-hidden">
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
+<<<<<<< HEAD
                   <th>Supplier Raw SKU</th>
                   <th>Supplier Name</th>
                   <th></th>
                   <th>Master Catalog SKU</th>
                   <th>Master Product Name</th>
+=======
+                  <th>Supplier SKU</th>
+                  <th>Supplier</th>
+                  <th className="text-center">Link</th>
+                  <th>Master SKU</th>
+                  <th>Master Product</th>
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
                   <th>Confidence</th>
                   <th>Status</th>
                   <th className="text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
+<<<<<<< HEAD
                 {productMappings
                   .filter(m => supplierFilter === 'all' || m.supplierName === supplierFilter)
                   .filter(m => m.supplierSku.toLowerCase().includes(search.toLowerCase()) || m.masterSku.toLowerCase().includes(search.toLowerCase()))
@@ -404,6 +497,35 @@ export const ProductMapping: React.FC = () => {
                         className={m.status === 'unmapped' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
                       >
                         {m.status === 'unmapped' ? 'Map Category' : 'Edit Target'}
+=======
+                {MOCK_PRODUCT_MAPPINGS.map(m => (
+                  <tr key={m.id}>
+                    <td><code className="mono">{m.supplierSku}</code></td>
+                    <td><span className="text-xs text-slate-600 dark:text-slate-400 font-medium">{m.supplierName}</span></td>
+                    <td className="text-center"><ArrowLeftRight size={14} className="text-primary-500 mx-auto opacity-70" /></td>
+                    <td>{m.masterSku ? <code className="mono">{m.masterSku}</code> : <span className="text-slate-400 text-xs italic">Not mapped</span>}</td>
+                    <td><span className="text-xs text-slate-800 dark:text-slate-200 font-semibold max-w-[240px] truncate block">{m.masterName || '—'}</span></td>
+                    <td>
+                      {m.confidence > 0 ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full ${m.confidence > 90 ? 'bg-emerald-500' : m.confidence > 70 ? 'bg-amber-500' : 'bg-rose-500'}`} style={{ width: `${m.confidence}%` }} />
+                          </div>
+                          <span className="text-xs text-slate-600 dark:text-slate-400 font-bold">{m.confidence}%</span>
+                        </div>
+                      ) : (
+                        <span className="text-2xs text-slate-400">0%</span>
+                      )}
+                    </td>
+                    <td>
+                      <Badge variant={m.status === 'mapped' ? 'success' : m.status === 'review' ? 'warning' : 'danger'}>
+                        {m.status}
+                      </Badge>
+                    </td>
+                    <td className="text-right">
+                      <button className={m.status === 'unmapped' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}>
+                        {m.status === 'unmapped' ? 'Map Now' : 'Edit'}
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
                       </button>
                     </td>
                   </tr>
@@ -414,23 +536,36 @@ export const ProductMapping: React.FC = () => {
         </div>
       )}
 
+<<<<<<< HEAD
       {/* --- TAB 3: VARIANT MAPPING --- */}
       {activeMapping === 'variants' && (
+=======
+      {/* Category Mapping Table */}
+      {activeMapping === 'categories' && (
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
         <div className="card overflow-hidden">
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
+<<<<<<< HEAD
                   <th>Supplier Variant Key</th>
                   <th>Supplier</th>
                   <th></th>
                   <th>Master Variant Dimension</th>
                   <th>Mapped Values</th>
+=======
+                  <th>Supplier Category Taxonomy</th>
+                  <th>Supplier</th>
+                  <th className="text-center">Link</th>
+                  <th>Master PIM Category</th>
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
                   <th>Status</th>
                   <th className="text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
+<<<<<<< HEAD
                 {variantMappings.map(m => (
                   <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
                     <td><code className="mono font-semibold text-slate-800">{m.supplierVariantKey}</code></td>
@@ -452,6 +587,16 @@ export const ProductMapping: React.FC = () => {
                         {m.status === 'unmapped' ? 'Map Variant' : 'Edit Dimension'}
                       </button>
                     </td>
+=======
+                {MOCK_CATEGORY_MAPPINGS.map(m => (
+                  <tr key={m.id}>
+                    <td><span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{m.supplierCategory}</span></td>
+                    <td><span className="text-xs text-slate-500">{m.supplierName}</span></td>
+                    <td className="text-center"><ArrowLeftRight size={14} className="text-primary-500 mx-auto opacity-70" /></td>
+                    <td><span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{m.masterCategory || <span className="text-slate-400 italic">Not mapped</span>}</span></td>
+                    <td><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
+                    <td className="text-right"><button className={m.status === 'unmapped' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}>{m.status === 'unmapped' ? 'Map Now' : 'Edit'}</button></td>
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
                   </tr>
                 ))}
               </tbody>
@@ -460,23 +605,37 @@ export const ProductMapping: React.FC = () => {
         </div>
       )}
 
+<<<<<<< HEAD
       {/* --- TAB 4: ATTRIBUTE MAPPING --- */}
       {activeMapping === 'attributes' && (
+=======
+      {/* Supplier Mapping Table */}
+      {activeMapping === 'supplier' && (
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
         <div className="card overflow-hidden">
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
+<<<<<<< HEAD
                   <th>Supplier Feed Attribute</th>
                   <th>Supplier</th>
                   <th></th>
                   <th>PIM Master Specification Field</th>
                   <th>Data Type</th>
+=======
+                  <th>Supplier Partner</th>
+                  <th>Supplier Code</th>
+                  <th>Integration Protocol</th>
+                  <th>Mapped Fields</th>
+                  <th>Sync Frequency</th>
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
                   <th>Status</th>
                   <th className="text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
+<<<<<<< HEAD
                 {attributeMappings.map(m => (
                   <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
                     <td><code className="mono font-semibold text-slate-800">{m.supplierAttribute}</code></td>
@@ -497,12 +656,85 @@ export const ProductMapping: React.FC = () => {
                       >
                         {m.status === 'unmapped' ? 'Map Attribute' : 'Edit Rule'}
                       </button>
+=======
+                {MOCK_SUPPLIER_MAPPINGS.map(m => (
+                  <tr key={m.id}>
+                    <td>
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-slate-800 flex items-center justify-center text-primary-600 font-bold text-xs">
+                          {m.supplierName.charAt(0)}
+                        </div>
+                        <span className="font-bold text-sm text-slate-800 dark:text-slate-100">{m.supplierName}</span>
+                      </div>
+                    </td>
+                    <td><code className="mono">{m.code}</code></td>
+                    <td><span className="text-xs font-semibold text-slate-600 dark:text-slate-300">{m.type}</span></td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary-500 rounded-full" style={{ width: `${(m.mappedFields / m.totalFields) * 100}%` }} />
+                        </div>
+                        <span className="text-xs text-slate-600 dark:text-slate-400 font-bold">{m.mappedFields}/{m.totalFields}</span>
+                      </div>
+                    </td>
+                    <td><span className="text-xs text-slate-500">{m.syncFreq}</span></td>
+                    <td>
+                      <Badge variant={m.status === 'mapped' ? 'success' : m.status === 'review' ? 'warning' : 'danger'}>
+                        {m.status}
+                      </Badge>
+                    </td>
+                    <td className="text-right">
+                      <button className="btn-secondary btn-sm">Configure Field Map</button>
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+<<<<<<< HEAD
+=======
+        </div>
+      )}
+
+      {/* Variant Mapping Table */}
+      {activeMapping === 'variants' && (
+        <div className="card overflow-hidden">
+          <div className="table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Supplier Option / Attribute</th>
+                  <th>Supplier</th>
+                  <th className="text-center">Link</th>
+                  <th>Master Variant Schema</th>
+                  <th>Confidence</th>
+                  <th>Status</th>
+                  <th className="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {MOCK_VARIANT_MAPPINGS.map(m => (
+                  <tr key={m.id}>
+                    <td><span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{m.supplierOption}</span></td>
+                    <td><span className="text-xs text-slate-500">{m.supplierName}</span></td>
+                    <td className="text-center"><ArrowLeftRight size={14} className="text-primary-500 mx-auto opacity-70" /></td>
+                    <td><span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{m.masterAttribute || <span className="text-slate-400 italic">Not mapped</span>}</span></td>
+                    <td>
+                      {m.confidence > 0 ? (
+                        <span className="text-xs text-emerald-600 font-bold">{m.confidence}%</span>
+                      ) : (
+                        <span className="text-2xs text-slate-400">0%</span>
+                      )}
+                    </td>
+                    <td><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
+                    <td className="text-right"><button className={m.status === 'unmapped' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}>{m.status === 'unmapped' ? 'Map Variant' : 'Edit'}</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+>>>>>>> c3be9fd65bbe4388b3e41d5c4496d08555f5dffc
         </div>
       )}
 

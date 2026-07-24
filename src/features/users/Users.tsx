@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { UserPlus, MoreVertical, Edit, Ban, CheckCircle2, Mail } from 'lucide-react'
+import { UserPlus, MoreVertical, Edit, Ban, CheckCircle2, Mail, Eye } from 'lucide-react'
 import { SectionHeader, FilterBar } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { mockUsers } from '../../data/mockData'
 import { statusToVariant, formatDate, getInitials, timeAgo } from '../../utils'
+import { useAuth } from '../../context/AuthContext'
 import type { UserRole } from '../../types'
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -24,6 +25,7 @@ const ROLE_COLORS: Record<UserRole, string> = {
 } as any
 
 export const Users: React.FC = () => {
+  const { setViewProfileUser } = useAuth()
   const [search, setSearch] = useState('')
   const [inviteOpen, setInviteOpen] = useState(false)
 
@@ -78,14 +80,14 @@ export const Users: React.FC = () => {
             </thead>
             <tbody>
               {filtered.map(user => (
-                <tr key={user.id}>
+                <tr key={user.id} className="cursor-pointer hover:bg-slate-50/80 transition-colors" onClick={() => setViewProfileUser(user)}>
                   <td>
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                      <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-sm">
                         {getInitials(user.name)}
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-800 text-sm">{user.name}</p>
+                        <p className="font-semibold text-slate-800 text-sm hover:text-primary-600 transition-colors">{user.name}</p>
                         <p className="text-xs text-slate-400">{user.email}</p>
                       </div>
                     </div>
@@ -101,12 +103,13 @@ export const Users: React.FC = () => {
                   </td>
                   <td><span className="text-xs text-slate-400">{user.lastLogin ? timeAgo(user.lastLogin) : '—'}</span></td>
                   <td><span className="text-xs text-slate-400">{formatDate(user.createdAt)}</span></td>
-                  <td>
+                  <td onClick={e => e.stopPropagation()}>
                     <div className="flex gap-1">
-                      <button className="btn-icon"><Edit size={14} /></button>
+                      <button className="btn-icon" onClick={() => setViewProfileUser(user)} title="View Profile"><Eye size={14} /></button>
+                      <button className="btn-icon" title="Edit User"><Edit size={14} /></button>
                       {user.status === 'active'
-                        ? <button className="btn-icon text-rose-500 hover:bg-rose-50"><Ban size={14} /></button>
-                        : <button className="btn-icon text-emerald-500 hover:bg-emerald-50"><CheckCircle2 size={14} /></button>
+                        ? <button className="btn-icon text-rose-500 hover:bg-rose-50" title="Deactivate"><Ban size={14} /></button>
+                        : <button className="btn-icon text-emerald-500 hover:bg-emerald-50" title="Activate"><CheckCircle2 size={14} /></button>
                       }
                     </div>
                   </td>

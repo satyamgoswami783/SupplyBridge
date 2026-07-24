@@ -6,10 +6,10 @@ import {
   Layers, ArrowLeftRight, ShieldCheck, RefreshCw, DollarSign,
   Image, Store, Globe, Briefcase, Download, FileText, Activity,
   BarChart3, Users, UserCog, Lock, Settings, ChevronDown,
-  ChevronRight, Zap, X, Menu
+  ChevronRight, Zap, X, Menu, User, LogOut
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { cn } from '../../utils'
+import { cn, getInitials } from '../../utils'
 
 interface NavItem {
   id: string
@@ -74,19 +74,19 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
   const location = useLocation()
   const { hasPermission } = useAuth()
   
-  const allowedChildren = item.children?.filter(c => !c.module || hasPermission(c.module)) || []
-  if (allowedChildren.length === 0) return null
+  const visibleChildren = item.children?.filter(c => !c.module || hasPermission(c.module)) || []
+  if (visibleChildren.length === 0) return null
 
-  const isChildActive = allowedChildren.some(c => c.path && location.pathname.startsWith(c.path))
+  const isChildActive = visibleChildren.some(c => c.path && location.pathname.startsWith(c.path))
 
   return (
     <div>
       <button
         onClick={() => setExpanded(!expanded)}
-        className={cn('sidebar-item w-full justify-between', isChildActive && 'sidebar-item-active')}
+        className={cn('sidebar-item w-full justify-between', isChildActive && 'text-primary-300 font-bold bg-slate-800/40')}
       >
         <span className="flex items-center gap-3">
-          <span className="opacity-70">{item.icon}</span>
+          <span className="opacity-80">{item.icon}</span>
           {item.label}
         </span>
         <motion.span
@@ -105,8 +105,8 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="ml-3 pl-3 border-l border-slate-700/60 mt-0.5 mb-0.5 space-y-0.5">
-              {allowedChildren.map(child => (
+            <div className="ml-3.5 pl-3 border-l border-slate-800/80 mt-0.5 mb-0.5 space-y-0.5">
+              {visibleChildren.map(child => (
                 <NavLink
                   key={child.id}
                   to={child.path!}
@@ -115,7 +115,7 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
                     cn('sidebar-item text-xs', isActive && 'sidebar-item-active')
                   }
                 >
-                  <span className="opacity-60">{child.icon}</span>
+                  <span className="opacity-70">{child.icon}</span>
                   {child.label}
                 </NavLink>
               ))}
@@ -128,24 +128,30 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
-  const { hasPermission } = useAuth()
+  const { hasPermission, currentUser, logout, openCurrentUserProfile } = useAuth()
 
   const visibleItems = NAV_ITEMS.filter(item => {
     if (item.module && !hasPermission(item.module)) return false
+    if (item.children) {
+      const validChildren = item.children.filter(c => !c.module || hasPermission(c.module))
+      return validChildren.length > 0
+    }
     return true
   })
 
-  const sidebarContent = (
-    <div className="flex flex-col h-full">
+  return (
+    <div className="flex flex-col h-full bg-gradient-sidebar border-r border-slate-800/80">
       {/* Logo */}
-      <div className="px-4 py-5 border-b border-slate-800 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center shadow-glow-primary">
-            <Zap size={16} className="text-white" />
+      <div className="px-5 py-5 border-b border-slate-800/80 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-aurora flex items-center justify-center shadow-glow-primary text-white font-black">
+            <Zap size={18} />
           </div>
           <div>
-            <span className="font-bold text-white text-sm tracking-tight">SupplyBridge</span>
-            <span className="block text-2xs text-slate-500 font-medium">Enterprise PIM</span>
+            <span className="font-extrabold text-white text-sm tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+              SupplyBridge
+            </span>
+            <span className="block text-2xs text-cyan-400 font-semibold tracking-wider uppercase">Enterprise PIM</span>
           </div>
         </div>
         <button onClick={onClose} className="lg:hidden btn-icon text-slate-400 hover:text-white hover:bg-slate-800">
@@ -154,7 +160,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5 scrollbar-hide">
+      <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-1 scrollbar-hide">
         {visibleItems.map(item => {
           if (item.children) {
             return <NavGroup key={item.id} item={item} onClose={onClose} />
@@ -169,53 +175,66 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
                 cn('sidebar-item', isActive && 'sidebar-item-active')
               }
             >
-              <span className="opacity-70">{item.icon}</span>
+              <span className="opacity-80">{item.icon}</span>
               {item.label}
             </NavLink>
           )
         })}
+
+        {/* Profile & Logout Section at bottom of menu */}
+        <div className="pt-3 mt-3 border-t border-slate-800/80 space-y-1">
+          <button
+            onClick={() => { onClose(); openCurrentUserProfile(); }}
+            className="sidebar-item w-full text-slate-300 hover:bg-slate-800/80 hover:text-white"
+          >
+            <User size={18} className="opacity-70" />
+            <span>My Profile</span>
+          </button>
+
+          <button
+            onClick={() => { onClose(); logout(); }}
+            className="sidebar-item w-full text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 font-bold"
+          >
+            <LogOut size={18} className="text-rose-400 opacity-90" />
+            <span>Logout</span>
+          </button>
+        </div>
       </nav>
 
-      {/* Footer */}
-      <div className="px-3 py-3 border-t border-slate-800">
-        <div className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-slate-800 cursor-pointer transition-colors">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-slow" />
-          <span className="text-xs text-slate-500">All Systems Operational</span>
+      {/* User Profile Footer Card */}
+      <div className="p-3 border-t border-slate-800/80 bg-slate-950/80 space-y-2 backdrop-blur-md">
+        <div
+          onClick={openCurrentUserProfile}
+          className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-900/80 border border-slate-800/80 hover:border-primary-500/40 hover:bg-slate-850 transition-all duration-200 cursor-pointer group"
+          title="Click to view profile"
+        >
+          <div className="w-8 h-8 rounded-xl bg-gradient-aurora flex items-center justify-center text-xs font-black text-white shadow-glow-primary flex-shrink-0 group-hover:scale-105 transition-transform">
+            {getInitials(currentUser.name)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-white truncate group-hover:text-cyan-300 transition-colors">{currentUser.name}</p>
+            <p className="text-2xs text-slate-400 truncate font-medium capitalize">{currentUser.role.replace('_', ' ')}</p>
+          </div>
+          <User size={14} className="text-slate-400 group-hover:text-white transition-colors" />
+        </div>
+
+        {/* Direct Logout Button in Sidebar Footer */}
+        <button
+          onClick={logout}
+          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold border border-rose-500/20 transition-all duration-200 shadow-glow-rose"
+        >
+          <LogOut size={14} />
+          Logout
+        </button>
+
+        <div className="flex items-center justify-between px-2 pt-1">
+          <span className="text-2xs text-slate-500 font-semibold uppercase tracking-wider">System Status</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-slow shadow-glow-emerald" />
+            <span className="text-2xs text-emerald-400 font-bold">Operational</span>
+          </div>
         </div>
       </div>
     </div>
-  )
-
-  return (
-    <>
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-60 flex-col bg-sidebar-bg h-screen sticky top-0 flex-shrink-0 border-r border-sidebar-border z-30">
-        {sidebarContent}
-      </aside>
-
-      {/* Mobile drawer */}
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              className="fixed inset-0 bg-black/60 z-40 lg:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={onClose}
-            />
-            <motion.aside
-              className="fixed inset-y-0 left-0 w-72 bg-sidebar-bg flex flex-col z-50 lg:hidden"
-              initial={{ x: -288 }}
-              animate={{ x: 0 }}
-              exit={{ x: -288 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 280 }}
-            >
-              {sidebarContent}
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-    </>
   )
 }
