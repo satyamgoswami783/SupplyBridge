@@ -10,6 +10,11 @@ export const AppShell: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false)
   const location = useLocation()
 
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [location.pathname])
+
   const toggleDark = () => {
     const nextDark = !darkMode
     setDarkMode(nextDark)
@@ -24,7 +29,28 @@ export const AppShell: React.FC = () => {
 
   return (
     <div className={`flex h-screen overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-slate-950 text-slate-100 dark' : 'bg-surface-bg text-slate-900'}`}>
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      {/* Mobile Backdrop — click to close sidebar */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar — fixed drawer on mobile, always visible on desktop */}
+      <div
+        className={`
+          fixed inset-y-0 left-0 z-40 w-64 flex-shrink-0
+          transform transition-transform duration-300 ease-in-out
+          lg:relative lg:translate-x-0 lg:z-auto lg:flex
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      </div>
+
+      {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header
           onMenuClick={() => setSidebarOpen(true)}
@@ -37,7 +63,7 @@ export const AppShell: React.FC = () => {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="p-4 sm:p-5 w-full"
+            className="p-3 sm:p-5 w-full max-w-full"
           >
             <Outlet />
           </motion.div>
