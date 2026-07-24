@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
@@ -8,6 +8,7 @@ import { UserProfileModal } from '../ui/UserProfileModal'
 export const AppShell: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
+  const location = useLocation()
 
   const toggleDark = () => {
     const nextDark = !darkMode
@@ -36,7 +37,7 @@ export const AppShell: React.FC = () => {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="p-6 max-w-screen-2xl mx-auto"
+            className="p-4 sm:p-5 w-full"
           >
             <Outlet />
           </motion.div>
