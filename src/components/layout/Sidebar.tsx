@@ -129,7 +129,7 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
-  const { hasPermission, currentUser, logout, openCurrentUserProfile } = useAuth()
+  const { hasPermission, currentUser, openCurrentUserProfile } = useAuth()
 
   const visibleItems = NAV_ITEMS.filter(item => {
     if (item.module && !hasPermission(item.module)) return false
@@ -150,22 +150,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-slate-950/65 z-30 lg:hidden backdrop-blur-xs"
+            className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-40 lg:hidden cursor-pointer"
           />
         )}
       </AnimatePresence>
 
       {/* Sidebar Container */}
-      <div
+      <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 lg:static lg:translate-x-0 flex flex-col h-full bg-gradient-sidebar border-r border-slate-800/80 transition-transform duration-300 ease-in-out flex-shrink-0",
-          open ? "translate-x-0" : "-translate-x-full"
+          "fixed inset-y-0 left-0 z-50 w-64 lg:static lg:translate-x-0 flex flex-col h-full bg-gradient-sidebar border-r border-slate-800/80 transition-transform duration-300 ease-in-out flex-shrink-0",
+          open ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         )}
       >
         {/* Logo */}
-        <div className="px-5 py-5 border-b border-slate-800/80 flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-aurora flex items-center justify-center shadow-glow-primary text-white font-black">
+            <div className="w-9 h-9 rounded-xl bg-gradient-aurora flex items-center justify-center shadow-glow-primary text-white font-black flex-shrink-0">
               <Zap size={18} />
             </div>
             <div>
@@ -176,11 +176,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             </div>
           </div>
           <button onClick={onClose} className="lg:hidden btn-icon text-slate-400 hover:text-white hover:bg-slate-800">
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
 
-        {/* Nav */}
+        {/* Nav list */}
         <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-1 scrollbar-hide">
           {visibleItems.map(item => {
             if (item.children) {
@@ -223,9 +223,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         </nav>
 
         {/* User Profile Footer Card */}
-        <div className="p-3 border-t border-slate-800/80 bg-slate-950/80 space-y-2 backdrop-blur-md">
+        <div className="p-3 border-t border-slate-800/80 bg-slate-950/80 space-y-2 backdrop-blur-md flex-shrink-0">
           <div
-            onClick={openCurrentUserProfile}
+            onClick={() => { onClose(); openCurrentUserProfile(); }}
             className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-900/80 border border-slate-800/80 hover:border-primary-500/40 hover:bg-slate-850 transition-all duration-200 cursor-pointer group"
             title="Click to view profile"
           >
@@ -256,7 +256,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             </div>
           </div>
         </div>
-      </div>
+      </aside>
     </>
   )
 }
