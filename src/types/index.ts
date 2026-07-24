@@ -112,7 +112,6 @@ export interface Product {
   updatedAt: string
   publishedAt?: string
   stores: string[]
-  masterId?: string
 }
 
 export interface ProductImage {
@@ -264,7 +263,6 @@ export interface ImportQueueItem {
   startedAt?: string
   completedAt?: string
   errorMessage?: string
-  format?: string
 }
 
 export type ImportJob = ImportQueueItem

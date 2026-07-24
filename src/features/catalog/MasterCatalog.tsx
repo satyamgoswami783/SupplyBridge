@@ -189,8 +189,6 @@ export const MasterCatalog: React.FC = () => {
       masterSku: newProduct.sku.toUpperCase(),
       supplierSku: newProduct.sku.toUpperCase(),
       sku: newProduct.sku.toUpperCase(),
-      masterSku: newProduct.sku.toUpperCase(),
-      supplierSku: newProduct.sku.toUpperCase(),
       name: newProduct.name,
       brand: newProduct.brand || 'Generic',
       categoryName: newProduct.categoryName || 'General',
