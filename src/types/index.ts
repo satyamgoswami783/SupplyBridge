@@ -88,6 +88,7 @@ export interface Product {
   id: string
   sku: string
   masterSku: string
+  masterId?: string
   name: string
   description?: string
   shortDescription?: string
@@ -252,6 +253,7 @@ export interface ImportQueueItem {
   supplierId: string
   supplierName: string
   connectionType: ConnectionType
+  format?: string
   fileName?: string
   status: 'pending' | 'processing' | 'completed' | 'failed'
   totalRecords: number

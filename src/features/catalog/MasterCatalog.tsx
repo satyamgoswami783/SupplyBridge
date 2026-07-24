@@ -186,6 +186,8 @@ export const MasterCatalog: React.FC = () => {
     const created: Product = {
       id: `p_${Date.now()}`,
       masterId: `MSTR-${newProduct.sku.toUpperCase()}`,
+      masterSku: newProduct.sku.toUpperCase(),
+      supplierSku: newProduct.sku.toUpperCase(),
       sku: newProduct.sku.toUpperCase(),
       name: newProduct.name,
       brand: newProduct.brand || 'Generic',
