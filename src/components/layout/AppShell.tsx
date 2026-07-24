@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Sidebar } from './Sidebar'
@@ -10,12 +10,19 @@ export const AppShell: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false)
 
   const toggleDark = () => {
-    setDarkMode(!darkMode)
-    document.body.classList.toggle('dark', !darkMode)
+    const nextDark = !darkMode
+    setDarkMode(nextDark)
+    if (nextDark) {
+      document.documentElement.classList.add('dark')
+      document.body.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+      document.body.classList.remove('dark')
+    }
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-surface-bg">
+    <div className={`flex h-screen overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-dark-bg text-slate-100' : 'bg-surface-bg text-slate-900'}`}>
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header
