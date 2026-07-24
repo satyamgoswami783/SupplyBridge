@@ -97,44 +97,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         {/* 2-Column Responsive Card */}
         <div className="max-w-5xl w-full bg-white rounded-3xl border border-slate-200/90 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 relative z-10">
           
-          {/* Left Column: Hero Visual & Showcase */}
-          <div className="lg:col-span-5 bg-gradient-to-br from-indigo-700 via-primary-700 to-violet-900 p-8 lg:p-10 text-white flex flex-col justify-between relative overflow-hidden">
-            {/* Background pattern */}
-            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
+          {/* Left Column: FULL DISPLAY HERO IMAGE COVER */}
+          <div className="lg:col-span-5 relative min-h-[450px] lg:min-h-full flex flex-col justify-between p-8 lg:p-10 text-white overflow-hidden">
+            {/* Full Display Background Cover Image */}
+            <img
+              src="/login_hero.png"
+              alt="SupplyBridge Middleware Architecture"
+              className="absolute inset-0 w-full h-full object-cover z-0 scale-105"
+            />
+            {/* Dark Gradient Overlay for high text contrast */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/70 to-indigo-950/80 z-10" />
 
-            <div className="relative z-10">
-              {/* Brand Logo */}
+            {/* Top Brand Logo */}
+            <div className="relative z-20">
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-black shadow-lg">
+                <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-black shadow-lg border border-white/20">
                   <Zap size={22} />
                 </div>
                 <div>
                   <h1 className="font-extrabold text-white text-lg tracking-tight">SupplyBridge</h1>
-                  <p className="text-2xs text-cyan-200 font-semibold uppercase tracking-wider">Enterprise Middleware & PIM</p>
+                  <p className="text-2xs text-cyan-300 font-bold uppercase tracking-wider">Enterprise Middleware & PIM</p>
                 </div>
               </div>
 
-              <h2 className="text-2xl font-black tracking-tight text-white mb-2 leading-tight">
-                Centralized Product & Supplier Integration
+              <h2 className="text-3xl font-black tracking-tight text-white mb-3 leading-tight drop-shadow-md">
+                Centralized Product & Supplier Hub
               </h2>
-              <p className="text-xs text-indigo-100/80 leading-relaxed mb-6">
-                Automated multi-supplier data normalization, inventory synchronization & Shift4Shop publishing hub.
+              <p className="text-xs text-slate-200 leading-relaxed mb-6 font-medium drop-shadow-sm">
+                Automated multi-supplier normalization, inventory sync & Shift4Shop publishing engine.
               </p>
-
-              {/* Generated Hero Image Card */}
-              <div className="relative rounded-2xl overflow-hidden border border-white/20 shadow-2xl mb-6 group">
-                <img
-                  src="/login_hero.png"
-                  alt="SupplyBridge Middleware Infrastructure"
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-4">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs font-bold text-white">Live Core Data Sync Engine</span>
-                  </div>
-                </div>
-              </div>
 
               {/* Feature Points */}
               <div className="space-y-2.5">
@@ -143,17 +134,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   { icon: <RefreshCw size={14} />, text: 'Real-time Inventory & Pricing Pipeline' },
                   { icon: <Globe size={14} />, text: 'Multi-Storefront Validation & Sync' },
                 ].map((f, i) => (
-                  <div key={i} className="flex items-center gap-2.5 text-xs text-indigo-100 font-semibold bg-white/10 backdrop-blur-xs px-3 py-2 rounded-xl">
-                    <span className="text-cyan-300">{f.icon}</span>
+                  <div key={i} className="flex items-center gap-2.5 text-xs text-white font-bold bg-slate-900/60 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-white/20">
+                    <span className="text-cyan-400">{f.icon}</span>
                     <span>{f.text}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <p className="text-2xs text-indigo-200/60 mt-8 relative z-10">
-              SupplyBridge Platform Security v2.4 • ISO 27001 Certified
-            </p>
+            {/* Bottom Status Indicator */}
+            <div className="relative z-20 flex items-center justify-between pt-6 border-t border-white/20 mt-8">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-glow-emerald" />
+                <span className="text-xs font-bold text-white">Live Data Middleware Active</span>
+              </div>
+              <span className="text-2xs text-slate-300 font-semibold">ISO 27001</span>
+            </div>
           </div>
 
           {/* Right Column: Interactive Login Form & Role Selector */}
