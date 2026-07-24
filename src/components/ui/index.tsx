@@ -78,10 +78,14 @@ interface StatsCardProps {
   icon: React.ReactNode
   iconBg?: string
   footer?: React.ReactNode
+  onClick?: () => void
 }
 
-export const StatsCard: React.FC<StatsCardProps> = ({ label, value, change, changeType = 'neutral', icon, iconBg = 'bg-primary-50', footer }) => (
-  <div className="kpi-card group">
+export const StatsCard: React.FC<StatsCardProps> = ({ label, value, change, changeType = 'neutral', icon, iconBg = 'bg-primary-50', footer, onClick }) => (
+  <div
+    onClick={onClick}
+    className={cn('kpi-card group', onClick && 'cursor-pointer hover:shadow-card-md hover:border-primary-300 transition-all')}
+  >
     <div className="flex items-start justify-between">
       <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', iconBg)}>
         {icon}
