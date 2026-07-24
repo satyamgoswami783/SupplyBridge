@@ -9,6 +9,16 @@ import { statusToVariant, timeAgo } from '../../utils'
 import type { ValidationItem, ValidationStatus } from '../../types'
 import { useAuth } from '../../context/AuthContext'
 
+const errorTypeLabel: Record<string, string> = {
+  missing_image: 'Missing Image',
+  duplicate_sku: 'Duplicate SKU',
+  invalid_category: 'Invalid Category',
+  missing_price: 'Missing Price',
+  invalid_attribute: 'Invalid Attribute',
+  duplicate_product: 'Duplicate Product',
+  missing_description: 'Missing Description',
+}
+
 export const ValidationCenter: React.FC = () => {
   const { role } = useAuth()
   const [items, setItems] = useState<ValidationItem[]>(mockValidationItems)
@@ -75,17 +85,6 @@ export const ValidationCenter: React.FC = () => {
   const getErrorCount = (type: string) => {
     return items.filter(item => item.errors.some(err => err.type === type)).length
   }
-
-  const errorTypeLabel: Record<string, string> = {
-    missing_image: 'Missing Image',
-    duplicate_sku: 'Duplicate SKU',
-    invalid_category: 'Invalid Category',
-    missing_price: 'Missing Price',
-    invalid_attribute: 'Invalid Attribute',
-    duplicate_product: 'Duplicate Product',
-    missing_description: 'Missing Description',
-  }
-
   // Toggle selection for a single item
   const toggleSelect = (id: string) =>
     setSelectedIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]))
