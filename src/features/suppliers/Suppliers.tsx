@@ -29,6 +29,7 @@ import { mockSuppliers } from '../../data/mockData'
 import { statusToVariant, connectionTypeLabel, formatDateTime, timeAgo } from '../../utils'
 import type { Supplier, ConnectionType, SupplierStatus } from '../../types'
 import { useAuth } from '../../context/AuthContext'
+import { useSuppliers } from '../../context/SupplierContext'
 
 const CONNECTION_TYPES: { value: ConnectionType; label: string }[] = [
   { value: 'api',   label: 'REST API' },
@@ -46,7 +47,7 @@ const connTypeIcon: Record<ConnectionType, string> = {
 export const Suppliers: React.FC = () => {
   const { role } = useAuth()
   const canManageSuppliers = role === 'super_admin' || role === 'admin' || role === 'integration_manager'
-  const [suppliersList, setSuppliersList] = useState<Supplier[]>(mockSuppliers)
+  const { suppliersList, setSuppliersList } = useSuppliers()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [typeFilter, setTypeFilter] = useState('all')

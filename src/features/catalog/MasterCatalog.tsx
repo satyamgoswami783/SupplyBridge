@@ -32,9 +32,11 @@ import { statusToVariant, timeAgo } from '../../utils'
 import type { Product, ProductStatus, ValidationStatus } from '../../types'
 
 import { useAuth } from '../../context/AuthContext'
+import { useSuppliers } from '../../context/SupplierContext'
 
 export const MasterCatalog: React.FC = () => {
   const { role } = useAuth()
+  const { suppliersList } = useSuppliers()
   const canManageCatalog = role === 'super_admin' || role === 'admin' || role === 'catalog_manager'
   const canDelete = role === 'super_admin' || role === 'admin'
   const [productsList, setProductsList] = useState<Product[]>(mockProducts)
@@ -99,9 +101,7 @@ export const MasterCatalog: React.FC = () => {
     // Dropdown Supplier Filter
     let matchesSupplier = true
     if (supplierFilter !== 'all') {
-      if (supplierFilter === 's1') matchesSupplier = product.supplierName.includes('TechParts')
-      if (supplierFilter === 's2') matchesSupplier = product.supplierName.includes('GlobalSource')
-      if (supplierFilter === 's3') matchesSupplier = product.supplierName.includes('PrimeSup')
+      matchesSupplier = product.supplierName === supplierFilter
     }
 
     return matchesSearch && matchesTab && matchesStatus && matchesSupplier
@@ -409,9 +409,9 @@ export const MasterCatalog: React.FC = () => {
           onChange={e => { setSupplierFilter(e.target.value); setCurrentPage(1); }}
         >
           <option value="all">All Suppliers</option>
-          <option value="s1">TechParts International</option>
-          <option value="s2">GlobalSource Limited</option>
-          <option value="s3">PrimeSupply Corp</option>
+          {suppliersList.map(s => (
+            <option key={s.id} value={s.name}>{s.name}</option>
+          ))}
         </select>
         <select
           className="select input-sm w-auto min-w-[130px] font-medium"
@@ -797,9 +797,9 @@ export const MasterCatalog: React.FC = () => {
                 value={newProduct.supplierName}
                 onChange={e => setNewProduct({ ...newProduct, supplierName: e.target.value })}
               >
-                <option value="TechParts International">TechParts International</option>
-                <option value="GlobalSource Limited">GlobalSource Limited</option>
-                <option value="PrimeSupply Corp">PrimeSupply Corp</option>
+                {suppliersList.map(s => (
+                  <option key={s.id} value={s.name}>{s.name}</option>
+                ))}
               </select>
             </div>
           </div>
