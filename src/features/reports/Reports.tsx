@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BarChart3, Download, Calendar, TrendingUp, CheckCircle2, FileSpreadsheet, FileText } from 'lucide-react'
+import { BarChart3, Download, Calendar, TrendingUp, CheckCircle2, FileSpreadsheet, FileText, Package, RefreshCw, AlertTriangle, ShieldCheck, Truck, Database } from 'lucide-react'
 import { SectionHeader, Tabs } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts'
@@ -8,20 +8,20 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const COLORS = ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#f43f5e', '#7c3aed']
 
 const supplierData = [
-  { name: 'TechParts Int.', products: 18420, synced: 18420, errors: 0 },
-  { name: 'GlobalSource',    products: 14800, synced: 14600, errors: 200 },
-  { name: 'PrimeSup Corp',   products: 11200, synced: 11200, errors: 0 },
-  { name: 'AcmeDist.',       products: 9800,  synced: 9200,  errors: 600 },
-  { name: 'QuickShip',       products: 7300,  synced: 7300,  errors: 0 },
+  { name: 'TechParts Int.', type: 'REST API', products: 18420, synced: 18420, errors: 0, passRate: 100, uptime: '99.9%' },
+  { name: 'GlobalSource',    type: 'SFTP (CSV)', products: 14800, synced: 14600, errors: 200, passRate: 98.6, uptime: '99.5%' },
+  { name: 'PrimeSup Corp',   type: 'FTP (XML)', products: 11200, synced: 11200, errors: 0, passRate: 100, uptime: '99.8%' },
+  { name: 'AcmeDist.',       type: 'Excel Upload', products: 9800,  synced: 9200,  errors: 600, passRate: 93.8, uptime: '94.2%' },
+  { name: 'QuickShip Co.',   type: 'REST API', products: 7300,  synced: 7300,  errors: 0, passRate: 100, uptime: '99.9%' },
 ]
 
 const syncTrend = [
-  { month: 'Feb', success: 98.2, failed: 1.8 },
-  { month: 'Mar', success: 97.8, failed: 2.2 },
-  { month: 'Apr', success: 99.1, failed: 0.9 },
-  { month: 'May', success: 98.7, failed: 1.3 },
-  { month: 'Jun', success: 99.3, failed: 0.7 },
-  { month: 'Jul', success: 98.4, failed: 1.6 },
+  { month: 'Feb', success: 98.2, failed: 1.8, durationMin: 34 },
+  { month: 'Mar', success: 97.8, failed: 2.2, durationMin: 32 },
+  { month: 'Apr', success: 99.1, failed: 0.9, durationMin: 30 },
+  { month: 'May', success: 98.7, failed: 1.3, durationMin: 29 },
+  { month: 'Jun', success: 99.3, failed: 0.7, durationMin: 28 },
+  { month: 'Jul', success: 98.4, failed: 1.6, durationMin: 27 },
 ]
 
 const catalogPie = [
@@ -30,6 +30,13 @@ const catalogPie = [
   { name: 'Sporting Goods', value: 8900 },
   { name: 'Industrial', value: 6200 },
   { name: 'Other', value: 11729 },
+]
+
+const validationErrorsPie = [
+  { name: 'Missing Price', value: 42 },
+  { name: 'Duplicate SKU', value: 28 },
+  { name: 'Missing Image', value: 18 },
+  { name: 'Invalid Category', value: 12 },
 ]
 
 export const Reports: React.FC = () => {
@@ -42,7 +49,7 @@ export const Reports: React.FC = () => {
     setTimeout(() => setToastMessage(null), 3000)
   }
 
-  // --- Real File Download Handlers ---
+  // --- Real File Exporters ---
   const handleExportPDF = () => {
     showNotification('Generating PDF report...')
 
@@ -53,33 +60,33 @@ export const Reports: React.FC = () => {
 ============================================================
 Report Generated: ${new Date().toLocaleString()}
 Selected Date Range: ${dateRange}
-Report Section: ${tab.toUpperCase()}
+Active Report Focus: ${tab.toUpperCase()}
 
 1. EXECUTIVE SUMMARY & KPIS
 ------------------------------------------------------------
-• Total Suppliers: 27 (+3 this month)
-• Active Connections: 23 (+2 this month)
-• Total Catalog Products: 84,329 (+1.2K this week)
-• Avg Sync Duration: 28 min (-4 min improved)
+• Total Configured Suppliers: 27 Partners
+• Active API/FTP Connections: 23 Connections
+• Total Catalog Products: 84,329 SKUs
+• Overall Sync Health: 99.8% Operational
 
-2. SUPPLIER PRODUCT & ERROR BREAKDOWN
+2. SUPPLIER PERFORMANCE & FEED PASS RATES
 ------------------------------------------------------------
-${supplierData.map(s => `• ${s.name.padEnd(20)} | Products: ${s.products.toLocaleString().padStart(6)} | Synced: ${s.synced.toLocaleString().padStart(6)} | Errors: ${s.errors}`).join('\n')}
+${supplierData.map(s => `• ${s.name.padEnd(20)} | Protocol: ${s.type.padEnd(12)} | SKUs: ${s.products.toLocaleString().padStart(6)} | Pass Rate: ${s.passRate}%`).join('\n')}
 
-3. HISTORICAL SYNC SUCCESS RATE (LAST 6 MONTHS)
+3. HISTORICAL SYNC TRENDS (LAST 6 MONTHS)
 ------------------------------------------------------------
-${syncTrend.map(t => `• Month ${t.month}: ${t.success}% Success Rate (${t.failed}% Failures)`).join('\n')}
+${syncTrend.map(t => `• Month ${t.month}: ${t.success}% Success Rate | Avg Duration: ${t.durationMin} mins`).join('\n')}
 
-4. CATALOG HEALTH METRICS
+4. PIM CATALOG QUALITY & COMPLETENESS INDEX
 ------------------------------------------------------------
 • Products With High-Res Images: 97.2%
-• Products With Full Description: 91.5%
-• Mapped To Category Tree: 99.1%
-• Products With Retail Pricing: 98.8%
-• Storefront Published: 98.1%
+• Products With Full Descriptions: 91.5%
+• Category Taxonomy Mapped: 99.1%
+• Retail & MAP Pricing Set: 98.8%
+• Shift4Shop Storefront Published: 98.1%
 
 ============================================================
-Confidential - SupplyBridge PIM Enterprise Platform
+Confidential - SupplyBridge Enterprise PIM & Middleware Platform
 ============================================================
 `
 
@@ -101,10 +108,10 @@ Confidential - SupplyBridge PIM Enterprise Platform
   const handleExportCSV = () => {
     showNotification('Generating CSV export file...')
 
-    const fileName = `SupplyBridge_Supplier_Analytics_${dateRange.replace(/\s+/g, '_')}.csv`
-    const csvHeaders = 'Supplier Name,Total Products,Synced SKUs,Feed Errors,Sync Health Status\n'
+    const fileName = `SupplyBridge_Analytics_${dateRange.replace(/\s+/g, '_')}.csv`
+    const csvHeaders = 'Supplier Partner,Connection Type,Total Products,Synced SKUs,Feed Errors,Validation Pass Rate %,Uptime %\n'
     const csvRows = supplierData
-      .map(s => `"${s.name}",${s.products},${s.synced},${s.errors},"${s.errors === 0 ? 'Healthy' : 'Degraded'}"`)
+      .map(s => `"${s.name}","${s.type}",${s.products},${s.synced},${s.errors},${s.passRate},"${s.uptime}"`)
       .join('\n')
 
     const csvContent = csvHeaders + csvRows
@@ -125,15 +132,15 @@ Confidential - SupplyBridge PIM Enterprise Platform
   }
 
   const tabs = [
-    { id: 'supplier',  label: 'Supplier Reports' },
-    { id: 'catalog',   label: 'Catalog Reports' },
-    { id: 'inventory', label: 'Inventory Reports' },
-    { id: 'sync',      label: 'Sync Performance' },
+    { id: 'supplier',  label: 'Supplier Performance' },
+    { id: 'catalog',   label: 'Catalog & PIM Quality' },
+    { id: 'inventory', label: 'Inventory Buffer' },
+    { id: 'sync',      label: 'Sync Pipeline' },
     { id: 'validation',label: 'Validation Audit' },
   ]
 
   return (
-    <div className="relative">
+    <div className="space-y-6">
       {/* Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
@@ -141,7 +148,7 @@ Confidential - SupplyBridge PIM Enterprise Platform
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold"
+            className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold border border-slate-700"
           >
             <CheckCircle2 size={16} className="text-emerald-400" />
             {toastMessage}
@@ -151,10 +158,10 @@ Confidential - SupplyBridge PIM Enterprise Platform
 
       <SectionHeader
         title="Operational Analytics & Reports"
-        subtitle="Comprehensive data insights across supplier feeds, catalog health, and sync performance"
+        subtitle="Comprehensive operational reports across supplier feeds, PIM catalog health, inventory buffers, and Shift4Shop sync throughput"
         actions={
-          <>
-            <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5">
               <Calendar size={14} className="text-slate-400" />
               <select
                 value={dateRange}
@@ -162,7 +169,7 @@ Confidential - SupplyBridge PIM Enterprise Platform
                   setDateRange(e.target.value)
                   showNotification(`Date range changed to ${e.target.value}`)
                 }}
-                className="text-sm text-slate-700 bg-transparent outline-none cursor-pointer font-medium"
+                className="text-xs text-slate-700 dark:text-slate-200 bg-transparent outline-none cursor-pointer font-bold"
               >
                 <option value="Last 7 days">Last 7 days</option>
                 <option value="Last 30 days">Last 30 days</option>
@@ -172,44 +179,46 @@ Confidential - SupplyBridge PIM Enterprise Platform
             </div>
             <button
               onClick={handleExportPDF}
-              className="btn-secondary btn-sm flex items-center gap-1.5 hover:bg-slate-100 cursor-pointer"
+              className="btn-secondary btn-sm flex items-center gap-1.5 shadow-sm"
               title="Download PDF Operational Report"
             >
-              <FileText size={14} className="text-rose-600" /> Export PDF
+              <FileText size={14} className="text-rose-600 dark:text-rose-400" /> Export PDF
             </button>
             <button
               onClick={handleExportCSV}
-              className="btn-secondary btn-sm flex items-center gap-1.5 hover:bg-slate-100 cursor-pointer"
-              title="Download CSV Supplier Data"
+              className="btn-secondary btn-sm flex items-center gap-1.5 shadow-sm"
+              title="Download CSV Analytics File"
             >
-              <FileSpreadsheet size={14} className="text-emerald-600" /> Export CSV
+              <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" /> Export CSV
             </button>
-          </>
+          </div>
         }
       />
 
       <Tabs tabs={tabs} active={tab} onChange={setTab} />
 
+      {/* 1. SUPPLIER REPORTS TAB */}
       {tab === 'supplier' && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { label: 'Total Suppliers', value: '27', delta: '+3 this month', up: true },
+              { label: 'Configured Suppliers', value: '27', delta: '+3 this month', up: true },
               { label: 'Active Connections', value: '23', delta: '+2 this month', up: true },
-              { label: 'Total Products', value: '84,329', delta: '+1.2K this week', up: true },
-              { label: 'Avg Sync Duration', value: '28 min', delta: '-4 min improved', up: true },
+              { label: 'Total Catalog SKUs', value: '84,329', delta: '+1.2K this week', up: true },
+              { label: 'Avg Feed Parse Duration', value: '27 min', delta: '-4 min improved', up: true },
             ].map(s => (
               <div key={s.label} className="card p-4">
                 <p className="text-xs text-slate-400 font-medium mb-1">{s.label}</p>
-                <p className="text-2xl font-bold text-slate-900">{s.value}</p>
-                <p className={`text-xs mt-1 flex items-center gap-1 ${s.up ? 'text-emerald-600' : 'text-rose-600'}`}>
+                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{s.value}</p>
+                <p className={`text-xs mt-1 flex items-center gap-1 font-bold ${s.up ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}`}>
                   <TrendingUp size={10} /> {s.delta}
                 </p>
               </div>
             ))}
           </div>
+
           <div className="card p-5">
-            <h3 className="text-sm font-semibold text-slate-800 mb-4">Products & Error Breakdown per Supplier</h3>
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Supplier Products & Error Rate Breakdown</h3>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={supplierData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -222,69 +231,175 @@ Confidential - SupplyBridge PIM Enterprise Platform
               </BarChart>
             </ResponsiveContainer>
           </div>
+
+          {/* Supplier Performance Table */}
+          <div className="card overflow-hidden">
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Supplier Feed Performance Index</h3>
+              <span className="text-2xs text-slate-400 font-semibold">{dateRange}</span>
+            </div>
+            <div className="table-container">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Supplier Partner</th>
+                    <th>Protocol</th>
+                    <th>Total SKUs</th>
+                    <th>Synced SKUs</th>
+                    <th>Validation Pass %</th>
+                    <th>Connection Uptime</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {supplierData.map(s => (
+                    <tr key={s.name}>
+                      <td className="font-bold text-slate-800 dark:text-slate-200">{s.name}</td>
+                      <td><span className="text-2xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">{s.type}</span></td>
+                      <td className="font-semibold">{s.products.toLocaleString()}</td>
+                      <td className="text-emerald-600 font-bold">{s.synced.toLocaleString()}</td>
+                      <td className="font-bold text-slate-700 dark:text-slate-300">{s.passRate}%</td>
+                      <td className="text-xs text-slate-500 font-medium">{s.uptime}</td>
+                      <td>
+                        <Badge variant={s.errors === 0 ? 'success' : 'warning'}>
+                          {s.errors === 0 ? 'Optimal' : `${s.errors} Errors`}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
 
+      {/* 2. CATALOG REPORTS TAB */}
+      {tab === 'catalog' && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="card p-5">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Master Catalog Category Share</h3>
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Pie data={catalogPie} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
+                    {catalogPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip formatter={(v) => (v as number).toLocaleString()} contentStyle={{ borderRadius: '12px', fontSize: '12px' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="card p-5">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Catalog Quality & Completeness Index</h3>
+              <div className="space-y-3.5">
+                {[
+                  { label: 'Products With High-Res Images', pct: 97.2, color: 'bg-emerald-500' },
+                  { label: 'Products With Full Description', pct: 91.5, color: 'bg-indigo-500' },
+                  { label: 'Mapped To Category Tree', pct: 99.1, color: 'bg-emerald-500' },
+                  { label: 'Products With Retail Pricing', pct: 98.8, color: 'bg-emerald-500' },
+                  { label: 'Shift4Shop Storefront Published', pct: 98.1, color: 'bg-cyan-500' },
+                ].map(s => (
+                  <div key={s.label}>
+                    <div className="flex justify-between mb-1 text-xs">
+                      <span className="text-slate-600 dark:text-slate-300 font-semibold">{s.label}</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-100">{s.pct}%</span>
+                    </div>
+                    <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full ${s.color}`} style={{ width: `${s.pct}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. INVENTORY REPORTS TAB */}
+      {tab === 'inventory' && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              { label: 'In-Stock SKUs', value: '78,420', color: 'text-emerald-600' },
+              { label: 'Low Stock Threshold', value: '4,109', color: 'text-amber-600' },
+              { label: 'Out of Stock', value: '1,800', color: 'text-rose-600' },
+              { label: 'Reserved Stock', value: '12,450', color: 'text-primary-600' },
+            ].map(s => (
+              <div key={s.label} className="card p-4 text-center">
+                <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+                <p className="text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="card p-5">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Inventory Buffer & Stock Health Ratio</h3>
+            <p className="text-xs text-slate-500 mb-4">Stock buffer maintained across 27 suppliers to prevent overselling on Shift4Shop storefronts.</p>
+            <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
+              <div className="bg-emerald-500 h-full" style={{ width: '85%' }} title="In-Stock (85%)" />
+              <div className="bg-amber-500 h-full" style={{ width: '10%' }} title="Low-Stock (10%)" />
+              <div className="bg-rose-500 h-full" style={{ width: '5%' }} title="Out-of-Stock (5%)" />
+            </div>
+            <div className="flex justify-between text-2xs text-slate-400 mt-2 font-bold uppercase">
+              <span className="text-emerald-600">85% Healthy Stock</span>
+              <span className="text-amber-600">10% Low Stock Alert</span>
+              <span className="text-rose-600">5% Out of Stock</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. SYNC PIPELINE TAB */}
       {tab === 'sync' && (
         <div className="space-y-4">
           <div className="card p-5">
-            <h3 className="text-sm font-semibold text-slate-800 mb-4">Sync Success Rate (%) — Last 6 Months</h3>
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Sync Pipeline Success Rate (%) & Duration (Mins) — Last 6 Months</h3>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={syncTrend} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                 <YAxis domain={[95, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }} />
-                <Line type="monotone" dataKey="success" name="Success Rate %" stroke="#10b981" strokeWidth={2.5} dot={{ fill: '#10b981', r: 4 }} />
+                <Line type="monotone" dataKey="success" name="Sync Success Rate %" stroke="#10b981" strokeWidth={2.5} dot={{ fill: '#10b981', r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
       )}
 
-      {tab === 'catalog' && (
+      {/* 5. VALIDATION AUDIT TAB */}
+      {tab === 'validation' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="card p-5">
-            <h3 className="text-sm font-semibold text-slate-800 mb-4">Products by Category Share</h3>
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Pre-Publish Validation Error Share</h3>
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
-                <Pie data={catalogPie} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
-                  {catalogPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                <Pie data={validationErrorsPie} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, value }) => `${name} (${value})`} labelLine={false}>
+                  {validationErrorsPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip formatter={(v) => (v as number).toLocaleString()} contentStyle={{ borderRadius: '12px', fontSize: '12px' }} />
+                <Tooltip contentStyle={{ borderRadius: '12px', fontSize: '12px' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
+
           <div className="card p-5">
-            <h3 className="text-sm font-semibold text-slate-800 mb-4">Catalog Quality Metrics</h3>
-            <div className="space-y-3">
-              {[
-                { label: 'Products With High-Res Images', pct: 97.2, color: 'bg-emerald-500' },
-                { label: 'Products With Full Description', pct: 91.5, color: 'bg-indigo-500' },
-                { label: 'Mapped To Category Tree', pct: 99.1, color: 'bg-emerald-500' },
-                { label: 'Products With Retail Pricing', pct: 98.8, color: 'bg-emerald-500' },
-                { label: 'Storefront Published', pct: 98.1, color: 'bg-emerald-500' },
-              ].map(s => (
-                <div key={s.label}>
-                  <div className="flex justify-between mb-1 text-sm">
-                    <span className="text-slate-600 font-medium">{s.label}</span>
-                    <span className="font-semibold text-slate-800">{s.pct}%</span>
-                  </div>
-                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full ${s.color}`} style={{ width: `${s.pct}%` }} />
-                  </div>
-                </div>
-              ))}
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Validation Audit Resolution Index</h3>
+            <div className="space-y-4 text-xs">
+              <div className="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                <span className="font-bold text-emerald-800 dark:text-emerald-300">Resolved & Approved Products</span>
+                <span className="font-black text-emerald-700 dark:text-emerald-400 text-sm">1,247 Items</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800">
+                <span className="font-bold text-amber-800 dark:text-amber-300">Pending Review Queue</span>
+                <span className="font-black text-amber-700 dark:text-amber-400 text-sm">84 Items</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-rose-50 dark:bg-rose-950/40 rounded-xl border border-rose-200 dark:border-rose-800">
+                <span className="font-bold text-rose-800 dark:text-rose-300">Rejected & Returned to Supplier</span>
+                <span className="font-black text-rose-700 dark:text-rose-400 text-sm">12 Items</span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {(tab === 'inventory' || tab === 'validation') && (
-        <div className="card p-12 text-center">
-          <BarChart3 size={40} className="mx-auto mb-3 text-slate-300" />
-          <p className="text-slate-600 font-semibold capitalize">{tab} Analytics Report</p>
-          <p className="text-xs text-slate-400 mt-1">Data metrics loaded for selected date range: {dateRange}</p>
         </div>
       )}
     </div>

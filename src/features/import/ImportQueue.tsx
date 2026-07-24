@@ -1,24 +1,84 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Download, CheckCircle2, XCircle, RefreshCw, RotateCcw, AlertCircle } from 'lucide-react'
+import { Download, CheckCircle2, XCircle, RefreshCw, RotateCcw, AlertCircle, FileSpreadsheet, Clock, ArrowDownCircle, UploadCloud, Eye, FileCode, Play } from 'lucide-react'
 import { SectionHeader, FilterBar, Tabs, ProgressBar, EmptyState } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
+import { Modal } from '../../components/ui/Modal'
 import { mockImportQueue } from '../../data/mockData'
 import { statusToVariant, connectionTypeLabel, timeAgo } from '../../utils'
 import type { ImportJob } from '../../types'
+
+interface SampleRecord {
+  sku: string
+  name: string
+  category: string
+  costPrice: number
+  retailPrice: number
+  stock: number
+  status: 'valid' | 'mapping_needed' | 'error'
+}
+
+const MOCK_PREVIEW_RECORDS: SampleRecord[] = [
+  { sku: 'TP-CPU-9900K', name: 'Intel Core i9-9900K Processor', category: 'Processors', costPrice: 310.00, retailPrice: 420.00, stock: 45, status: 'valid' },
+  { sku: 'GS-GPU-3080',  name: 'NVIDIA GeForce RTX 3080 10GB', category: 'Graphics Cards', costPrice: 650.00, retailPrice: 799.00, stock: 12, status: 'valid' },
+  { sku: 'PS-SSD-1TB',   name: 'Samsung 980 Pro NVMe 1TB SSD', category: 'Storage', costPrice: 85.00, retailPrice: 120.00, stock: 150, status: 'valid' },
+  { sku: 'AC-MEM-16GB',  name: 'Corsair Vengeance DDR4 16GB Kit', category: 'Memory', costPrice: 0.00, retailPrice: 65.00, stock: 80, status: 'error' },
+  { sku: 'QS-CASE-MID',  name: 'NZXT H510 Mid-Tower ATX Case', category: 'Computer Cases', costPrice: 60.00, retailPrice: 89.00, stock: 25, status: 'mapping_needed' },
+]
 
 export const ImportQueue: React.FC = () => {
   const [importsList, setImportsList] = useState<ImportJob[]>(mockImportQueue)
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('all')
+  const [uploadModalOpen, setUploadModalOpen] = useState(false)
+  const [previewItem, setPreviewItem] = useState<ImportJob | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+
+  // Upload Modal State
+  const [supplierName, setSupplierName] = useState('TechParts International')
+  const [fileFormat, setFileFormat] = useState('CSV')
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
 
   const showNotification = (msg: string) => {
     setToastMessage(msg)
     setTimeout(() => setToastMessage(null), 3000)
   }
 
-  const handleRetry = (id: string, supplierName: string) => {
+  const handleFileDrop = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setUploadedFileName(e.target.files[0].name)
+    }
+  }
+
+  const handleUploadSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsUploading(true)
+    showNotification('Parsing supplier feed & validating schema...')
+
+    setTimeout(() => {
+      const newJob: ImportJob = {
+        id: `job_${Date.now()}`,
+        supplierId: 's1',
+        supplierName: supplierName,
+        connectionType: fileFormat === 'CSV' ? 'csv' : fileFormat === 'XML' ? 'xml' : 'excel',
+        fileName: uploadedFileName || `feed_${Date.now()}.${fileFormat.toLowerCase()}`,
+        totalRecords: 1250,
+        processedRecords: 450,
+        failedRecords: 0,
+        status: 'processing',
+        createdAt: new Date().toISOString(),
+      }
+
+      setImportsList([newJob, ...importsList])
+      setIsUploading(false)
+      setUploadModalOpen(false)
+      setUploadedFileName(null)
+      showNotification(`Import job for ${supplierName} queued successfully (1,250 SKUs parsed)!`)
+    }, 1200)
+  }
+
+  const handleRetry = (id: string, sName: string) => {
     setImportsList(prev =>
       prev.map(item =>
         item.id === id
@@ -31,7 +91,7 @@ export const ImportQueue: React.FC = () => {
           : item
       )
     )
-    showNotification(`Retrying import feed for ${supplierName}...`)
+    showNotification(`Retrying import feed for ${sName}...`)
 
     setTimeout(() => {
       setImportsList(prev =>
@@ -46,11 +106,11 @@ export const ImportQueue: React.FC = () => {
             : item
         )
       )
-      showNotification(`Import for ${supplierName} completed successfully!`)
+      showNotification(`Import for ${sName} completed successfully!`)
     }, 2000)
   }
 
-  const handleCancel = (id: string, supplierName: string) => {
+  const handleCancel = (id: string, sName: string) => {
     setImportsList(prev =>
       prev.map(item =>
         item.id === id
@@ -62,7 +122,27 @@ export const ImportQueue: React.FC = () => {
           : item
       )
     )
-    showNotification(`Import for ${supplierName} cancelled.`)
+    showNotification(`Import for ${sName} cancelled.`)
+  }
+
+  const handleExportQueueCSV = () => {
+    showNotification('Generating Import Queue CSV export...')
+    const csvHeaders = 'Job ID,Supplier Name,Source File,ConnectionType,Total Records,Processed Records,Failed Records,Status,Created At\n'
+    const csvRows = importsList.map(i =>
+      `"${i.id}","${i.supplierName}","${i.fileName || ''}","${i.connectionType}",${i.totalRecords},${i.processedRecords},${i.failedRecords},"${i.status}","${i.createdAt || ''}"`
+    ).join('\n')
+    const csvContent = csvHeaders + csvRows
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `SupplyBridge_Import_Queue_${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    showNotification('Import Queue CSV file downloaded!')
   }
 
   const tabs = [
@@ -79,28 +159,8 @@ export const ImportQueue: React.FC = () => {
     return matchTab && matchSearch
   })
 
-  const handleExportQueueCSV = () => {
-    showNotification('Generating Import Queue CSV export...')
-    const csvHeaders = 'Job ID,Supplier Name,Source File,Format,Total Records,Processed Records,Failed Records,Status,Created At\n'
-    const csvRows = importsList.map(i =>
-      `"${i.id}","${i.supplierName}","${i.fileName || ''}","${i.format || ''}",${i.totalRecords},${i.processedRecords},${i.failedRecords},"${i.status}","${i.createdAt || ''}"`
-    ).join('\n')
-    const csvContent = csvHeaders + csvRows
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `SupplyBridge_Import_Queue_${new Date().toISOString().split('T')[0]}.csv`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-    showNotification('Import Queue CSV file downloaded!')
-  }
-
   return (
-    <div className="relative">
+    <div className="space-y-6">
       {/* Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
@@ -108,7 +168,7 @@ export const ImportQueue: React.FC = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold"
+            className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold border border-slate-700"
           >
             <CheckCircle2 size={16} className="text-emerald-400" />
             {toastMessage}
@@ -117,112 +177,106 @@ export const ImportQueue: React.FC = () => {
       </AnimatePresence>
 
       <SectionHeader
-        title="Import Queue"
-        subtitle="Monitor and manage product feed import jobs from all suppliers"
+        title="Import Queue & Supplier Feed Ingestion"
+        subtitle="Upload supplier catalog feeds (CSV, XML, Excel) and track background ingestion queues in real-time"
         actions={
-          <>
+          <div className="flex items-center gap-2">
             <button
               onClick={handleExportQueueCSV}
-              className="btn-secondary btn-sm flex items-center gap-1.5 cursor-pointer"
+              className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
               title="Download Import Queue CSV File"
             >
-              <Download size={14} className="text-emerald-600" /> Export CSV
+              <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" /> Export Queue
             </button>
             <button
-              onClick={() => showNotification('Import queue refreshed.')}
-              className="btn-secondary btn-sm flex items-center gap-1.5"
+              onClick={() => setUploadModalOpen(true)}
+              className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20"
             >
-              <RefreshCw size={14} /> Refresh Queue
+              <UploadCloud size={14} /> Upload Supplier Feed
             </button>
-          </>
+          </div>
         }
       />
 
-      {/* KPI Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      {/* KPI Summary Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Products Processing', value: importsList.reduce((s, q) => s + q.totalRecords, 0).toLocaleString(), color: 'text-slate-800' },
-          { label: 'Processing',  value: importsList.filter(q => q.status === 'processing').length, color: 'text-cyan-600' },
-          { label: 'Pending',     value: importsList.filter(q => q.status === 'pending').length, color: 'text-amber-600' },
-          { label: 'Failed',      value: importsList.filter(q => q.status === 'failed').length, color: 'text-rose-600' },
+          { label: 'Total Ingestion SKUs', value: importsList.reduce((s, q) => s + q.totalRecords, 0).toLocaleString(), color: 'text-slate-900 dark:text-slate-100', icon: <ArrowDownCircle size={18} className="text-slate-700 dark:text-slate-300" /> },
+          { label: 'Currently Processing',  value: importsList.filter(q => q.status === 'processing').length, color: 'text-cyan-600 dark:text-cyan-400', icon: <RefreshCw size={18} className="animate-spin text-cyan-600" /> },
+          { label: 'Pending Queue',     value: importsList.filter(q => q.status === 'pending').length, color: 'text-amber-600 dark:text-amber-400', icon: <Clock size={18} className="text-amber-600" /> },
+          { label: 'Failed Ingestions', value: importsList.filter(q => q.status === 'failed').length, color: 'text-rose-600 dark:text-rose-400', icon: <XCircle size={18} className="text-rose-600" /> },
         ].map(s => (
-          <div key={s.label} className="card px-4 py-3 text-center">
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
+          <div key={s.label} className="card p-4 flex items-center gap-3.5">
+            <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800">
+              {s.icon}
+            </div>
+            <div>
+              <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+              <p className="text-xs text-slate-400 font-semibold mt-0.5">{s.label}</p>
+            </div>
           </div>
         ))}
       </div>
 
       <Tabs tabs={tabs} active={tab} onChange={setTab} />
-      <FilterBar search={search} onSearch={setSearch} placeholder="Search suppliers..." />
+      <FilterBar search={search} onSearch={setSearch} placeholder="Search supplier feeds by name or format..." />
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {filtered.length === 0 && (
           <div className="card p-12 text-center text-slate-400">
             <EmptyState
-              icon={<Download size={24} />}
+              icon={<Download size={28} className="text-slate-300" />}
               title="No import jobs found"
-              description="Try selecting another tab or adjusting your filter."
+              description="Try selecting another tab or uploading a new feed file."
             />
           </div>
         )}
         {filtered.map(item => (
-          <div key={item.id} className="card p-5 hover:shadow-card-md transition-all">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-3 flex-1 min-w-0">
+          <div key={item.id} className="card p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3.5 flex-1 min-w-0">
                 <div
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-2xs ${
                     item.status === 'completed'
-                      ? 'bg-emerald-50'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600'
                       : item.status === 'failed'
-                      ? 'bg-rose-50'
+                      ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600'
                       : item.status === 'processing'
-                      ? 'bg-cyan-50'
-                      : 'bg-amber-50'
+                      ? 'bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600'
+                      : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600'
                   }`}
                 >
-                  <Download
-                    size={16}
-                    className={
-                      item.status === 'completed'
-                        ? 'text-emerald-600'
-                        : item.status === 'failed'
-                        ? 'text-rose-600'
-                        : item.status === 'processing'
-                        ? 'text-cyan-600'
-                        : 'text-amber-600'
-                    }
-                  />
+                  <Download size={18} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="font-semibold text-slate-800">{item.supplierName}</p>
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <p className="font-bold text-slate-800 dark:text-slate-100 text-sm">{item.supplierName}</p>
                     <Badge variant="info">{connectionTypeLabel(item.connectionType)}</Badge>
-                    <Badge variant={statusToVariant(item.status)}>{item.status}</Badge>
+                    <Badge variant={statusToVariant(item.status)} dot>{item.status}</Badge>
                   </div>
                   {item.fileName && (
-                    <p className="text-xs text-slate-400 mb-2">
-                      File: <code className="mono">{item.fileName}</code>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                      Source Feed File: <code className="mono text-2xs font-bold px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-700 dark:text-slate-300">{item.fileName}</code>
                     </p>
                   )}
                   {item.errorMessage && (
-                    <p className="text-xs text-rose-600 mb-2 flex items-center gap-1 font-mono">
-                      <AlertCircle size={11} /> {item.errorMessage}
+                    <p className="text-xs text-rose-600 dark:text-rose-400 mb-2 flex items-center gap-1.5 font-semibold bg-rose-50 dark:bg-rose-950/40 px-3 py-1.5 rounded-lg border border-rose-200 dark:border-rose-800">
+                      <AlertCircle size={13} /> Error: {item.errorMessage}
                     </p>
                   )}
-                  <div className="flex gap-4 text-xs text-slate-500">
+                  <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-600 dark:text-slate-300 mt-2">
                     <span>
-                      <CheckCircle2 size={10} className="inline mr-1 text-emerald-500" />
-                      {item.processedRecords.toLocaleString()} processed
+                      <CheckCircle2 size={12} className="inline mr-1 text-emerald-500" />
+                      <strong className="text-slate-800 dark:text-slate-100">{item.processedRecords.toLocaleString()}</strong> processed
                     </span>
                     {item.failedRecords > 0 && (
-                      <span className="text-rose-600 font-semibold">
-                        <XCircle size={10} className="inline mr-1 text-rose-500" />
+                      <span className="text-rose-600 font-bold">
+                        <XCircle size={12} className="inline mr-1 text-rose-500" />
                         {item.failedRecords.toLocaleString()} failed
                       </span>
                     )}
-                    <span>of {item.totalRecords.toLocaleString()} total</span>
-                    <span>{timeAgo(item.createdAt)}</span>
+                    <span>Total: <strong className="text-slate-800 dark:text-slate-100">{item.totalRecords.toLocaleString()}</strong> SKUs</span>
+                    <span className="text-slate-400 font-mono">• {timeAgo(item.createdAt)}</span>
                   </div>
                   {item.status === 'processing' && (
                     <ProgressBar
@@ -230,26 +284,35 @@ export const ImportQueue: React.FC = () => {
                       max={item.totalRecords}
                       color="cyan"
                       showLabel
-                      className="mt-2"
+                      className="mt-3"
                     />
                   )}
                 </div>
               </div>
-              <div className="flex gap-2 flex-shrink-0">
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
+                <button
+                  onClick={() => setPreviewItem(item)}
+                  className="btn-ghost btn-sm font-bold flex items-center gap-1 text-primary-600 dark:text-primary-400"
+                  title="Preview Imported Sample Records Data"
+                >
+                  <Eye size={14} /> Preview Data
+                </button>
                 {item.status === 'failed' && (
                   <button
                     onClick={() => handleRetry(item.id, item.supplierName)}
-                    className="btn-secondary btn-sm flex items-center gap-1"
+                    className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
                   >
-                    <RotateCcw size={12} /> Retry Import
+                    <RotateCcw size={13} /> Retry Ingestion
                   </button>
                 )}
                 {item.status === 'processing' && (
                   <button
                     onClick={() => handleCancel(item.id, item.supplierName)}
-                    className="btn-ghost btn-sm text-rose-600 flex items-center gap-1"
+                    className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50 flex items-center gap-1.5 font-bold cursor-pointer"
                   >
-                    <XCircle size={12} /> Cancel
+                    <XCircle size={13} /> Cancel
                   </button>
                 )}
               </div>
@@ -257,6 +320,123 @@ export const ImportQueue: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* UPLOAD FEED MODAL */}
+      <Modal
+        open={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+        title="Upload Supplier Feed File"
+        subtitle="Ingest CSV, XML, or Excel files into SupplyBridge PIM queue"
+        size="lg"
+      >
+        <form onSubmit={handleUploadSubmit} className="space-y-4">
+          <div>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Supplier Partner *</label>
+            <select className="select" value={supplierName} onChange={e => setSupplierName(e.target.value)}>
+              <option value="TechParts International">TechParts International (API/FTP)</option>
+              <option value="GlobalSource Limited">GlobalSource Limited (SFTP CSV)</option>
+              <option value="PrimeSupply Corp">PrimeSupply Corp (XML Feed)</option>
+              <option value="AcmeDistributors">AcmeDistributors (Excel Import)</option>
+              <option value="QuickShip LLC">QuickShip LLC (REST API)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">File Feed Format</label>
+            <select className="select" value={fileFormat} onChange={e => setFileFormat(e.target.value)}>
+              <option value="CSV">CSV (Comma Separated Values)</option>
+              <option value="XML">XML (Extensible Markup Language)</option>
+              <option value="XLSX">Excel Spreadsheet (.xlsx / .xls)</option>
+            </select>
+          </div>
+
+          {/* Drag and Drop Zone */}
+          <div>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Upload Feed File *</label>
+            <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-primary-500 p-6 rounded-2xl text-center bg-slate-50/50 dark:bg-slate-850/50 transition-colors relative cursor-pointer">
+              <input type="file" onChange={handleFileDrop} accept=".csv,.xml,.xlsx,.xls" className="absolute inset-0 opacity-0 cursor-pointer" />
+              <UploadCloud size={32} className="mx-auto text-primary-500 mb-2" />
+              {uploadedFileName ? (
+                <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">Selected File: {uploadedFileName}</p>
+              ) : (
+                <>
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Click or drag & drop feed file here</p>
+                  <p className="text-2xs text-slate-400 mt-1">Supports CSV, XML, Excel up to 50MB (max 100,000 SKUs)</p>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <button type="button" onClick={() => setUploadModalOpen(false)} className="btn-secondary">Cancel</button>
+            <button type="submit" disabled={isUploading} className="btn-primary flex items-center gap-1.5 shadow-md shadow-indigo-500/20">
+              {isUploading ? 'Parsing Feed...' : 'Start Ingestion Queue'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* SAMPLE RECORDS PREVIEW MODAL */}
+      {previewItem && (
+        <Modal
+          open
+          onClose={() => setPreviewItem(null)}
+          title={`Import Sample Records: ${previewItem.supplierName}`}
+          subtitle={`Preview parsed SKUs, prices, stock, and schema mappings from ${previewItem.fileName || 'feed'}`}
+          size="xl"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-850 p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
+              <div>
+                <span className="font-bold text-slate-800 dark:text-slate-200">Total File Records:</span> {previewItem.totalRecords.toLocaleString()} SKUs
+              </div>
+              <div>
+                <span className="font-bold text-slate-800 dark:text-slate-200">Format:</span> {previewItem.connectionType.toUpperCase()}
+              </div>
+              <div>
+                <Badge variant={statusToVariant(previewItem.status)}>{previewItem.status}</Badge>
+              </div>
+            </div>
+
+            <div className="table-container">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Supplier SKU</th>
+                    <th>Product Title</th>
+                    <th>Category</th>
+                    <th>Cost Price</th>
+                    <th>Retail Price</th>
+                    <th>Stock Qty</th>
+                    <th>Mapping Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {MOCK_PREVIEW_RECORDS.map((row, i) => (
+                    <tr key={i}>
+                      <td><code className="mono font-bold">{row.sku}</code></td>
+                      <td className="font-medium text-slate-800 dark:text-slate-200">{row.name}</td>
+                      <td><span className="text-xs text-slate-500">{row.category}</span></td>
+                      <td><span className="text-xs text-slate-600 dark:text-slate-300 font-mono">${row.costPrice.toFixed(2)}</span></td>
+                      <td><span className="text-xs font-bold text-slate-800 dark:text-slate-100 font-mono">${row.retailPrice.toFixed(2)}</span></td>
+                      <td className="font-bold text-emerald-600">{row.stock}</td>
+                      <td>
+                        <Badge variant={row.status === 'valid' ? 'success' : row.status === 'mapping_needed' ? 'warning' : 'danger'}>
+                          {row.status === 'valid' ? 'Mapped' : row.status === 'mapping_needed' ? 'Needs Map' : 'Invalid'}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button onClick={() => setPreviewItem(null)} className="btn-secondary">Close Preview</button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }

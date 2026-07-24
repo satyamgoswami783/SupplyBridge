@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, Layers, CheckCircle2, X } from 'lucide-react'
+import { Plus, Edit2, Trash2, Layers, CheckCircle2, X, Sliders, Tag, Sparkles } from 'lucide-react'
 import { SectionHeader, FilterBar, EmptyState, ConfirmDialog } from '../../components/ui'
 import { Modal } from '../../components/ui/Modal'
 import { mockVariantTypes } from '../../data/mockData'
@@ -35,6 +35,11 @@ export const Variants: React.FC = () => {
     setToastMessage(msg)
     setTimeout(() => setToastMessage(null), 3000)
   }
+
+  // Calculate summary metrics
+  const totalDimensions = variantsList.length
+  const totalOptionValues = variantsList.reduce((acc, curr) => acc + curr.values.length, 0)
+  const totalProductsCovered = variantsList.reduce((acc, curr) => acc + curr.productCount, 0)
 
   // --- Handlers ---
   const handleOpenAdd = () => {
@@ -151,7 +156,7 @@ export const Variants: React.FC = () => {
   )
 
   return (
-    <div className="relative">
+    <div className="relative space-y-6">
       {/* Toast Notification Banner */}
       <AnimatePresence>
         {toastMessage && (
@@ -169,102 +174,122 @@ export const Variants: React.FC = () => {
 
       <SectionHeader
         title="Variant Types"
-        subtitle="Define product variant dimensions (Size, Color, Storage) used across all catalog products"
+        subtitle="Define product variant dimensions (Size, Color, Storage, RAM) used across all catalog products"
         actions={
-          <button onClick={handleOpenAdd} className="btn-primary btn-sm flex items-center gap-1.5">
+          <button onClick={handleOpenAdd} className="btn-primary btn-sm flex items-center gap-1.5 cursor-pointer">
             <Plus size={14} /> Add Variant Type
           </button>
         }
       />
 
-      <FilterBar search={search} onSearch={setSearch} placeholder="Search variant types..." />
+      {/* Summary KPI Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { label: 'Variant Dimensions', value: totalDimensions, color: 'text-slate-900' },
+          { label: 'Total Value Chips',  value: totalOptionValues, color: 'text-violet-600' },
+          { label: 'Products Using',      value: totalProductsCovered.toLocaleString(), color: 'text-emerald-600' },
+          { label: 'Auto-Mapped Rules',  value: '99.4%', color: 'text-primary-600' },
+        ].map(s => (
+          <div key={s.label} className="card p-4 text-center">
+            <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+            <p className="text-xs text-slate-400 font-semibold mt-0.5">{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      <FilterBar search={search} onSearch={setSearch} placeholder="Search variant types by name..." />
 
       {filtered.length === 0 ? (
-        <div className="card p-8">
+        <div className="card p-12 text-center">
           <EmptyState
-            icon={<Layers size={24} />}
+            icon={<Layers size={28} className="text-slate-300" />}
             title="No variant types found"
             description="Try searching for another term or create a new variant dimension."
           />
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map(v => (
-            <div key={v.id} className="card p-5 hover:shadow-card-md transition-all">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center">
-                    <Layers size={14} className="text-violet-600" />
+            <div key={v.id} className="card p-5 hover:shadow-card-md transition-all flex flex-col justify-between border border-slate-200">
+              <div>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center shadow-2xs">
+                      <Layers size={18} className="text-violet-600" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900 text-sm">{v.name}</p>
+                      <p className="text-xs text-slate-400 font-medium mt-0.5">{v.productCount.toLocaleString()} products using</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-bold text-slate-800 text-sm">{v.name}</p>
-                    <p className="text-xs text-slate-400">{v.productCount.toLocaleString()} products using</p>
-                  </div>
-                </div>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => handleOpenEdit(v)}
-                    className="btn-icon"
-                    title="Edit Variant Type"
-                  >
-                    <Edit2 size={13} />
-                  </button>
-                  <button
-                    onClick={() => { setDeletingVariant(v); setDeleteOpen(true); }}
-                    className="btn-icon text-rose-500 hover:bg-rose-50"
-                    title="Delete Variant Type"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Option Chips */}
-              <div className="flex flex-wrap gap-1.5 items-center pt-2">
-                {v.values.map(val => (
-                  <span
-                    key={val}
-                    className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium inline-flex items-center gap-1 group/chip"
-                  >
-                    {val}
+                  <div className="flex items-center gap-1">
                     <button
-                      onClick={() => handleRemoveChipValue(v.id, val)}
-                      className="text-slate-400 hover:text-rose-600 rounded-full p-0.5"
-                      title="Remove option"
+                      onClick={() => handleOpenEdit(v)}
+                      className="btn-icon text-slate-400 hover:text-slate-700"
+                      title="Edit Variant Type"
                     >
-                      <X size={10} />
+                      <Edit2 size={13} />
                     </button>
-                  </span>
-                ))}
-
-                {addingValueForId === v.id ? (
-                  <div className="inline-flex items-center gap-1">
-                    <input
-                      className="input input-sm py-0.5 text-xs w-24"
-                      autoFocus
-                      placeholder="New Value"
-                      value={newValueInput}
-                      onChange={e => setNewValueInput(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') handleAddInlineValue(v.id)
-                        if (e.key === 'Escape') setAddingValueForId(null)
-                      }}
-                    />
                     <button
-                      onClick={() => handleAddInlineValue(v.id)}
-                      className="btn-primary btn-sm text-2xs py-0.5 px-2"
+                      onClick={() => { setDeletingVariant(v); setDeleteOpen(true); }}
+                      className="btn-icon text-rose-400 hover:text-rose-600 hover:bg-rose-50"
+                      title="Delete Variant Type"
                     >
-                      Add
+                      <Trash2 size={13} />
                     </button>
                   </div>
-                ) : (
-                  <button
-                    onClick={() => { setAddingValueForId(v.id); setNewValueInput(''); }}
-                    className="px-2.5 py-1 border border-dashed border-slate-300 text-slate-500 rounded-full text-xs hover:border-primary-400 hover:text-primary-600 transition-colors font-medium"
-                  >
-                    + Add Option
-                  </button>
-                )}
+                </div>
+
+                {/* Option Chips Container */}
+                <div className="space-y-2">
+                  <p className="text-2xs font-bold uppercase tracking-wider text-slate-400">Available Dimension Values ({v.values.length})</p>
+                  <div className="flex flex-wrap gap-1.5 items-center bg-slate-50/80 p-3 rounded-xl border border-slate-100 min-h-[60px]">
+                    {v.values.map(val => (
+                      <span
+                        key={val}
+                        className="px-2.5 py-1 bg-white border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 shadow-2xs group/chip hover:border-slate-300 transition-colors"
+                      >
+                        {val}
+                        <button
+                          onClick={() => handleRemoveChipValue(v.id, val)}
+                          className="text-slate-400 hover:text-rose-600 rounded-md p-0.5 transition-colors"
+                          title="Remove option value"
+                        >
+                          <X size={11} />
+                        </button>
+                      </span>
+                    ))}
+
+                    {addingValueForId === v.id ? (
+                      <div className="inline-flex items-center gap-1">
+                        <input
+                          className="input input-sm py-1 px-2.5 text-xs w-28 font-medium"
+                          autoFocus
+                          placeholder="New Option"
+                          value={newValueInput}
+                          onChange={e => setNewValueInput(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') handleAddInlineValue(v.id)
+                            if (e.key === 'Escape') setAddingValueForId(null)
+                          }}
+                        />
+                        <button
+                          onClick={() => handleAddInlineValue(v.id)}
+                          className="btn-primary btn-sm text-2xs py-1 px-2.5 font-bold cursor-pointer"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => { setAddingValueForId(v.id); setNewValueInput(''); }}
+                        className="px-3 py-1 border border-dashed border-slate-300 bg-white text-slate-500 rounded-lg text-xs hover:border-primary-400 hover:text-primary-600 transition-colors font-semibold cursor-pointer"
+                      >
+                        + Add Option
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           ))}
@@ -287,7 +312,7 @@ export const Variants: React.FC = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Variant Type Name *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Variant Type Name *</label>
             <input
               className="input"
               placeholder="e.g. Color, Size, Storage, Voltage"
@@ -296,7 +321,7 @@ export const Variants: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Values (comma-separated)</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Values (comma-separated)</label>
             <input
               className="input"
               placeholder="e.g. Black, White, Red, Blue, 128GB, 256GB"
@@ -323,7 +348,7 @@ export const Variants: React.FC = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Variant Type Name *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Variant Type Name *</label>
             <input
               className="input"
               value={formData.name}
@@ -331,7 +356,7 @@ export const Variants: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Values (comma-separated)</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Values (comma-separated)</label>
             <input
               className="input"
               value={formData.valuesString}

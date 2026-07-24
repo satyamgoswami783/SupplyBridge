@@ -186,6 +186,8 @@ export const MasterCatalog: React.FC = () => {
     const created: Product = {
       id: `p_${Date.now()}`,
       masterId: `MSTR-${newProduct.sku.toUpperCase()}`,
+      masterSku: newProduct.sku.toUpperCase(),
+      supplierSku: newProduct.sku.toUpperCase(),
       sku: newProduct.sku.toUpperCase(),
       masterSku: newProduct.sku.toUpperCase(),
       supplierSku: newProduct.sku.toUpperCase(),
@@ -780,28 +782,14 @@ export const MasterCatalog: React.FC = () => {
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1.5">Category</label>
-              <input
-                className="input"
-                placeholder="e.g. Processors"
-                value={newProduct.categoryName}
-                onChange={e => setNewProduct({ ...newProduct, categoryName: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1.5">Supplier</label>
-              <select
-                className="select"
-                value={newProduct.supplierName}
-                onChange={e => setNewProduct({ ...newProduct, supplierName: e.target.value })}
-              >
-                <option value="TechParts International">TechParts International</option>
-                <option value="GlobalSource Limited">GlobalSource Limited</option>
-                <option value="PrimeSupply Corp">PrimeSupply Corp</option>
-              </select>
-            </div>
+          <div>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Category *</label>
+            <input
+              className="input"
+              placeholder="e.g. Processors"
+              value={newProduct.categoryName}
+              onChange={e => setNewProduct({ ...newProduct, categoryName: e.target.value })}
+            />
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
