@@ -105,8 +105,11 @@ export interface Product {
   attributes: ProductAttribute[]
   pricing: ProductPricing
   inventory: ProductInventory
-  weight?: number
-  dimensions?: { l: number; w: number; h: number; unit: string }
+  seo?: {
+    metaTitle: string
+    metaDescription: string
+    focusKeyword: string
+  }
   createdAt: string
   updatedAt: string
   publishedAt?: string

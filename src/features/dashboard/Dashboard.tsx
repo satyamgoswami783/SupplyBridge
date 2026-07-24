@@ -4,7 +4,7 @@ import {
   Truck, Package, AlertTriangle, CheckCircle2, RefreshCw,
   DollarSign, Image, Briefcase, XCircle, PlayCircle,
   Globe, Wifi, Server, Database, Clock, TrendingUp,
-  ArrowUpRight, ArrowDownRight, Activity, ShieldCheck, UserCheck
+  ArrowUpRight, ArrowDownRight, Activity, ShieldCheck, UserCheck, Tag
 } from 'lucide-react'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis,
@@ -56,6 +56,28 @@ export const Dashboard: React.FC = () => {
   const { role, currentUser } = useAuth()
   const roleInfo = ROLE_DESCRIPTIONS[role] || ROLE_DESCRIPTIONS.super_admin
 
+  const getKpis = () => {
+    if (role === 'catalog_manager') {
+      return [
+        { label: 'Total Products',      value: formatNumber(m.totalProducts), icon: <Package size={18} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const },
+        { label: 'Pending Validation',  value: m.pendingProducts, icon: <AlertTriangle size={18} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const },
+        { label: 'Draft Products',      value: formatNumber(Math.round(m.totalProducts * 0.12)), icon: <Clock size={18} className="text-slate-600" />, iconBg: 'bg-slate-50', change: '+32 this week', changeType: 'positive' as const },
+        { label: 'Products Missing Images', value: 8, icon: <Image size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: 'Require review', changeType: 'negative' as const },
+        { label: 'Missing Categories',  value: 3, icon: <Tag size={18} className="text-violet-600" />, iconBg: 'bg-violet-50', change: 'Require review', changeType: 'negative' as const },
+        { label: 'Duplicate SKU Count',  value: 1, icon: <XCircle size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: 'High priority', changeType: 'negative' as const },
+      ]
+    }
+    // Default KPIs for other roles
+    return [
+      { label: 'Connected Suppliers', value: m.connectedSuppliers, icon: <Truck size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+2 this week', changeType: 'positive' as const },
+      { label: 'Disconnected',        value: m.disconnectedSuppliers, icon: <Wifi size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '-1 resolved', changeType: 'positive' as const },
+      { label: 'Total Products',      value: formatNumber(m.totalProducts), icon: <Package size={18} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const },
+      { label: 'Pending Validation',  value: m.pendingProducts, icon: <AlertTriangle size={18} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const },
+      { label: 'Published Products',  value: formatNumber(m.publishedProducts), icon: <CheckCircle2 size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+982 today', changeType: 'positive' as const },
+      { label: 'Failed Products',     value: m.failedProducts, icon: <XCircle size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '+12 today', changeType: 'negative' as const },
+    ]
+  }
+
   return (
     <div className="space-y-6">
       {/* Role-Specific Page Header */}
@@ -81,14 +103,7 @@ export const Dashboard: React.FC = () => {
         initial="initial"
         animate="animate"
       >
-        {[
-          { label: 'Connected Suppliers', value: m.connectedSuppliers, icon: <Truck size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+2 this week', changeType: 'positive' as const },
-          { label: 'Disconnected',        value: m.disconnectedSuppliers, icon: <Wifi size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '-1 resolved', changeType: 'positive' as const },
-          { label: 'Total Products',      value: formatNumber(m.totalProducts), icon: <Package size={18} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const },
-          { label: 'Pending Validation',  value: m.pendingProducts, icon: <AlertTriangle size={18} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const },
-          { label: 'Published Products',  value: formatNumber(m.publishedProducts), icon: <CheckCircle2 size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+982 today', changeType: 'positive' as const },
-          { label: 'Failed Products',     value: m.failedProducts, icon: <XCircle size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '+12 today', changeType: 'negative' as const },
-        ].map((item, i) => (
+        {getKpis().map((item, i) => (
           <motion.div key={i} variants={stagger.child} transition={{ duration: 0.3 }}>
             <StatsCard {...item} />
           </motion.div>

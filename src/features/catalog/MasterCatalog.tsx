@@ -64,6 +64,9 @@ export const MasterCatalog: React.FC = () => {
     retailPrice: 99.99,
     costPrice: 65.0,
     stock: 50,
+    metaTitle: '',
+    metaDescription: '',
+    focusKeyword: '',
   })
 
   const showNotification = (msg: string) => {
@@ -219,6 +222,11 @@ export const MasterCatalog: React.FC = () => {
         status: Number(newProduct.stock) > 0 ? 'in_stock' : 'out_of_stock',
         lastSynced: new Date().toISOString(),
       },
+      seo: {
+        metaTitle: newProduct.metaTitle,
+        metaDescription: newProduct.metaDescription,
+        focusKeyword: newProduct.focusKeyword,
+      },
       status: 'published',
       validationStatus: 'passed',
       images: [
@@ -248,6 +256,9 @@ export const MasterCatalog: React.FC = () => {
       retailPrice: 99.99,
       costPrice: 65.0,
       stock: 50,
+      metaTitle: '',
+      metaDescription: '',
+      focusKeyword: '',
     })
     showNotification(`Product "${created.name}" created successfully!`)
   }
@@ -264,6 +275,9 @@ export const MasterCatalog: React.FC = () => {
       retailPrice: p.pricing.retailPrice,
       costPrice: p.pricing.costPrice,
       stock: p.inventory.availableStock,
+      metaTitle: p.seo?.metaTitle || '',
+      metaDescription: p.seo?.metaDescription || '',
+      focusKeyword: p.seo?.focusKeyword || '',
     })
     setEditModalOpen(true)
   }
@@ -292,6 +306,11 @@ export const MasterCatalog: React.FC = () => {
               availableStock: Number(newProduct.stock),
               totalStock: Number(newProduct.stock),
               status: Number(newProduct.stock) > 0 ? 'in_stock' : 'out_of_stock',
+            },
+            seo: {
+              metaTitle: newProduct.metaTitle,
+              metaDescription: newProduct.metaDescription,
+              focusKeyword: newProduct.focusKeyword,
             },
             updatedAt: new Date().toISOString(),
           }
@@ -455,7 +474,7 @@ export const MasterCatalog: React.FC = () => {
                 <th>Status</th>
                 <th>Validation</th>
                 <th>Updated</th>
-                <th className="text-right">Actions</th>
+                <th className="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -549,9 +568,9 @@ export const MasterCatalog: React.FC = () => {
                         {timeAgo(product.updatedAt)}
                       </span>
                     </td>
-                    <td className="text-right">
+                    <td className="text-center">
                       <div
-                        className="flex items-center justify-end gap-1"
+                        className="flex items-center justify-center gap-1"
                         onClick={e => e.stopPropagation()}
                       >
                         <button
@@ -707,6 +726,40 @@ export const MasterCatalog: React.FC = () => {
               />
             </div>
           </div>
+
+          <div className="border-t border-slate-200 pt-4 mt-2">
+            <h5 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">SEO & Metadata</h5>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1.5">Meta Title</label>
+                <input
+                  className="input"
+                  placeholder="SEO Title (leave empty to use product name)"
+                  value={newProduct.metaTitle}
+                  onChange={e => setNewProduct({ ...newProduct, metaTitle: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1.5">Focus Keyword</label>
+                <input
+                  className="input"
+                  placeholder="e.g. SSD, Motherboard"
+                  value={newProduct.focusKeyword}
+                  onChange={e => setNewProduct({ ...newProduct, focusKeyword: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="mt-3">
+              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Meta Description</label>
+              <textarea
+                className="input"
+                rows={2}
+                placeholder="Brief summary for search engine snippet..."
+                value={newProduct.metaDescription}
+                onChange={e => setNewProduct({ ...newProduct, metaDescription: e.target.value })}
+              />
+            </div>
+          </div>
         </div>
       </Modal>
 
@@ -773,6 +826,40 @@ export const MasterCatalog: React.FC = () => {
               />
             </div>
           </div>
+
+          <div className="border-t border-slate-200 pt-4 mt-2">
+            <h5 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">SEO & Metadata</h5>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1.5">Meta Title</label>
+                <input
+                  className="input"
+                  placeholder="SEO Title (leave empty to use product name)"
+                  value={newProduct.metaTitle}
+                  onChange={e => setNewProduct({ ...newProduct, metaTitle: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1.5">Focus Keyword</label>
+                <input
+                  className="input"
+                  placeholder="e.g. SSD, Motherboard"
+                  value={newProduct.focusKeyword}
+                  onChange={e => setNewProduct({ ...newProduct, focusKeyword: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="mt-3">
+              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Meta Description</label>
+              <textarea
+                className="input"
+                rows={2}
+                placeholder="Brief summary for search engine snippet..."
+                value={newProduct.metaDescription}
+                onChange={e => setNewProduct({ ...newProduct, metaDescription: e.target.value })}
+              />
+            </div>
+          </div>
         </div>
       </Modal>
 
@@ -829,6 +916,27 @@ export const MasterCatalog: React.FC = () => {
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <p className="text-2xs text-slate-400 font-semibold uppercase">Available Stock</p>
                 <p className="text-lg font-bold text-slate-900">{viewProduct.inventory.availableStock.toLocaleString()} units</p>
+              </div>
+            </div>
+
+            {/* Google Search Snippet Preview */}
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <p className="font-semibold text-slate-700 uppercase tracking-wider text-2xs">Google Search Engine Preview</p>
+              <div className="bg-white p-3 rounded-lg border border-slate-200 font-sans">
+                <p className="text-xs text-slate-400 font-mono truncate">https://pim.supplybridge.com/products/{viewProduct.sku.toLowerCase()}</p>
+                <p className="text-sm text-blue-800 font-medium hover:underline cursor-pointer truncate">
+                  {viewProduct.seo?.metaTitle || viewProduct.name}
+                </p>
+                <p className="text-xs text-slate-600 line-clamp-2 mt-0.5">
+                  {viewProduct.seo?.metaDescription || viewProduct.description || 'No search description added yet. Edit metadata to improve search visibility.'}
+                </p>
+                {viewProduct.seo?.focusKeyword && (
+                  <div className="mt-2 flex items-center gap-1">
+                    <span className="text-3xs font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                      Keyword: {viewProduct.seo.focusKeyword}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
