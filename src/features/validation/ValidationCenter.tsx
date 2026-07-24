@@ -8,7 +8,10 @@ import { mockValidationItems } from '../../data/mockData'
 import { statusToVariant, timeAgo } from '../../utils'
 import type { ValidationItem } from '../../types'
 
+import { useAuth } from '../../context/AuthContext'
+
 export const ValidationCenter: React.FC = () => {
+  const { role } = useAuth()
   const [tab, setTab]                   = useState('pending')
   const [search, setSearch]             = useState('')
   const [reviewItem, setReviewItem]     = useState<ValidationItem | null>(null)

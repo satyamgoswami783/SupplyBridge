@@ -7,6 +7,7 @@ import { Modal } from '../../components/ui/Modal'
 import { mockSuppliers } from '../../data/mockData'
 import { statusToVariant, connectionTypeLabel, formatDateTime, timeAgo } from '../../utils'
 import type { Supplier, ConnectionType } from '../../types'
+import { useAuth } from '../../context/AuthContext'
 
 const CONNECTION_TYPES: { value: ConnectionType; label: string }[] = [
   { value: 'api',   label: 'REST API' },
@@ -22,6 +23,8 @@ const connTypeIcon: Record<ConnectionType, string> = {
 }
 
 export const Suppliers: React.FC = () => {
+  const { role } = useAuth()
+  const canManageSuppliers = role === 'super_admin' || role === 'admin' || role === 'integration_manager'
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [typeFilter, setTypeFilter] = useState('all')
@@ -42,10 +45,12 @@ export const Suppliers: React.FC = () => {
         title="Suppliers"
         subtitle={`${mockSuppliers.length} suppliers configured — ${mockSuppliers.filter(s => s.status === 'connected').length} connected`}
         actions={
-          <>
-            <button className="btn-secondary btn-sm"><RefreshCw size={14} /> Sync All</button>
-            <button onClick={() => setAddOpen(true)} className="btn-primary btn-sm"><Plus size={14} /> Add Supplier</button>
-          </>
+          canManageSuppliers ? (
+            <>
+              <button className="btn-secondary btn-sm"><RefreshCw size={14} /> Sync All</button>
+              <button onClick={() => setAddOpen(true)} className="btn-primary btn-sm"><Plus size={14} /> Add Supplier</button>
+            </>
+          ) : undefined
         }
       />
 

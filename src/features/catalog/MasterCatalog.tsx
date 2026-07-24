@@ -6,7 +6,12 @@ import { SectionHeader, FilterBar, Tabs } from '../../components/ui'
 import { mockProducts } from '../../data/mockData'
 import { statusToVariant, formatDateTime, timeAgo } from '../../utils'
 
+import { useAuth } from '../../context/AuthContext'
+
 export const MasterCatalog: React.FC = () => {
+  const { role } = useAuth()
+  const canManageCatalog = role === 'super_admin' || role === 'admin' || role === 'catalog_manager'
+  const canDelete = role === 'super_admin' || role === 'admin'
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -35,7 +40,7 @@ export const MasterCatalog: React.FC = () => {
         actions={
           <>
             <button className="btn-secondary btn-sm"><Filter size={14} /> Filters</button>
-            <button className="btn-primary btn-sm"><Plus size={14} /> Add Product</button>
+            {canManageCatalog && <button className="btn-primary btn-sm"><Plus size={14} /> Add Product</button>}
           </>
         }
       />
