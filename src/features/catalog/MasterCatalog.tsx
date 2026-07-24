@@ -324,11 +324,11 @@ export const MasterCatalog: React.FC = () => {
   }
 
   const tabs = [
-    { id: 'all',              label: 'All Products',     count: productsList.length },
-    { id: 'published',        label: 'Published',        count: productsList.filter(p => p.status === 'published').length },
+    { id: 'all', label: 'All Products', count: productsList.length },
+    { id: 'published', label: 'Published', count: productsList.filter(p => p.status === 'published').length },
     { id: 'needs_validation', label: 'Needs Validation', count: productsList.filter(p => p.validationStatus === 'failed').length },
-    { id: 'draft',            label: 'Draft',            count: productsList.filter(p => p.status === 'draft').length },
-    { id: 'failed',           label: 'Failed',           count: productsList.filter(p => p.status === 'failed').length },
+    { id: 'draft', label: 'Draft', count: productsList.filter(p => p.status === 'draft').length },
+    { id: 'failed', label: 'Failed', count: productsList.filter(p => p.status === 'failed').length },
   ]
 
   return (
@@ -513,9 +513,8 @@ export const MasterCatalog: React.FC = () => {
                 return (
                   <tr
                     key={product.id}
-                    className={`cursor-pointer transition-colors ${
-                      isSelected ? 'bg-primary-50/50' : 'hover:bg-slate-50/80'
-                    }`}
+                    className={`cursor-pointer transition-colors ${isSelected ? 'bg-primary-50/50' : 'hover:bg-slate-50/80'
+                      }`}
                     onClick={() => setViewProduct(product)}
                   >
                     <td className="text-center" onClick={e => e.stopPropagation()}>
@@ -873,6 +872,29 @@ export const MasterCatalog: React.FC = () => {
                 value={newProduct.brand}
                 onChange={e => setNewProduct({ ...newProduct, brand: e.target.value })}
               />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Category</label>
+              <input
+                className="input"
+                placeholder="e.g. Processors"
+                value={newProduct.categoryName}
+                onChange={e => setNewProduct({ ...newProduct, categoryName: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Supplier</label>
+              <select
+                className="select"
+                value={newProduct.supplierName}
+                onChange={e => setNewProduct({ ...newProduct, supplierName: e.target.value })}
+              >
+                {suppliersList.map(s => (
+                  <option key={s.id} value={s.name}>{s.name}</option>
+                ))}
+              </select>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
