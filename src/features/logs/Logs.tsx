@@ -4,7 +4,7 @@ import { mockLogs } from '../../data/mockData'
 import type { LogEntry, LogLevel } from '../../types'
 import {
   AlertCircle, Info, CheckCircle2, AlertTriangle, Search, RefreshCw,
-  ChevronRight, ChevronDown, Download, FileCode, FileSpreadsheet, Trash2, Shield, Database, Terminal, Filter, Code, ArrowUpRight
+  ChevronRight, ChevronDown, Download, FileCode, FileSpreadsheet, Trash2, Shield, Database, Terminal, Filter, Code, ArrowUpRight, Activity
 } from 'lucide-react'
 import { SectionHeader, ConfirmDialog } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
