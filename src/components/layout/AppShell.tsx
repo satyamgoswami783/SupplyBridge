@@ -10,12 +10,14 @@ export const AppShell: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false)
 
   const toggleDark = () => {
-    setDarkMode(!darkMode)
-    document.body.classList.toggle('dark', !darkMode)
+    const nextDark = !darkMode
+    setDarkMode(nextDark)
+    document.documentElement.classList.toggle('dark', nextDark)
+    document.body.classList.toggle('dark', nextDark)
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-surface-bg">
+    <div className={`flex h-screen overflow-hidden transition-colors ${darkMode ? 'bg-slate-950 text-slate-100' : 'bg-surface-bg'}`}>
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header

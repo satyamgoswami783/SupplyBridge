@@ -1,16 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Truck, Package, AlertTriangle, CheckCircle2, RefreshCw,
   DollarSign, Image, Briefcase, XCircle, PlayCircle,
   Globe, Wifi, Server, Database, Clock, TrendingUp,
-  ArrowUpRight, ArrowDownRight, Activity
+  ArrowUpRight, ArrowDownRight, Activity, Zap, RotateCcw
 } from 'lucide-react'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts'
-import { StatsCard, HealthIndicator } from '../../components/ui'
+import { StatsCard, HealthIndicator, ConfirmDialog } from '../../components/ui'
+import { Modal } from '../../components/ui/Modal'
 import { Badge } from '../../components/ui/Badge'
 import { mockDashboardMetrics, mockSyncChartData, mockProductsBySupplier, mockActivities } from '../../data/mockData'
 import { formatNumber } from '../../utils'
@@ -23,19 +25,98 @@ const stagger = {
 const m = mockDashboardMetrics
 
 export const Dashboard: React.FC = () => {
+  const navigate = useNavigate()
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState('Updated just now')
+
+  // Quick Action Modal states
+  const [manualSyncOpen, setManualSyncOpen] = useState(false)
+  const [retryModalOpen, setRetryModalOpen] = useState(false)
+  const [selectedSupplier, setSelectedSupplier] = useState('TechParts International')
+  const [selectedSyncType, setSelectedSyncType] = useState('Inventory Sync')
+  const [syncLaunching, setSyncLaunching] = useState(false)
+  const [syncSuccessMsg, setSyncSuccessMsg] = useState('')
+
+  const handleRefresh = () => {
+    setIsRefreshing(true)
+    setTimeout(() => {
+      setIsRefreshing(false)
+      setLastUpdated('Updated just now')
+    }, 600)
+  }
+
+  const handleLaunchSync = () => {
+    setSyncLaunching(true)
+    setTimeout(() => {
+      setSyncLaunching(false)
+      setManualSyncOpen(false)
+      setSyncSuccessMsg(`Manual ${selectedSyncType} triggered successfully for ${selectedSupplier}!`)
+      setTimeout(() => setSyncSuccessMsg(''), 4000)
+    }, 600)
+  }
+
+  const handleConfirmRetryAll = () => {
+    setRetryModalOpen(false)
+    setSyncSuccessMsg('Re-queued all 17 failed sync jobs for immediate retry!')
+    setTimeout(() => setSyncSuccessMsg(''), 4000)
+  }
+
   return (
     <div className="space-y-6">
       {/* Page header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="page-title">Platform Overview</h1>
           <p className="page-subtitle">Real-time health and synchronization status across all suppliers and stores</p>
         </div>
-        <div className="flex items-center gap-2">
+
+        {/* Header Quick Action Controls */}
+        <div className="flex items-center gap-2 flex-wrap">
           <HealthIndicator status="operational" label="All Systems" />
-          <span className="text-xs text-slate-400">Updated just now</span>
+
+          {/* Trigger Manual Sync Button */}
+          <button
+            onClick={() => setManualSyncOpen(true)}
+            className="btn-primary btn-sm flex items-center gap-1.5 cursor-pointer shadow-sm"
+          >
+            <Zap size={14} />
+            <span>Trigger Manual Sync</span>
+          </button>
+
+          {/* Retry Failed Jobs Button */}
+          <button
+            onClick={() => setRetryModalOpen(true)}
+            className="btn-secondary btn-sm text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 flex items-center gap-1.5 cursor-pointer"
+          >
+            <RotateCcw size={14} />
+            <span>Retry Failed (17)</span>
+          </button>
+
+          {/* Refresh Button */}
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors border border-slate-200 cursor-pointer disabled:opacity-50"
+            title="Click to refresh dashboard metrics"
+          >
+            <RefreshCw size={13} className={isRefreshing ? 'animate-spin text-primary-600' : 'text-slate-500'} />
+            <span>{isRefreshing ? 'Refreshing...' : lastUpdated}</span>
+          </button>
         </div>
       </div>
+
+      {/* Instant Action Alert Banner */}
+      {syncSuccessMsg && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-medium flex items-center gap-2"
+        >
+          <CheckCircle2 size={16} className="text-emerald-600 flex-shrink-0" />
+          <span>{syncSuccessMsg}</span>
+        </motion.div>
+      )}
 
       {/* Top KPI Grid */}
       <motion.div
@@ -45,15 +126,15 @@ export const Dashboard: React.FC = () => {
         animate="animate"
       >
         {[
-          { label: 'Connected Suppliers', value: m.connectedSuppliers, icon: <Truck size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+2 this week', changeType: 'positive' as const },
-          { label: 'Disconnected',        value: m.disconnectedSuppliers, icon: <Wifi size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '-1 resolved', changeType: 'positive' as const },
-          { label: 'Total Products',      value: formatNumber(m.totalProducts), icon: <Package size={18} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const },
-          { label: 'Pending Validation',  value: m.pendingProducts, icon: <AlertTriangle size={18} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const },
-          { label: 'Published Products',  value: formatNumber(m.publishedProducts), icon: <CheckCircle2 size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+982 today', changeType: 'positive' as const },
-          { label: 'Failed Products',     value: m.failedProducts, icon: <XCircle size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '+12 today', changeType: 'negative' as const },
+          { label: 'Connected Suppliers', value: m.connectedSuppliers, icon: <Truck size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+2 this week', changeType: 'positive' as const, path: '/suppliers' },
+          { label: 'Disconnected',        value: m.disconnectedSuppliers, icon: <Wifi size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '-1 resolved', changeType: 'positive' as const, path: '/suppliers' },
+          { label: 'Total Products',      value: formatNumber(m.totalProducts), icon: <Package size={18} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const, path: '/mapping/products' },
+          { label: 'Pending Validation',  value: m.pendingProducts, icon: <AlertTriangle size={18} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const, path: '/validation' },
+          { label: 'Published Products',  value: formatNumber(m.publishedProducts), icon: <CheckCircle2 size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+982 today', changeType: 'positive' as const, path: '/sync/website' },
+          { label: 'Failed Products',     value: m.failedProducts, icon: <XCircle size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '+12 today', changeType: 'negative' as const, path: '/import-queue' },
         ].map((item, i) => (
           <motion.div key={i} variants={stagger.child} transition={{ duration: 0.3 }}>
-            <StatsCard {...item} />
+            <StatsCard {...item} onClick={() => navigate(item.path)} />
           </motion.div>
         ))}
       </motion.div>
@@ -67,12 +148,16 @@ export const Dashboard: React.FC = () => {
           </p>
           <div className="space-y-3.5">
             {[
-              { label: 'Inventory Sync', status: m.inventorySyncStatus, last: '4 min ago', icon: <RefreshCw size={14} /> },
-              { label: 'Pricing Sync',   status: m.pricingSyncStatus,   last: '12 min ago', icon: <DollarSign size={14} /> },
-              { label: 'Image Sync',     status: m.imageSyncStatus,     last: '2 hr ago', icon: <Image size={14} /> },
+              { label: 'Inventory Sync', status: m.inventorySyncStatus, last: '4 min ago', icon: <RefreshCw size={14} />, path: '/sync/inventory' },
+              { label: 'Pricing Sync',   status: m.pricingSyncStatus,   last: '12 min ago', icon: <DollarSign size={14} />, path: '/sync/pricing' },
+              { label: 'Image Sync',     status: m.imageSyncStatus,     last: '2 hr ago', icon: <Image size={14} />, path: '/sync/images' },
             ].map(s => (
-              <div key={s.label} className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-slate-600 text-sm">
+              <div
+                key={s.label}
+                onClick={() => navigate(s.path)}
+                className="flex items-center justify-between p-1.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-2 text-slate-600 text-sm font-medium">
                   <span className="opacity-60">{s.icon}</span>
                   {s.label}
                 </div>
@@ -97,7 +182,11 @@ export const Dashboard: React.FC = () => {
               { label: 'Completed', value: m.completedJobs, color: 'text-emerald-600', bg: 'bg-emerald-50', icon: <CheckCircle2 size={18} /> },
               { label: 'Failed',    value: m.failedJobs,    color: 'text-rose-600',    bg: 'bg-rose-50',    icon: <XCircle size={18} /> },
             ].map(j => (
-              <div key={j.label} className={`${j.bg} rounded-xl p-3 flex flex-col gap-1`}>
+              <div
+                key={j.label}
+                onClick={() => navigate('/sync/jobs')}
+                className={`${j.bg} rounded-xl p-3 flex flex-col gap-1 cursor-pointer hover:opacity-90 transition-opacity`}
+              >
                 <span className={j.color}>{j.icon}</span>
                 <p className={`text-2xl font-bold ${j.color}`}>{j.value.toLocaleString()}</p>
                 <p className="text-xs text-slate-500 font-medium">{j.label}</p>
@@ -210,7 +299,12 @@ export const Dashboard: React.FC = () => {
             <p className="text-sm font-semibold text-slate-800 flex items-center gap-2">
               <Activity size={15} className="text-primary-600" /> Recent Activity
             </p>
-            <button className="text-xs text-primary-600 hover:text-primary-700 font-medium">View all logs →</button>
+            <button
+              onClick={() => navigate('/logs')}
+              className="text-xs text-primary-600 hover:text-primary-700 font-medium hover:underline cursor-pointer flex items-center gap-1"
+            >
+              View all logs →
+            </button>
           </div>
           <div className="space-y-3">
             {mockActivities.map(act => {
@@ -239,7 +333,10 @@ export const Dashboard: React.FC = () => {
         {/* Queue + Store Status */}
         <div className="space-y-4">
           {/* Import Queue */}
-          <div className="card p-5">
+          <div
+            onClick={() => navigate('/import-queue')}
+            className="card p-5 cursor-pointer hover:shadow-card-md transition-all"
+          >
             <p className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
               <Database size={15} className="text-primary-600" /> Import Queue
             </p>
@@ -260,7 +357,10 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Store Status */}
-          <div className="card p-5">
+          <div
+            onClick={() => navigate('/sync/website')}
+            className="card p-5 cursor-pointer hover:shadow-card-md transition-all"
+          >
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-semibold text-slate-800 flex items-center gap-2">
                 <Globe size={15} className="text-primary-600" /> Store Status
@@ -283,6 +383,92 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Trigger Manual Sync Modal */}
+      <Modal
+        open={manualSyncOpen}
+        onClose={() => setManualSyncOpen(false)}
+        title="Trigger Manual Synchronization"
+        subtitle="Manually launch an instant synchronization pipeline for a specific supplier"
+        size="md"
+        footer={
+          <>
+            <button onClick={() => setManualSyncOpen(false)} className="btn-secondary">Cancel</button>
+            <button
+              onClick={handleLaunchSync}
+              disabled={syncLaunching}
+              className="btn-primary flex items-center gap-1.5"
+            >
+              {syncLaunching ? (
+                <>
+                  <RefreshCw size={14} className="animate-spin" />
+                  <span>Triggering Job...</span>
+                </>
+              ) : (
+                <>
+                  <Zap size={14} />
+                  <span>Run Sync Now</span>
+                </>
+              )}
+            </button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs font-semibold text-slate-700 block mb-1.5">Select Supplier</label>
+            <select
+              value={selectedSupplier}
+              onChange={e => setSelectedSupplier(e.target.value)}
+              className="select w-full"
+            >
+              <option>TechParts International</option>
+              <option>PrimeSupply Corp</option>
+              <option>AcmeDistributors</option>
+              <option>EastWest Imports</option>
+              <option>QuickShip LLC</option>
+              <option>NovaTech Supplies</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-slate-700 block mb-1.5">Synchronization Type</label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { id: 'Inventory Sync', label: 'Inventory Sync', desc: 'Stock level updates' },
+                { id: 'Pricing Sync',   label: 'Pricing Sync',   desc: 'Cost & MSRP updates' },
+                { id: 'Image Sync',     label: 'Image Sync',     desc: 'Media & gallery sync' },
+                { id: 'Full Sync',      label: 'Full Pipeline',  desc: 'Complete data pull' },
+              ].map(st => (
+                <button
+                  key={st.id}
+                  type="button"
+                  onClick={() => setSelectedSyncType(st.id)}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    selectedSyncType === st.id
+                      ? 'border-primary-500 bg-primary-50/50 ring-2 ring-primary-500/20'
+                      : 'border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  <p className="text-xs font-bold text-slate-800">{st.label}</p>
+                  <p className="text-2xs text-slate-500 mt-0.5">{st.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Retry All Failed Jobs Confirmation Dialog */}
+      <ConfirmDialog
+        open={retryModalOpen}
+        onClose={() => setRetryModalOpen(false)}
+        onConfirm={handleConfirmRetryAll}
+        title="Retry All Failed Sync Jobs?"
+        message="Are you sure you want to re-queue all 17 failed synchronization jobs across connected suppliers? This will trigger automated retry attempts immediately."
+        confirmLabel="Retry All Jobs (17)"
+        danger={false}
+      />
     </div>
   )
 }

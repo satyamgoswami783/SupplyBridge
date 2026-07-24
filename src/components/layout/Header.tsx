@@ -31,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
   ]
 
   return (
-    <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-slate-200 h-14 flex items-center px-4 gap-4">
+    <header className={`sticky top-0 z-20 backdrop-blur-md border-b h-14 flex items-center px-4 gap-4 transition-colors ${darkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white/90 border-slate-200 text-slate-800'}`}>
       {/* Mobile menu */}
       <button onClick={onMenuClick} className="lg:hidden btn-icon">
         <Menu size={20} />
@@ -43,15 +43,19 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
         <input
           type="text"
           placeholder="Search products, suppliers, jobs..."
-          className="w-full pl-9 pr-4 py-2 text-sm rounded-xl bg-slate-100 border border-transparent focus:bg-white focus:border-slate-200 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all placeholder-slate-400"
+          className={`w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-transparent focus:ring-2 focus:ring-primary-500/20 outline-none transition-all ${darkMode ? 'bg-slate-800 text-white placeholder-slate-400 focus:border-slate-700' : 'bg-slate-100 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-slate-200'}`}
         />
-        <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden lg:inline-block px-1.5 py-0.5 text-2xs font-medium text-slate-400 bg-slate-200 rounded">⌘K</kbd>
+        <kbd className={`absolute right-3 top-1/2 -translate-y-1/2 hidden lg:inline-block px-1.5 py-0.5 text-2xs font-medium rounded ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-200 text-slate-500'}`}>⌘K</kbd>
       </div>
 
       <div className="flex items-center gap-1 ml-auto">
         {/* Dark mode toggle */}
-        <button onClick={onToggleDark} className="btn-icon" title="Toggle theme">
-          {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+        <button
+          onClick={onToggleDark}
+          className={`btn-icon transition-transform active:scale-95 ${darkMode ? 'text-amber-400 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'}`}
+          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {darkMode ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-slate-600" />}
         </button>
 
         {/* Notifications */}

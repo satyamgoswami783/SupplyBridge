@@ -17,11 +17,38 @@
   }
 
   body {
-    @apply bg-surface-bg text-slate-900;
+    @apply bg-surface-bg text-slate-900 transition-colors duration-200;
   }
 
-  body.dark {
-    @apply bg-dark-bg text-slate-100;
+  body.dark, html.dark body {
+    @apply bg-slate-950 text-slate-100;
+  }
+
+  .dark .card, html.dark .card {
+    background-color: #0f172a !important;
+    border-color: #1e293b !important;
+    color: #f8fafc !important;
+  }
+
+  .dark .page-title, html.dark .page-title {
+    color: #ffffff !important;
+  }
+
+  .dark .page-subtitle, html.dark .page-subtitle {
+    color: #94a3b8 !important;
+  }
+
+  .dark .kpi-card, html.dark .kpi-card {
+    background-color: #0f172a !important;
+    border-color: #1e293b !important;
+  }
+
+  .dark .kpi-label, html.dark .kpi-label {
+    color: #94a3b8 !important;
+  }
+
+  .dark .kpi-value, html.dark .kpi-value {
+    color: #ffffff !important;
   }
 
   ::-webkit-scrollbar {
