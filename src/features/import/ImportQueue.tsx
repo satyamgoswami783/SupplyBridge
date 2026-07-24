@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Download, CheckCircle2, XCircle, RefreshCw, RotateCcw, AlertCircle } from 'lucide-react'
+import { Download, CheckCircle2, XCircle, RefreshCw, RotateCcw, AlertCircle, FileSpreadsheet, Clock, ArrowDownCircle } from 'lucide-react'
 import { SectionHeader, FilterBar, Tabs, ProgressBar, EmptyState } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { mockImportQueue } from '../../data/mockData'
@@ -100,7 +100,7 @@ export const ImportQueue: React.FC = () => {
   }
 
   return (
-    <div className="relative">
+    <div className="relative space-y-6">
       {/* Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
@@ -118,19 +118,19 @@ export const ImportQueue: React.FC = () => {
 
       <SectionHeader
         title="Import Queue"
-        subtitle="Monitor and manage product feed import jobs from all suppliers"
+        subtitle="Monitor and manage product feed import jobs from all connected suppliers"
         actions={
           <>
             <button
               onClick={handleExportQueueCSV}
-              className="btn-secondary btn-sm flex items-center gap-1.5 cursor-pointer"
+              className="btn-secondary btn-sm flex items-center gap-1.5 cursor-pointer font-semibold"
               title="Download Import Queue CSV File"
             >
-              <Download size={14} className="text-emerald-600" /> Export CSV
+              <FileSpreadsheet size={14} className="text-emerald-600" /> Export CSV
             </button>
             <button
               onClick={() => showNotification('Import queue refreshed.')}
-              className="btn-secondary btn-sm flex items-center gap-1.5"
+              className="btn-secondary btn-sm flex items-center gap-1.5 cursor-pointer font-semibold"
             >
               <RefreshCw size={14} /> Refresh Queue
             </button>
@@ -138,51 +138,56 @@ export const ImportQueue: React.FC = () => {
         }
       />
 
-      {/* KPI Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      {/* KPI Summary Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Products Processing', value: importsList.reduce((s, q) => s + q.totalRecords, 0).toLocaleString(), color: 'text-slate-800' },
-          { label: 'Processing',  value: importsList.filter(q => q.status === 'processing').length, color: 'text-cyan-600' },
-          { label: 'Pending',     value: importsList.filter(q => q.status === 'pending').length, color: 'text-amber-600' },
-          { label: 'Failed',      value: importsList.filter(q => q.status === 'failed').length, color: 'text-rose-600' },
+          { label: 'Total Records Processing', value: importsList.reduce((s, q) => s + q.totalRecords, 0).toLocaleString(), color: 'text-slate-900', bg: 'bg-white', icon: <ArrowDownCircle size={18} className="text-slate-700" /> },
+          { label: 'Currently Processing',  value: importsList.filter(q => q.status === 'processing').length, color: 'text-cyan-700', bg: 'bg-cyan-50/80 border-cyan-100', icon: <RefreshCw size={18} className="animate-spin text-cyan-600" /> },
+          { label: 'Pending Queue',     value: importsList.filter(q => q.status === 'pending').length, color: 'text-amber-700', bg: 'bg-amber-50/80 border-amber-100', icon: <Clock size={18} className="text-amber-600" /> },
+          { label: 'Failed Feeds',      value: importsList.filter(q => q.status === 'failed').length, color: 'text-rose-700', bg: 'bg-rose-50/80 border-rose-100', icon: <XCircle size={18} className="text-rose-600" /> },
         ].map(s => (
-          <div key={s.label} className="card px-4 py-3 text-center">
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
+          <div key={s.label} className={`card p-4 flex items-center gap-3.5 border ${s.bg}`}>
+            <div className="p-2.5 rounded-xl bg-white shadow-2xs">
+              {s.icon}
+            </div>
+            <div>
+              <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+              <p className="text-xs text-slate-500 font-semibold mt-0.5">{s.label}</p>
+            </div>
           </div>
         ))}
       </div>
 
       <Tabs tabs={tabs} active={tab} onChange={setTab} />
-      <FilterBar search={search} onSearch={setSearch} placeholder="Search suppliers..." />
+      <FilterBar search={search} onSearch={setSearch} placeholder="Search supplier feeds by name..." />
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {filtered.length === 0 && (
-          <div className="card p-12 text-center text-slate-400">
+          <div className="card p-16 text-center text-slate-400">
             <EmptyState
-              icon={<Download size={24} />}
+              icon={<Download size={28} className="text-slate-300" />}
               title="No import jobs found"
-              description="Try selecting another tab or adjusting your filter."
+              description="Try selecting another tab or adjusting your filter criteria."
             />
           </div>
         )}
         {filtered.map(item => (
-          <div key={item.id} className="card p-5 hover:shadow-card-md transition-all">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-3 flex-1 min-w-0">
+          <div key={item.id} className="card p-5 hover:shadow-card-md transition-all border border-slate-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3.5 flex-1 min-w-0">
                 <div
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-2xs border ${
                     item.status === 'completed'
-                      ? 'bg-emerald-50'
+                      ? 'bg-emerald-50 border-emerald-200'
                       : item.status === 'failed'
-                      ? 'bg-rose-50'
+                      ? 'bg-rose-50 border-rose-200'
                       : item.status === 'processing'
-                      ? 'bg-cyan-50'
-                      : 'bg-amber-50'
+                      ? 'bg-cyan-50 border-cyan-200'
+                      : 'bg-amber-50 border-amber-200'
                   }`}
                 >
                   <Download
-                    size={16}
+                    size={18}
                     className={
                       item.status === 'completed'
                         ? 'text-emerald-600'
@@ -195,34 +200,34 @@ export const ImportQueue: React.FC = () => {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="font-semibold text-slate-800">{item.supplierName}</p>
+                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                    <p className="font-bold text-slate-900 text-sm">{item.supplierName}</p>
                     <Badge variant="info">{connectionTypeLabel(item.connectionType)}</Badge>
-                    <Badge variant={statusToVariant(item.status)}>{item.status}</Badge>
+                    <Badge variant={statusToVariant(item.status)} dot>{item.status}</Badge>
                   </div>
                   {item.fileName && (
-                    <p className="text-xs text-slate-400 mb-2">
-                      File: <code className="mono">{item.fileName}</code>
+                    <p className="text-xs text-slate-500 mb-2">
+                      Feed Source: <code className="mono text-xs font-semibold px-2 py-0.5 bg-slate-100 border border-slate-200 rounded-md text-slate-800">{item.fileName}</code>
                     </p>
                   )}
                   {item.errorMessage && (
-                    <p className="text-xs text-rose-600 mb-2 flex items-center gap-1 font-mono">
-                      <AlertCircle size={11} /> {item.errorMessage}
+                    <p className="text-xs text-rose-600 mb-2 flex items-center gap-1.5 font-semibold bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-100">
+                      <AlertCircle size={13} /> Error: {item.errorMessage}
                     </p>
                   )}
-                  <div className="flex gap-4 text-xs text-slate-500">
+                  <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-600 mt-2">
                     <span>
-                      <CheckCircle2 size={10} className="inline mr-1 text-emerald-500" />
-                      {item.processedRecords.toLocaleString()} processed
+                      <CheckCircle2 size={12} className="inline mr-1 text-emerald-500" />
+                      <strong className="text-slate-900">{item.processedRecords.toLocaleString()}</strong> processed
                     </span>
                     {item.failedRecords > 0 && (
-                      <span className="text-rose-600 font-semibold">
-                        <XCircle size={10} className="inline mr-1 text-rose-500" />
+                      <span className="text-rose-600 font-bold">
+                        <XCircle size={12} className="inline mr-1 text-rose-500" />
                         {item.failedRecords.toLocaleString()} failed
                       </span>
                     )}
-                    <span>of {item.totalRecords.toLocaleString()} total</span>
-                    <span>{timeAgo(item.createdAt)}</span>
+                    <span>Total: <strong className="text-slate-900">{item.totalRecords.toLocaleString()}</strong> SKUs</span>
+                    <span className="text-slate-400 font-mono">• {timeAgo(item.createdAt)}</span>
                   </div>
                   {item.status === 'processing' && (
                     <ProgressBar
@@ -230,26 +235,26 @@ export const ImportQueue: React.FC = () => {
                       max={item.totalRecords}
                       color="cyan"
                       showLabel
-                      className="mt-2"
+                      className="mt-3"
                     />
                   )}
                 </div>
               </div>
-              <div className="flex gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
                 {item.status === 'failed' && (
                   <button
                     onClick={() => handleRetry(item.id, item.supplierName)}
-                    className="btn-secondary btn-sm flex items-center gap-1"
+                    className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
                   >
-                    <RotateCcw size={12} /> Retry Import
+                    <RotateCcw size={13} /> Retry Feed
                   </button>
                 )}
                 {item.status === 'processing' && (
                   <button
                     onClick={() => handleCancel(item.id, item.supplierName)}
-                    className="btn-ghost btn-sm text-rose-600 flex items-center gap-1"
+                    className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50 flex items-center gap-1.5 font-bold cursor-pointer"
                   >
-                    <XCircle size={12} /> Cancel
+                    <XCircle size={13} /> Cancel
                   </button>
                 )}
               </div>
