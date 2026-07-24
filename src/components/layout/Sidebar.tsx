@@ -129,7 +129,7 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
-  const { hasPermission, currentUser, openCurrentUserProfile } = useAuth()
+  const { hasPermission, currentUser, openCurrentUserProfile, logout } = useAuth()
 
   const visibleItems = NAV_ITEMS.filter(item => {
     if (item.module && !hasPermission(item.module)) return false

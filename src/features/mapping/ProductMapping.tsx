@@ -168,11 +168,40 @@ export const ProductMapping: React.FC = () => {
     }, 1500)
   }
 
-  const handleCreateNewRule = () => {
-    if (!formData.field1.trim()) {
-      alert('Please enter source field value.')
-      return
-    }
+const handleCreateNewRule = () => {
+  // TODO: implement rule creation logic
+}
+
+
+
+
+
+
+
+
+  // Save edited product mapping
+  const handleSaveProductEdit = () => {
+    if (!editProductMapping) return;
+    setProductMappings(prev =>
+      prev.map(p =>
+        p.id === editProductMapping.id
+          ? {
+              ...p,
+              masterSku: formData.field2 || p.masterSku,
+              masterName: formData.field3 || p.masterName,
+              status: 'mapped',
+              confidence: formData.field2 ? 95 : p.confidence,
+            }
+          : p
+      )
+    );
+    setEditProductMapping(null);
+    showNotification(`Product mapping updated for "${editProductMapping.supplierSku}"!`);
+  }
+
+
+
+
 
     if (activeMapping === 'products') {
       const newP: ProductMappingItem = {
@@ -393,6 +422,39 @@ export const ProductMapping: React.FC = () => {
                         >
                           {m.status === 'unmapped' ? 'Map Now' : 'Edit Mapping'}
                         </button>
+                        {/* Trigger Edit Product Modal */}
+                        {editProductMapping && (
+                          <Modal
+                            open={true}
+                            onClose={() => setEditProductMapping(null)}
+                            title={`Edit Product Mapping: ${editProductMapping.supplierSku}`}
+                            subtitle={`Supplier: ${editProductMapping.supplierName}`}
+                            size="md"
+                            footer={
+                              <>
+                                <button onClick={() => setEditProductMapping(null)} className="btn-secondary">Cancel</button>
+                                <button onClick={handleSaveProductEdit} className="btn-primary flex items-center gap-1.5 shadow-md shadow-indigo-500/20">
+                                  <Save size={14} /> Save Product Mapping
+                                </button>
+                              </>
+                            }
+                          >
+                            <div className="space-y-4">
+                              <div>
+                                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Supplier Raw SKU *</label>
+                                <input className="input font-mono" value={formData.field1} readOnly />
+                              </div>
+                              <div>
+                                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Target Master SKU</label>
+                                <input className="input font-mono" value={formData.field2} onChange={e => setFormData({ ...formData, field2: e.target.value })} />
+                              </div>
+                              <div>
+                                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Product Name</label>
+                                <input className="input" placeholder="Enter product name" value={formData.field3 || ''} onChange={e => setFormData({ ...formData, field3: e.target.value })} />
+                              </div>
+                            </div>
+                          </Modal>
+                        
                       </td>
                     </tr>
                   ))}
