@@ -139,7 +139,7 @@ export const ProductMapping: React.FC = () => {
 
   const showNotification = (msg: string) => {
     setToastMessage(msg)
-    setTimeout(() => setToastMessage(null), 3000)
+    setTimeout(() => setToastMessage(null), 3500)
   }
 
   // --- Handlers ---
@@ -230,6 +230,27 @@ export const ProductMapping: React.FC = () => {
     showNotification(`New mapping rule created for "${formData.field1}"!`)
   }
 
+  // Edit Product SKU Mapping Save
+  const handleSaveProductEdit = () => {
+    if (!editProductMapping) return
+    const newMasterSku = formData.field2.trim().toUpperCase()
+    setProductMappings(prev =>
+      prev.map(p =>
+        p.id === editProductMapping.id
+          ? {
+              ...p,
+              masterSku: newMasterSku || `MSTR-${p.supplierSku}`,
+              masterName: newMasterSku ? `Master Product Item (${newMasterSku})` : p.masterName || 'Mapped Product Item',
+              status: 'mapped',
+              confidence: p.confidence > 0 ? p.confidence : 95,
+            }
+          : p
+      )
+    )
+    setEditProductMapping(null)
+    showNotification(`Product SKU mapping saved for "${editProductMapping.supplierSku}"!`)
+  }
+
   const handleOpenEditAttribute = (m: AttributeMappingItem) => {
     setEditAttributeMapping(m)
     setFormData({
@@ -275,7 +296,7 @@ export const ProductMapping: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-7 sm:space-y-8">
       {/* Toast Notification Banner */}
       <AnimatePresence>
         {toastMessage && (
@@ -283,7 +304,7 @@ export const ProductMapping: React.FC = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold"
+            className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold border border-slate-700"
           >
             <CheckCircle2 size={16} className="text-emerald-400" />
             {toastMessage}
@@ -295,7 +316,7 @@ export const ProductMapping: React.FC = () => {
         title={pageTitles[activeMapping]?.title || 'Product Mapping'}
         subtitle={pageTitles[activeMapping]?.subtitle || 'Manage schema mapping rules'}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={handleAutoMap}
               disabled={isAutoMapping}
@@ -306,7 +327,7 @@ export const ProductMapping: React.FC = () => {
             </button>
             <button
               onClick={() => { setFormData({ field1: '', field2: '', supplierName: 'TechParts Int.', dataType: 'String' }); setAddModalOpen(true); }}
-              className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20"
+              className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer"
             >
               <Plus size={14} /> Add Mapping Rule
             </button>
@@ -315,16 +336,16 @@ export const ProductMapping: React.FC = () => {
       />
 
       {/* Stats Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
         {[
-          { label: 'Product Rules',  value: productMappings.length, color: 'text-slate-800 dark:text-slate-100' },
-          { label: 'Category Rules', value: categoryMappings.length, color: 'text-primary-600 dark:text-primary-400' },
-          { label: 'Variant Rules',  value: variantMappings.length, color: 'text-violet-600 dark:text-violet-400' },
-          { label: 'Attribute Rules',value: attributeMappings.length, color: 'text-emerald-600 dark:text-emerald-400' },
-        ].map(s => (
-          <div key={s.label} className="card px-4 py-3 text-center">
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
+          { label: 'Product Rules',  value: productMappings.length, color: 'text-slate-800 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800' },
+          { label: 'Category Rules', value: categoryMappings.length, color: 'text-primary-600 dark:text-primary-400', bg: 'bg-primary-50/70 dark:bg-primary-950/30 border border-primary-200/80 dark:border-primary-900/50' },
+          { label: 'Variant Rules',  value: variantMappings.length, color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50/70 dark:bg-violet-950/30 border border-violet-200/80 dark:border-violet-900/50' },
+          { label: 'Attribute Rules',value: attributeMappings.length, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50' },
+        ].map((s, i) => (
+          <div key={i} className={`p-5 rounded-2xl shadow-xs min-h-[115px] flex flex-col justify-between border transition-all duration-200 ${s.bg}`}>
+            <p className="text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-1">{s.label}</p>
+            <p className={`text-2xl lg:text-3xl font-black ${s.color}`}>{s.value}</p>
           </div>
         ))}
       </div>
@@ -346,19 +367,19 @@ export const ProductMapping: React.FC = () => {
 
       {/* --- TAB 1: PRODUCT SKU MAPPING --- */}
       {activeMapping === 'products' && (
-        <div className="card overflow-hidden">
+        <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800">
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Supplier Raw SKU</th>
-                  <th>Supplier Name</th>
+                  <th className="whitespace-nowrap">Supplier Raw SKU</th>
+                  <th className="whitespace-nowrap">Supplier Name</th>
                   <th></th>
-                  <th>Master Catalog SKU</th>
-                  <th>Master Product Name</th>
-                  <th>Confidence</th>
-                  <th>Status</th>
-                  <th className="text-right">Action</th>
+                  <th className="whitespace-nowrap">Master Catalog SKU</th>
+                  <th className="whitespace-nowrap">Master Product Name</th>
+                  <th className="whitespace-nowrap">Confidence</th>
+                  <th className="whitespace-nowrap">Status</th>
+                  <th className="text-right whitespace-nowrap">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -366,30 +387,30 @@ export const ProductMapping: React.FC = () => {
                   .filter(m => supplierFilter === 'all' || m.supplierName === supplierFilter)
                   .filter(m => m.supplierSku.toLowerCase().includes(search.toLowerCase()) || m.masterSku.toLowerCase().includes(search.toLowerCase()))
                   .map(m => (
-                    <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td><code className="mono font-semibold text-slate-800 dark:text-slate-200">{m.supplierSku}</code></td>
-                      <td><span className="text-xs text-slate-500">{m.supplierName}</span></td>
+                    <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                      <td><code className="mono font-bold text-slate-800 dark:text-slate-200">{m.supplierSku}</code></td>
+                      <td><span className="text-xs text-slate-600 dark:text-slate-400 font-semibold">{m.supplierName}</span></td>
                       <td className="text-center"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
-                      <td>{m.masterSku ? <code className="mono text-primary-700 font-semibold">{m.masterSku}</code> : <span className="text-slate-300 text-xs italic">Not mapped</span>}</td>
-                      <td><span className="text-sm text-slate-700 dark:text-slate-300 font-medium truncate block max-w-[200px]">{m.masterName || '—'}</span></td>
+                      <td>{m.masterSku ? <code className="mono text-primary-700 dark:text-primary-400 font-bold">{m.masterSku}</code> : <span className="text-slate-400 text-xs italic">Not mapped</span>}</td>
+                      <td><span className="text-xs text-slate-700 dark:text-slate-300 font-semibold truncate block max-w-[220px]">{m.masterName || '—'}</span></td>
                       <td>
                         {m.confidence > 0 && (
                           <div className="flex items-center gap-2">
                             <div className="w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                               <div className={`h-full rounded-full ${m.confidence > 90 ? 'bg-emerald-500' : 'bg-amber-500'}`} style={{ width: `${m.confidence}%` }} />
                             </div>
-                            <span className="text-xs text-slate-600 dark:text-slate-300 font-semibold">{m.confidence}%</span>
+                            <span className="text-xs text-slate-600 dark:text-slate-300 font-bold">{m.confidence}%</span>
                           </div>
                         )}
                       </td>
-                      <td><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
-                      <td className="text-right">
+                      <td className="whitespace-nowrap"><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
+                      <td className="text-right whitespace-nowrap">
                         <button
                           onClick={() => {
                             setEditProductMapping(m)
                             setFormData({ field1: m.supplierSku, field2: m.masterSku, supplierName: m.supplierName, dataType: 'String' })
                           }}
-                          className={m.status === 'unmapped' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
+                          className={m.status === 'unmapped' ? 'btn-primary btn-sm font-bold cursor-pointer' : 'btn-secondary btn-sm font-bold cursor-pointer'}
                         >
                           {m.status === 'unmapped' ? 'Map Now' : 'Edit Mapping'}
                         </button>
@@ -404,34 +425,34 @@ export const ProductMapping: React.FC = () => {
 
       {/* --- TAB 2: CATEGORY MAPPING --- */}
       {activeMapping === 'categories' && (
-        <div className="card overflow-hidden">
+        <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800">
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Supplier Category Path</th>
-                  <th>Supplier</th>
+                  <th className="whitespace-nowrap">Supplier Category Path</th>
+                  <th className="whitespace-nowrap">Supplier</th>
                   <th></th>
-                  <th>Target Master Category</th>
-                  <th>Status</th>
-                  <th className="text-right">Action</th>
+                  <th className="whitespace-nowrap">Target Master Category</th>
+                  <th className="whitespace-nowrap">Status</th>
+                  <th className="text-right whitespace-nowrap">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {categoryMappings.map(m => (
-                  <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td><span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{m.supplierCategory}</span></td>
-                    <td><span className="text-xs text-slate-500">{m.supplierName}</span></td>
+                  <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                    <td><span className="text-xs font-bold text-slate-800 dark:text-slate-200">{m.supplierCategory}</span></td>
+                    <td><span className="text-xs text-slate-500 font-semibold">{m.supplierName}</span></td>
                     <td className="text-center"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
-                    <td><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.masterCategory || <span className="text-slate-300 italic">Not mapped</span>}</span></td>
-                    <td><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
-                    <td className="text-right">
+                    <td><span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{m.masterCategory || <span className="text-slate-400 italic">Not mapped</span>}</span></td>
+                    <td className="whitespace-nowrap"><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
+                    <td className="text-right whitespace-nowrap">
                       <button
                         onClick={() => {
                           setEditCategoryMapping(m)
                           setFormData({ field1: m.supplierCategory, field2: m.masterCategory, supplierName: m.supplierName, dataType: 'String' })
                         }}
-                        className={m.status === 'unmapped' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
+                        className={m.status === 'unmapped' ? 'btn-primary btn-sm font-bold cursor-pointer' : 'btn-secondary btn-sm font-bold cursor-pointer'}
                       >
                         {m.status === 'unmapped' ? 'Map Category' : 'Edit Target'}
                       </button>
@@ -446,36 +467,36 @@ export const ProductMapping: React.FC = () => {
 
       {/* --- TAB 3: VARIANT MAPPING --- */}
       {activeMapping === 'variants' && (
-        <div className="card overflow-hidden">
+        <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800">
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Supplier Variant Key</th>
-                  <th>Supplier</th>
+                  <th className="whitespace-nowrap">Supplier Variant Key</th>
+                  <th className="whitespace-nowrap">Supplier</th>
                   <th></th>
-                  <th>Master Variant Dimension</th>
-                  <th>Mapped Values</th>
-                  <th>Status</th>
-                  <th className="text-right">Action</th>
+                  <th className="whitespace-nowrap">Master Variant Dimension</th>
+                  <th className="whitespace-nowrap">Mapped Values</th>
+                  <th className="whitespace-nowrap">Status</th>
+                  <th className="text-right whitespace-nowrap">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {variantMappings.map(m => (
-                  <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td><code className="mono font-semibold text-slate-800 dark:text-slate-200">{m.supplierVariantKey}</code></td>
-                    <td><span className="text-xs text-slate-500">{m.supplierName}</span></td>
+                  <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                    <td><code className="mono font-bold text-slate-800 dark:text-slate-200">{m.supplierVariantKey}</code></td>
+                    <td><span className="text-xs text-slate-500 font-semibold">{m.supplierName}</span></td>
                     <td className="text-center"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
-                    <td><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.masterVariantDimension}</span></td>
-                    <td><span className="text-xs text-slate-600 font-mono">{m.mappedValues || '—'}</span></td>
-                    <td><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
-                    <td className="text-right">
+                    <td><span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{m.masterVariantDimension}</span></td>
+                    <td><span className="text-xs text-slate-600 dark:text-slate-400 font-mono">{m.mappedValues || '—'}</span></td>
+                    <td className="whitespace-nowrap"><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
+                    <td className="text-right whitespace-nowrap">
                       <button
                         onClick={() => {
                           setEditVariantMapping(m)
                           setFormData({ field1: m.supplierVariantKey, field2: m.masterVariantDimension, supplierName: m.supplierName, dataType: 'String' })
                         }}
-                        className={m.status === 'unmapped' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
+                        className={m.status === 'unmapped' ? 'btn-primary btn-sm font-bold cursor-pointer' : 'btn-secondary btn-sm font-bold cursor-pointer'}
                       >
                         {m.status === 'unmapped' ? 'Map Variant' : 'Edit Dimension'}
                       </button>
@@ -490,30 +511,30 @@ export const ProductMapping: React.FC = () => {
 
       {/* --- TAB 4: ATTRIBUTE MAPPING --- */}
       {activeMapping === 'attributes' && (
-        <div className="card overflow-hidden">
+        <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800">
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Supplier Feed Attribute</th>
-                  <th>Supplier</th>
+                  <th className="whitespace-nowrap">Supplier Feed Attribute</th>
+                  <th className="whitespace-nowrap">Supplier</th>
                   <th></th>
-                  <th>PIM Master Specification Field</th>
-                  <th>Data Type</th>
-                  <th>Status</th>
-                  <th className="text-right">Action</th>
+                  <th className="whitespace-nowrap">PIM Master Specification Field</th>
+                  <th className="whitespace-nowrap">Data Type</th>
+                  <th className="whitespace-nowrap">Status</th>
+                  <th className="text-right whitespace-nowrap">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {attributeMappings.map(m => (
-                  <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                     <td><code className="mono font-bold text-slate-800 dark:text-slate-200">{m.supplierAttribute}</code></td>
-                    <td><span className="text-xs text-slate-500">{m.supplierName}</span></td>
+                    <td><span className="text-xs text-slate-500 font-semibold">{m.supplierName}</span></td>
                     <td className="text-center"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
-                    <td><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.masterAttribute}</span></td>
-                    <td><Badge variant="neutral">{m.dataType}</Badge></td>
-                    <td><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
-                    <td className="text-right">
+                    <td><span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{m.masterAttribute}</span></td>
+                    <td className="whitespace-nowrap"><Badge variant="neutral">{m.dataType}</Badge></td>
+                    <td className="whitespace-nowrap"><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
+                    <td className="text-right whitespace-nowrap">
                       <button
                         onClick={() => handleOpenEditAttribute(m)}
                         className={m.status === 'unmapped' ? 'btn-primary btn-sm font-bold cursor-pointer' : 'btn-secondary btn-sm font-bold cursor-pointer'}
@@ -531,34 +552,34 @@ export const ProductMapping: React.FC = () => {
 
       {/* --- TAB 5: SUPPLIER FEED MAPPING --- */}
       {activeMapping === 'suppliers' && (
-        <div className="card overflow-hidden">
+        <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800">
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Supplier Feed Identifier</th>
-                  <th>Supplier Source</th>
-                  <th>Protocol / Format</th>
-                  <th>Assigned PIM Supplier Entity</th>
-                  <th>Status</th>
-                  <th className="text-right">Action</th>
+                  <th className="whitespace-nowrap">Supplier Feed Identifier</th>
+                  <th className="whitespace-nowrap">Supplier Source</th>
+                  <th className="whitespace-nowrap">Protocol / Format</th>
+                  <th className="whitespace-nowrap">Assigned PIM Supplier Entity</th>
+                  <th className="whitespace-nowrap">Status</th>
+                  <th className="text-right whitespace-nowrap">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {supplierMappings.map(m => (
-                  <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td><code className="mono font-semibold text-slate-800 dark:text-slate-200">{m.feedId}</code></td>
+                  <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                    <td><code className="mono font-bold text-slate-800 dark:text-slate-200">{m.feedId}</code></td>
                     <td><span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{m.supplierName}</span></td>
-                    <td><Badge variant="info">{m.protocol}</Badge></td>
-                    <td><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.assignedEntity || <span className="text-slate-300 italic">Unassigned</span>}</span></td>
-                    <td><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
-                    <td className="text-right">
+                    <td className="whitespace-nowrap"><Badge variant="info">{m.protocol}</Badge></td>
+                    <td><span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{m.assignedEntity || <span className="text-slate-400 italic">Unassigned</span>}</span></td>
+                    <td className="whitespace-nowrap"><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
+                    <td className="text-right whitespace-nowrap">
                       <button
                         onClick={() => {
                           setEditSupplierMapping(m)
                           setFormData({ field1: m.feedId, field2: m.assignedEntity, supplierName: m.supplierName, dataType: 'String' })
                         }}
-                        className={m.status === 'unmapped' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'}
+                        className={m.status === 'unmapped' ? 'btn-primary btn-sm font-bold cursor-pointer' : 'btn-secondary btn-sm font-bold cursor-pointer'}
                       >
                         {m.status === 'unmapped' ? 'Assign Entity' : 'Edit Feed Link'}
                       </button>
@@ -581,7 +602,7 @@ export const ProductMapping: React.FC = () => {
         footer={
           <>
             <button onClick={() => setAddModalOpen(false)} className="btn-secondary">Cancel</button>
-            <button onClick={handleCreateNewRule} className="btn-primary flex items-center gap-1.5"><Save size={14} /> Save Mapping Rule</button>
+            <button onClick={handleCreateNewRule} className="btn-primary flex items-center gap-1.5 font-bold cursor-pointer"><Save size={14} /> Save Mapping Rule</button>
           </>
         }
       >
@@ -641,6 +662,42 @@ export const ProductMapping: React.FC = () => {
         </div>
       </Modal>
 
+      {/* --- EDIT PRODUCT SKU MAPPING MODAL --- */}
+      {editProductMapping && (
+        <Modal
+          open
+          onClose={() => setEditProductMapping(null)}
+          title={`Map Product SKU: ${editProductMapping.supplierSku}`}
+          subtitle={`Supplier: ${editProductMapping.supplierName}`}
+          size="md"
+          footer={
+            <>
+              <button onClick={() => setEditProductMapping(null)} className="btn-secondary">Cancel</button>
+              <button onClick={handleSaveProductEdit} className="btn-primary flex items-center gap-1.5 shadow-md shadow-indigo-500/20 font-bold cursor-pointer">
+                <Save size={14} /> Save SKU Mapping
+              </button>
+            </>
+          }
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Supplier Raw SKU</label>
+              <input className="input font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" readOnly value={editProductMapping.supplierSku} />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Target Master Catalog SKU *</label>
+              <input
+                className="input font-mono font-bold"
+                placeholder="e.g. MB-X570-001 or RAM-DDR5-001"
+                value={formData.field2}
+                onChange={e => setFormData({ ...formData, field2: e.target.value })}
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
       {/* --- EDIT ATTRIBUTE MAPPING MODAL --- */}
       {editAttributeMapping && (
         <Modal
@@ -652,7 +709,7 @@ export const ProductMapping: React.FC = () => {
           footer={
             <>
               <button onClick={() => setEditAttributeMapping(null)} className="btn-secondary">Cancel</button>
-              <button onClick={handleSaveAttributeEdit} className="btn-primary flex items-center gap-1.5 shadow-md shadow-indigo-500/20">
+              <button onClick={handleSaveAttributeEdit} className="btn-primary flex items-center gap-1.5 shadow-md shadow-indigo-500/20 font-bold cursor-pointer">
                 <Save size={14} /> Save Attribute Mapping
               </button>
             </>
@@ -710,7 +767,7 @@ export const ProductMapping: React.FC = () => {
                   setEditCategoryMapping(null)
                   showNotification(`Category mapping saved for "${editCategoryMapping.supplierCategory}"`)
                 }}
-                className="btn-primary flex items-center gap-1.5"
+                className="btn-primary flex items-center gap-1.5 font-bold cursor-pointer"
               >
                 <Save size={14} /> Save Category Mapping
               </button>
@@ -759,7 +816,7 @@ export const ProductMapping: React.FC = () => {
                   setEditVariantMapping(null)
                   showNotification(`Variant mapping saved for "${editVariantMapping.supplierVariantKey}"`)
                 }}
-                className="btn-primary flex items-center gap-1.5"
+                className="btn-primary flex items-center gap-1.5 font-bold cursor-pointer"
               >
                 <Save size={14} /> Save Variant Mapping
               </button>
@@ -808,7 +865,7 @@ export const ProductMapping: React.FC = () => {
                   setEditSupplierMapping(null)
                   showNotification(`Supplier feed link saved for "${editSupplierMapping.feedId}"`)
                 }}
-                className="btn-primary flex items-center gap-1.5"
+                className="btn-primary flex items-center gap-1.5 font-bold cursor-pointer"
               >
                 <Save size={14} /> Save Feed Link
               </button>
