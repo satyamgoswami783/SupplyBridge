@@ -136,7 +136,7 @@ export const InventorySync: React.FC = () => {
   }
 
   return (
-    <div className="relative space-y-6">
+    <div className="relative space-y-7 sm:space-y-8">
       {/* Toast Notification Banner */}
       <AnimatePresence>
         {toastMessage && (
@@ -184,7 +184,7 @@ export const InventorySync: React.FC = () => {
       />
 
       {/* Summary Telemetry KPI Cards — High Resolution & Responsive Layout */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
         {[
           { label: 'TOTAL IN-STOCK ITEMS', value: '78,450 SKUs', color: 'text-slate-900 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800', sub: 'Across 25 connected suppliers' },
           { label: 'PENDING SYNC QUEUE',    value: (items.filter(i => i.status === 'pending').length * 114 + 116).toString(), color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50', sub: 'Queued for storefront push' },
@@ -200,7 +200,7 @@ export const InventorySync: React.FC = () => {
       </div>
 
       {/* Supplier Sync Progress & 7-Day Trend Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Supplier Pipeline Progress */}
         <div className="card p-5 border border-slate-200/90 dark:border-slate-800 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
