@@ -27,17 +27,19 @@ import {
 import { Badge } from '../../components/ui/Badge'
 import { SectionHeader, FilterBar, Tabs, ConfirmDialog } from '../../components/ui'
 import { Modal } from '../../components/ui/Modal'
-import { mockProducts } from '../../data/mockData'
 import { statusToVariant, timeAgo } from '../../utils'
 import type { Product, ProductStatus, ValidationStatus } from '../../types'
 
 import { useAuth } from '../../context/AuthContext'
+import { useSuppliers } from '../../context/SupplierContext'
+import { useProducts } from '../../context/ProductContext'
 
 export const MasterCatalog: React.FC = () => {
   const { role } = useAuth()
+  const { suppliersList } = useSuppliers()
+  const { productsList, setProductsList } = useProducts()
   const canManageCatalog = role === 'super_admin' || role === 'admin' || role === 'catalog_manager'
   const canDelete = role === 'super_admin' || role === 'admin'
-  const [productsList, setProductsList] = useState<Product[]>(mockProducts)
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -68,6 +70,9 @@ export const MasterCatalog: React.FC = () => {
     retailPrice: 99.99,
     costPrice: 65.0,
     stock: 50,
+    metaTitle: '',
+    metaDescription: '',
+    focusKeyword: '',
   })
 
   const showNotification = (msg: string) => {
@@ -99,9 +104,7 @@ export const MasterCatalog: React.FC = () => {
     // Dropdown Supplier Filter
     let matchesSupplier = true
     if (supplierFilter !== 'all') {
-      if (supplierFilter === 's1') matchesSupplier = product.supplierName.includes('TechParts')
-      if (supplierFilter === 's2') matchesSupplier = product.supplierName.includes('GlobalSource')
-      if (supplierFilter === 's3') matchesSupplier = product.supplierName.includes('PrimeSup')
+      matchesSupplier = product.supplierName === supplierFilter
     }
 
     return matchesSearch && matchesTab && matchesStatus && matchesSupplier
@@ -217,6 +220,11 @@ export const MasterCatalog: React.FC = () => {
         status: Number(newProduct.stock) > 0 ? 'in_stock' : 'out_of_stock',
         lastSynced: new Date().toISOString(),
       },
+      seo: {
+        metaTitle: newProduct.metaTitle,
+        metaDescription: newProduct.metaDescription,
+        focusKeyword: newProduct.focusKeyword,
+      },
       status: 'published',
       validationStatus: 'passed',
       images: [
@@ -246,6 +254,9 @@ export const MasterCatalog: React.FC = () => {
       retailPrice: 99.99,
       costPrice: 65.0,
       stock: 50,
+      metaTitle: '',
+      metaDescription: '',
+      focusKeyword: '',
     })
     showNotification(`Product "${created.name}" created successfully!`)
   }
@@ -262,6 +273,9 @@ export const MasterCatalog: React.FC = () => {
       retailPrice: p.pricing.retailPrice,
       costPrice: p.pricing.costPrice,
       stock: p.inventory.availableStock,
+      metaTitle: p.seo?.metaTitle || '',
+      metaDescription: p.seo?.metaDescription || '',
+      focusKeyword: p.seo?.focusKeyword || '',
     })
     setEditModalOpen(true)
   }
@@ -290,6 +304,11 @@ export const MasterCatalog: React.FC = () => {
               availableStock: Number(newProduct.stock),
               totalStock: Number(newProduct.stock),
               status: Number(newProduct.stock) > 0 ? 'in_stock' : 'out_of_stock',
+            },
+            seo: {
+              metaTitle: newProduct.metaTitle,
+              metaDescription: newProduct.metaDescription,
+              focusKeyword: newProduct.focusKeyword,
             },
             updatedAt: new Date().toISOString(),
           }
@@ -324,11 +343,11 @@ export const MasterCatalog: React.FC = () => {
   }
 
   const tabs = [
-    { id: 'all',              label: 'All Products',     count: productsList.length },
-    { id: 'published',        label: 'Published',        count: productsList.filter(p => p.status === 'published').length },
+    { id: 'all', label: 'All Products', count: productsList.length },
+    { id: 'published', label: 'Published', count: productsList.filter(p => p.status === 'published').length },
     { id: 'needs_validation', label: 'Needs Validation', count: productsList.filter(p => p.validationStatus === 'failed').length },
-    { id: 'draft',            label: 'Draft',            count: productsList.filter(p => p.status === 'draft').length },
-    { id: 'failed',           label: 'Failed',           count: productsList.filter(p => p.status === 'failed').length },
+    { id: 'draft', label: 'Draft', count: productsList.filter(p => p.status === 'draft').length },
+    { id: 'failed', label: 'Failed', count: productsList.filter(p => p.status === 'failed').length },
   ]
 
   return (
@@ -409,9 +428,9 @@ export const MasterCatalog: React.FC = () => {
           onChange={e => { setSupplierFilter(e.target.value); setCurrentPage(1); }}
         >
           <option value="all">All Suppliers</option>
-          <option value="s1">TechParts International</option>
-          <option value="s2">GlobalSource Limited</option>
-          <option value="s3">PrimeSupply Corp</option>
+          {suppliersList.map(s => (
+            <option key={s.id} value={s.name}>{s.name}</option>
+          ))}
         </select>
         <select
           className="select input-sm w-auto min-w-[130px] font-medium"
@@ -487,16 +506,17 @@ export const MasterCatalog: React.FC = () => {
                     onChange={e => handleSelectAll(e.target.checked)}
                   />
                 </th>
-                <th className="min-w-[240px]">Product</th>
-                <th className="min-w-[150px]">SKU</th>
-                <th className="min-w-[150px]">Supplier</th>
-                <th className="min-w-[140px]">Category</th>
-                <th className="min-w-[130px]">Retail Price</th>
-                <th className="min-w-[100px]">Stock</th>
-                <th className="min-w-[110px]">Status</th>
-                <th className="min-w-[110px]">Validation</th>
-                <th className="min-w-[110px]">Updated</th>
-                <th className="text-right min-w-[120px]">Actions</th>
+
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Supplier</th>
+                <th>Category</th>
+                <th>Retail Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Validation</th>
+                <th>Updated</th>
+                <th className="text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -513,9 +533,8 @@ export const MasterCatalog: React.FC = () => {
                 return (
                   <tr
                     key={product.id}
-                    className={`cursor-pointer transition-colors ${
-                      isSelected ? 'bg-primary-50/50' : 'hover:bg-slate-50/80'
-                    }`}
+                    className={`cursor-pointer transition-colors ${isSelected ? 'bg-primary-50/50' : 'hover:bg-slate-50/80'
+                      }`}
                     onClick={() => setViewProduct(product)}
                   >
                     <td className="text-center" onClick={e => e.stopPropagation()}>
@@ -594,9 +613,9 @@ export const MasterCatalog: React.FC = () => {
                         {timeAgo(product.updatedAt)}
                       </span>
                     </td>
-                    <td className="text-right">
+                    <td className="text-center">
                       <div
-                        className="flex items-center justify-end gap-1"
+                        className="flex items-center justify-center gap-1"
                         onClick={e => e.stopPropagation()}
                       >
                         <button
@@ -780,14 +799,28 @@ export const MasterCatalog: React.FC = () => {
               />
             </div>
           </div>
-          <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1.5">Category *</label>
-            <input
-              className="input"
-              placeholder="e.g. Processors"
-              value={newProduct.categoryName}
-              onChange={e => setNewProduct({ ...newProduct, categoryName: e.target.value })}
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Category</label>
+              <input
+                className="input"
+                placeholder="e.g. Processors"
+                value={newProduct.categoryName}
+                onChange={e => setNewProduct({ ...newProduct, categoryName: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Supplier</label>
+              <select
+                className="select"
+                value={newProduct.supplierName}
+                onChange={e => setNewProduct({ ...newProduct, supplierName: e.target.value })}
+              >
+                {suppliersList.map(s => (
+                  <option key={s.id} value={s.name}>{s.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
@@ -815,6 +848,40 @@ export const MasterCatalog: React.FC = () => {
                 className="input"
                 value={newProduct.stock}
                 onChange={e => setNewProduct({ ...newProduct, stock: Number(e.target.value) })}
+              />
+            </div>
+          </div>
+
+          <div className="border-t border-slate-200 pt-4 mt-2">
+            <h5 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">SEO & Metadata</h5>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1.5">Meta Title</label>
+                <input
+                  className="input"
+                  placeholder="SEO Title (leave empty to use product name)"
+                  value={newProduct.metaTitle}
+                  onChange={e => setNewProduct({ ...newProduct, metaTitle: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1.5">Focus Keyword</label>
+                <input
+                  className="input"
+                  placeholder="e.g. SSD, Motherboard"
+                  value={newProduct.focusKeyword}
+                  onChange={e => setNewProduct({ ...newProduct, focusKeyword: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="mt-3">
+              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Meta Description</label>
+              <textarea
+                className="input"
+                rows={2}
+                placeholder="Brief summary for search engine snippet..."
+                value={newProduct.metaDescription}
+                onChange={e => setNewProduct({ ...newProduct, metaDescription: e.target.value })}
               />
             </div>
           </div>
@@ -861,6 +928,29 @@ export const MasterCatalog: React.FC = () => {
               />
             </div>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Category</label>
+              <input
+                className="input"
+                placeholder="e.g. Processors"
+                value={newProduct.categoryName}
+                onChange={e => setNewProduct({ ...newProduct, categoryName: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1.5">Supplier</label>
+              <select
+                className="select"
+                value={newProduct.supplierName}
+                onChange={e => setNewProduct({ ...newProduct, supplierName: e.target.value })}
+              >
+                {suppliersList.map(s => (
+                  <option key={s.id} value={s.name}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="text-xs font-bold text-slate-700 block mb-1.5">Retail Price ($)</label>
@@ -890,6 +980,40 @@ export const MasterCatalog: React.FC = () => {
               />
             </div>
           </div>
+
+          <div className="border-t border-slate-200 pt-4 mt-2">
+            <h5 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">SEO & Metadata</h5>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1.5">Meta Title</label>
+                <input
+                  className="input"
+                  placeholder="SEO Title (leave empty to use product name)"
+                  value={newProduct.metaTitle}
+                  onChange={e => setNewProduct({ ...newProduct, metaTitle: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1.5">Focus Keyword</label>
+                <input
+                  className="input"
+                  placeholder="e.g. SSD, Motherboard"
+                  value={newProduct.focusKeyword}
+                  onChange={e => setNewProduct({ ...newProduct, focusKeyword: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="mt-3">
+              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Meta Description</label>
+              <textarea
+                className="input"
+                rows={2}
+                placeholder="Brief summary for search engine snippet..."
+                value={newProduct.metaDescription}
+                onChange={e => setNewProduct({ ...newProduct, metaDescription: e.target.value })}
+              />
+            </div>
+          </div>
         </div>
       </Modal>
 
@@ -903,6 +1027,84 @@ export const MasterCatalog: React.FC = () => {
         confirmLabel="Yes, Delete Products"
         danger
       />
+
+
+      {/* --- PRODUCT DETAIL DRAWER / MODAL --- */}
+      {viewProduct && (
+        <Modal
+          open
+          title={viewProduct.name}
+          subtitle={`SKU: ${viewProduct.sku} · Supplier: ${viewProduct.supplierName}`}
+          onClose={() => setViewProduct(null)}
+          size="xl"
+        >
+          <div className="space-y-5">
+            <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+              <div className="w-16 h-16 rounded-xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center">
+                {viewProduct.images.length > 0 ? (
+                  <img src={viewProduct.images[0].url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <Package size={24} className="text-slate-400" />
+                )}
+              </div>
+              <div className="flex-1">
+                <h4 className="text-base font-bold text-slate-900">{viewProduct.name}</h4>
+                <p className="text-xs text-slate-500">
+                  Category: <span className="font-semibold text-slate-700">{viewProduct.categoryName || 'General'}</span> | Brand: <span className="font-semibold text-slate-700">{viewProduct.brand || 'Generic'}</span>
+                </p>
+              </div>
+              <Badge variant={statusToVariant(viewProduct.status)}>
+                {viewProduct.status}
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <p className="text-2xs text-slate-400 font-semibold uppercase">Retail Price</p>
+                <p className="text-lg font-bold text-slate-900">${viewProduct.pricing.retailPrice.toFixed(2)}</p>
+                <p className="text-xs text-emerald-600 font-semibold">+{viewProduct.pricing.margin.toFixed(1)}% Margin</p>
+              </div>
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <p className="text-2xs text-slate-400 font-semibold uppercase">Cost Price</p>
+                <p className="text-lg font-bold text-slate-900">${viewProduct.pricing.costPrice.toFixed(2)}</p>
+              </div>
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <p className="text-2xs text-slate-400 font-semibold uppercase">Available Stock</p>
+                <p className="text-lg font-bold text-slate-900">{viewProduct.inventory.availableStock.toLocaleString()} units</p>
+              </div>
+            </div>
+
+            {/* Google Search Snippet Preview */}
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <p className="font-semibold text-slate-700 uppercase tracking-wider text-2xs">Google Search Engine Preview</p>
+              <div className="bg-white p-3 rounded-lg border border-slate-200 font-sans">
+                <p className="text-xs text-slate-400 font-mono truncate">https://pim.supplybridge.com/products/{viewProduct.sku.toLowerCase()}</p>
+                <p className="text-sm text-blue-800 font-medium hover:underline cursor-pointer truncate">
+                  {viewProduct.seo?.metaTitle || viewProduct.name}
+                </p>
+                <p className="text-xs text-slate-600 line-clamp-2 mt-0.5">
+                  {viewProduct.seo?.metaDescription || viewProduct.description || 'No search description added yet. Edit metadata to improve search visibility.'}
+                </p>
+                {viewProduct.seo?.focusKeyword && (
+                  <div className="mt-2 flex items-center gap-1">
+                    <span className="text-3xs font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                      Keyword: {viewProduct.seo.focusKeyword}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 rounded-xl space-y-2 text-xs">
+              <p className="font-semibold text-slate-700 uppercase tracking-wider text-2xs">Publishing & Channel Assignments</p>
+              <div className="flex gap-2">
+                <Badge variant="purple">Shift4Shop US Store</Badge>
+                <Badge variant="info">Shift4Shop EU Store</Badge>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }

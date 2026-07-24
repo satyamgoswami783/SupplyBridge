@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { DollarSign, TrendingUp, TrendingDown, RefreshCw, Plus, Edit2, Trash2, CheckCircle2 } from 'lucide-react'
+import { DollarSign, TrendingUp, TrendingDown, RefreshCw, Plus, Edit2, Trash2, CheckCircle2, FileSpreadsheet } from 'lucide-react'
 import { SectionHeader, FilterBar, ConfirmDialog } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
@@ -126,8 +126,41 @@ export const PricingSync: React.FC = () => {
     setDeletingRule(null)
   }
 
+  const handleExportPricingCSV = () => {
+    showNotification('Generating Price Update Audit Log CSV export...')
+    const csvHeaders = 'Product Name,SKU,Supplier,Old Price,New Price,Change,Margin %,Status,Time\n'
+    const auditRows = [
+      { name: 'AMD X570 Motherboard', sku: 'MB-X570-001', supplier: 'TechParts', old: 289.99, new: 299.99, margin: 18.3, ok: true, time: '2 hr ago' },
+      { name: 'DDR5 32GB Kit', sku: 'RAM-DDR5-001', supplier: 'TechParts', old: 124.99, new: 119.99, margin: 25.8, ok: true, time: '2 hr ago' },
+      { name: 'Samsung 980 Pro 2TB', sku: 'SSD-980P-001', supplier: 'GlobalSource', old: 144.99, new: 149.99, margin: 20.7, ok: true, time: '2 hr ago' },
+      { name: 'NVIDIA RTX 4090', sku: 'GPU-4090-001', supplier: 'TechParts', old: 0, new: 1699.99, margin: 14.7, ok: false, time: '2 hr ago' },
+    ]
+    const csvRows = auditRows.map(r =>
+      `"${r.name}","${r.sku}","${r.supplier}",${r.old},${r.new},${(r.new - r.old).toFixed(2)},${r.margin},"${r.ok ? 'Synced' : 'Pending'}","${r.time}"`
+    ).join('\n')
+    const csvContent = csvHeaders + csvRows
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `SupplyBridge_Pricing_Audit_${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    showNotification('Price Audit Log CSV file downloaded!')
+  }
+
+  const auditLogRows = [
+    { name: 'AMD X570 Motherboard', sku: 'MB-X570-001', supplier: 'TechParts', old: 289.99, new: 299.99, margin: 18.3, ok: true, time: '2 hr ago' },
+    { name: 'DDR5 32GB Kit', sku: 'RAM-DDR5-001', supplier: 'TechParts', old: 124.99, new: 119.99, margin: 25.8, ok: true, time: '2 hr ago' },
+    { name: 'Samsung 980 Pro 2TB', sku: 'SSD-980P-001', supplier: 'GlobalSource', old: 144.99, new: 149.99, margin: 20.7, ok: true, time: '2 hr ago' },
+    { name: 'NVIDIA RTX 4090', sku: 'GPU-4090-001', supplier: 'TechParts', old: 0, new: 1699.99, margin: 14.7, ok: false, time: '2 hr ago' },
+  ].filter(r => r.name.toLowerCase().includes(search.toLowerCase()) || r.sku.toLowerCase().includes(search.toLowerCase()))
+
   return (
-    <div className="relative">
+    <div className="relative space-y-6">
       {/* Toast Notification Banner */}
       <AnimatePresence>
         {toastMessage && (
@@ -149,15 +182,22 @@ export const PricingSync: React.FC = () => {
         actions={
           <>
             <button
+              onClick={handleExportPricingCSV}
+              className="btn-secondary btn-sm flex items-center gap-1.5 font-semibold cursor-pointer"
+              title="Download Pricing Audit Log CSV"
+            >
+              <FileSpreadsheet size={14} className="text-emerald-600" /> Export CSV
+            </button>
+            <button
               onClick={handleOpenAddRule}
-              className="btn-secondary btn-sm flex items-center gap-1.5"
+              className="btn-secondary btn-sm flex items-center gap-1.5 font-semibold cursor-pointer"
             >
               <Plus size={14} /> Add Price Rule
             </button>
             <button
               onClick={handleSyncPrices}
               disabled={syncing}
-              className="btn-primary btn-sm flex items-center gap-1.5"
+              className="btn-primary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
             >
               <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
               {syncing ? 'Syncing...' : 'Sync Prices Now'}
@@ -166,37 +206,38 @@ export const PricingSync: React.FC = () => {
         }
       />
 
-      {/* KPI Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      {/* KPI Summary Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Avg Catalog Margin', value: '22.4%', color: 'text-emerald-600', trend: '+1.2%' },
-          { label: 'Pending Price Updates', value: '486', color: 'text-amber-600', trend: '' },
-          { label: 'Active Rules', value: rulesList.length.toString(), color: 'text-primary-600', trend: '' },
-          { label: 'Last Price Sync', value: '12 min ago', color: 'text-slate-700', trend: '' },
+          { label: 'Avg Catalog Margin', value: '22.4%', color: 'text-emerald-700', bg: 'bg-emerald-50/80 border-emerald-100', trend: '+1.2% margin' },
+          { label: 'Pending Price Updates', value: '486 SKUs', color: 'text-amber-700', bg: 'bg-amber-50/80 border-amber-100', trend: 'Awaiting sync' },
+          { label: 'Active Rules', value: rulesList.length.toString(), color: 'text-primary-700', bg: 'bg-primary-50/80 border-primary-100', trend: 'Formula active' },
+          { label: 'Last Price Sync', value: '12 min ago', color: 'text-slate-800', bg: 'bg-white border-slate-200', trend: '486 updated' },
         ].map(s => (
-          <div key={s.label} className="card p-4">
-            <p className="text-xs text-slate-400 font-medium mb-1">{s.label}</p>
-            <div className="flex items-end gap-2">
-              <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-              {s.trend && <span className="text-xs text-emerald-600 font-medium mb-0.5">{s.trend}</span>}
+          <div key={s.label} className={`card p-4 border ${s.bg}`}>
+            <p className="text-xs text-slate-500 font-semibold mb-1">{s.label}</p>
+            <div className="flex items-end justify-between">
+              <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+              {s.trend && <span className="text-2xs text-slate-500 font-medium">{s.trend}</span>}
             </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
         {/* Active Pricing Rules */}
-        <div className="card p-5">
-          <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
-            <DollarSign size={15} className="text-primary-600" /> Active Pricing Rules
+        <div className="card p-5 border border-slate-200">
+          <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <DollarSign size={16} className="text-primary-600" /> Active Pricing Markup Rules
           </h3>
           <div className="space-y-3">
             {rulesList.map(rule => (
-              <div key={rule.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
+              <div key={rule.id} className="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
                 <div>
-                  <p className="text-sm font-semibold text-slate-800">{rule.name}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    <code className="mono">{rule.formula}</code> · {rule.products.toLocaleString()} products
+                  <p className="text-sm font-bold text-slate-900">{rule.name}</p>
+                  <p className="text-xs text-slate-500 mt-1 flex items-center gap-2">
+                    <code className="mono font-semibold px-2 py-0.5 bg-slate-200/70 text-slate-800 rounded-md">{rule.formula}</code>
+                    <span>• {rule.products.toLocaleString()} SKUs</span>
                   </p>
                 </div>
                 <div className="flex gap-2 items-center">
@@ -222,13 +263,13 @@ export const PricingSync: React.FC = () => {
         </div>
 
         {/* Price Comparison Chart */}
-        <div className="card p-5">
-          <h3 className="text-sm font-semibold text-slate-800 mb-4">Supplier Cost vs Retail Price Comparison</h3>
-          <ResponsiveContainer width="100%" height={220}>
+        <div className="card p-5 border border-slate-200">
+          <h3 className="text-sm font-bold text-slate-900 mb-4">Supplier Cost vs Retail Price Comparison</h3>
+          <ResponsiveContainer width="100%" height={230}>
             <BarChart data={priceChartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="sku" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="sku" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
               <Tooltip formatter={(v) => `$${v as number}`} contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }} />
               <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px' }} />
               <Bar dataKey="supplier" name="Supplier Cost" fill="#06b6d4" radius={[4,4,0,0]} />
@@ -239,50 +280,54 @@ export const PricingSync: React.FC = () => {
       </div>
 
       {/* Price History Table */}
-      <div className="card p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-slate-800">Price Update Audit Log</h3>
+      <div className="card p-5 border border-slate-200 shadow-card space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900">Price Update Audit Log</h3>
+            <p className="text-xs text-slate-400 font-medium">Recent supplier price updates and margin calculations</p>
+          </div>
         </div>
+
         <FilterBar search={search} onSearch={setSearch} placeholder="Search product name or SKU..." />
+
         <div className="table-container">
           <table className="table">
             <thead>
               <tr>
-                <th>Product</th>
-                <th>SKU</th>
-                <th>Supplier</th>
-                <th>Old Price</th>
-                <th>New Price</th>
-                <th>Change</th>
-                <th>Margin</th>
-                <th>Status</th>
-                <th>Time</th>
+                <th className="min-w-[200px]">Product Name</th>
+                <th className="min-w-[130px]">SKU</th>
+                <th className="min-w-[120px]">Supplier</th>
+                <th className="min-w-[100px]">Old Price</th>
+                <th className="min-w-[100px]">New Price</th>
+                <th className="min-w-[110px]">Change</th>
+                <th className="min-w-[90px]">Margin</th>
+                <th className="min-w-[100px]">Status</th>
+                <th className="min-w-[110px]">Time</th>
               </tr>
             </thead>
-            <tbody>
-              {[
-                { name: 'AMD X570 Motherboard', sku: 'MB-X570-001', supplier: 'TechParts', old: 289.99, new: 299.99, margin: 18.3, ok: true },
-                { name: 'DDR5 32GB Kit', sku: 'RAM-DDR5-001', supplier: 'TechParts', old: 124.99, new: 119.99, margin: 25.8, ok: true },
-                { name: 'Samsung 980 Pro 2TB', sku: 'SSD-980P-001', supplier: 'GlobalSource', old: 144.99, new: 149.99, margin: 20.7, ok: true },
-                { name: 'NVIDIA RTX 4090', sku: 'GPU-4090-001', supplier: 'TechParts', old: 0, new: 1699.99, margin: 14.7, ok: false },
-              ].map((row, i) => {
+            <tbody className="divide-y divide-slate-100">
+              {auditLogRows.map((row, i) => {
                 const change = row.new - row.old
                 return (
-                  <tr key={i}>
-                    <td><span className="font-medium text-slate-800 text-sm">{row.name}</span></td>
-                    <td><code className="mono">{row.sku}</code></td>
-                    <td><span className="text-xs text-slate-500">{row.supplier}</span></td>
-                    <td><span className="text-slate-500">${row.old.toFixed(2)}</span></td>
-                    <td><span className="font-semibold text-slate-800">${row.new.toFixed(2)}</span></td>
+                  <tr key={i} className="hover:bg-slate-50/80 transition-colors">
+                    <td><span className="font-bold text-slate-900 text-sm leading-snug">{row.name}</span></td>
                     <td>
-                      <span className={`flex items-center gap-1 text-xs font-semibold ${change > 0 ? 'text-emerald-600' : change < 0 ? 'text-rose-600' : 'text-slate-400'}`}>
-                        {change > 0 ? <TrendingUp size={12} /> : change < 0 ? <TrendingDown size={12} /> : '='}
-                        {change > 0 ? '+' : ''}{change.toFixed(2)}
+                      <span className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 font-mono text-xs font-semibold inline-block whitespace-nowrap">
+                        {row.sku}
                       </span>
                     </td>
-                    <td><span className="text-emerald-600 font-semibold text-sm">{row.margin}%</span></td>
-                    <td><Badge variant={row.ok ? 'success' : 'warning'}>{row.ok ? 'Synced' : 'Pending'}</Badge></td>
-                    <td><span className="text-xs text-slate-400 font-mono">2 hr ago</span></td>
+                    <td><span className="text-xs text-slate-600 font-semibold whitespace-nowrap">{row.supplier}</span></td>
+                    <td><span className="text-xs text-slate-500 font-mono font-medium whitespace-nowrap">${row.old.toFixed(2)}</span></td>
+                    <td><span className="text-xs font-bold text-slate-900 font-mono whitespace-nowrap">${row.new.toFixed(2)}</span></td>
+                    <td>
+                      <span className={`inline-flex items-center gap-1 text-xs font-bold whitespace-nowrap ${change > 0 ? 'text-emerald-600' : change < 0 ? 'text-rose-600' : 'text-slate-400'}`}>
+                        {change > 0 ? <TrendingUp size={12} /> : change < 0 ? <TrendingDown size={12} /> : '='}
+                        {change > 0 ? '+' : ''}${change.toFixed(2)}
+                      </span>
+                    </td>
+                    <td><span className="text-xs text-emerald-600 font-bold whitespace-nowrap">{row.margin}%</span></td>
+                    <td><Badge variant={row.ok ? 'success' : 'warning'} dot>{row.ok ? 'Synced' : 'Pending'}</Badge></td>
+                    <td><span className="text-xs text-slate-500 font-mono whitespace-nowrap">{row.time}</span></td>
                   </tr>
                 )
               })}
@@ -307,7 +352,7 @@ export const PricingSync: React.FC = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Rule Name *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Rule Name *</label>
             <input
               className="input"
               placeholder="e.g. Components — 20% Standard Markup"
@@ -316,7 +361,7 @@ export const PricingSync: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Formula Definition *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Formula Definition *</label>
             <input
               className="input font-mono text-xs"
               placeholder="e.g. Cost * 1.20 + $3"
@@ -325,9 +370,9 @@ export const PricingSync: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Applies To Category</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Applies To Category</label>
             <select
-              className="select"
+              className="select font-medium"
               value={ruleFormData.applies}
               onChange={e => setRuleFormData({ ...ruleFormData, applies: e.target.value })}
             >
@@ -357,7 +402,7 @@ export const PricingSync: React.FC = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Rule Name *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Rule Name *</label>
             <input
               className="input"
               value={ruleFormData.name}
@@ -365,7 +410,7 @@ export const PricingSync: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Formula Definition *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Formula Definition *</label>
             <input
               className="input font-mono text-xs"
               value={ruleFormData.formula}
@@ -373,9 +418,9 @@ export const PricingSync: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Applies To Category</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Applies To Category</label>
             <select
-              className="select"
+              className="select font-medium"
               value={ruleFormData.applies}
               onChange={e => setRuleFormData({ ...ruleFormData, applies: e.target.value })}
             >
