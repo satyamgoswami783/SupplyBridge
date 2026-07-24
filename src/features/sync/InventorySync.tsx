@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   RefreshCw, CheckCircle2, XCircle, TrendingDown, TrendingUp,
   Search, ShieldCheck, Database, AlertCircle, Settings, PlayCircle,
-  Clock, ArrowRight, Download, Sliders, AlertTriangle, Layers
+  Clock, ArrowRight, Download, Sliders, AlertTriangle, Layers, Activity
 } from 'lucide-react'
 import { SectionHeader, HealthIndicator, ProgressBar, FilterBar } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
