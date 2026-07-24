@@ -331,31 +331,117 @@
     @apply bg-slate-950 border-slate-800 text-slate-300;
   }
 
+  /* Tinted Background Overrides in Dark Mode */
+  .dark .bg-emerald-50 {
+    @apply bg-emerald-950/40 text-emerald-300 border-emerald-900/40;
+  }
+
+  .dark .bg-cyan-50 {
+    @apply bg-cyan-950/40 text-cyan-300 border-cyan-900/40;
+  }
+
+  .dark .bg-amber-50 {
+    @apply bg-amber-950/40 text-amber-300 border-amber-900/40;
+  }
+
+  .dark .bg-rose-50 {
+    @apply bg-rose-950/40 text-rose-300 border-rose-900/40;
+  }
+
+  .dark .bg-violet-50 {
+    @apply bg-violet-950/40 text-violet-300 border-violet-900/40;
+  }
+
+  .dark .bg-primary-50 {
+    @apply bg-primary-950/40 text-primary-300 border-primary-900/40;
+  }
+
+  .dark .bg-orange-50 {
+    @apply bg-orange-950/40 text-orange-300 border-orange-900/40;
+  }
+
+  .dark .bg-blue-50 {
+    @apply bg-blue-950/40 text-blue-300 border-blue-900/40;
+  }
+
   .dark .bg-slate-50 {
-    @apply bg-slate-900/60 border-slate-800/60;
+    @apply bg-slate-900/80 text-slate-200 border-slate-800/80;
   }
 
   .dark .bg-slate-100 {
-    @apply bg-slate-800/80 text-slate-200;
+    @apply bg-slate-800/80 text-slate-200 border-slate-700/60;
+  }
+
+  .dark .bg-slate-200 {
+    @apply bg-slate-800 text-slate-200;
+  }
+
+  .dark .bg-slate-300 {
+    @apply bg-slate-700 text-slate-200;
   }
 
   .dark .bg-white {
     @apply bg-slate-900 text-slate-100;
   }
 
+  /* Text color contrast adjustments in dark mode */
   .dark .text-slate-800,
   .dark .text-slate-900 {
     @apply text-slate-100;
   }
 
-  .dark .text-slate-700,
+  .dark .text-slate-700 {
+    @apply text-slate-200;
+  }
+
   .dark .text-slate-600 {
     @apply text-slate-300;
+  }
+
+  .dark .text-slate-500 {
+    @apply text-slate-400;
+  }
+
+  .dark .text-emerald-800,
+  .dark .text-emerald-700 {
+    @apply text-emerald-300;
+  }
+
+  .dark .text-cyan-800,
+  .dark .text-cyan-700 {
+    @apply text-cyan-300;
+  }
+
+  .dark .text-amber-800,
+  .dark .text-amber-700 {
+    @apply text-amber-300;
+  }
+
+  .dark .text-rose-800,
+  .dark .text-rose-700 {
+    @apply text-rose-300;
+  }
+
+  .dark .text-violet-800,
+  .dark .text-violet-700 {
+    @apply text-violet-300;
   }
 
   .dark .border-slate-200,
   .dark .border-slate-100 {
     @apply border-slate-800;
+  }
+
+  .dark .border-emerald-200 {
+    @apply border-emerald-900/50;
+  }
+
+  .dark .border-rose-200 {
+    @apply border-rose-900/50;
+  }
+
+  .dark .border-amber-200 {
+    @apply border-amber-900/50;
   }
 }
 
