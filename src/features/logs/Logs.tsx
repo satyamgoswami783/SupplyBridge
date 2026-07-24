@@ -3,20 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { mockLogs } from '../../data/mockData'
 import type { LogEntry, LogLevel } from '../../types'
 import {
-  AlertCircle,
-  Info,
-  CheckCircle2,
-  AlertTriangle,
-  Search,
-  RefreshCw,
-  ChevronRight,
-  ChevronDown,
-  Download,
-  FileCode,
-  FileSpreadsheet,
-  Activity,
-  Terminal
+  AlertCircle, Info, CheckCircle2, AlertTriangle, Search, RefreshCw,
+  ChevronRight, ChevronDown, Download, FileCode, FileSpreadsheet, Trash2, Shield, Database, Terminal, Filter, Code, ArrowUpRight, Activity
 } from 'lucide-react'
+import { SectionHeader, ConfirmDialog } from '../../components/ui'
+import { Badge } from '../../components/ui/Badge'
+import { Modal } from '../../components/ui/Modal'
 
 export const Logs: React.FC = () => {
   const [logs, setLogs] = useState<LogEntry[]>(mockLogs)
@@ -24,8 +16,10 @@ export const Logs: React.FC = () => {
   const [selectedLevel, setSelectedLevel] = useState<string>('all')
   const [selectedType, setSelectedType] = useState<string>('all')
   const [expandedLog, setExpandedLog] = useState<string | null>(null)
+  const [activeLogModal, setActiveLogModal] = useState<LogEntry | null>(null)
 
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
 
   const showNotification = (msg: string) => {
@@ -35,26 +29,33 @@ export const Logs: React.FC = () => {
 
   const handleRefreshLogs = () => {
     setIsRefreshing(true)
-    showNotification('Refreshing system logs...')
+    showNotification('Fetching live system audit traces...')
 
     setTimeout(() => {
       const freshLog: LogEntry = {
         id: `log_${Date.now()}`,
         timestamp: new Date().toISOString(),
         level: 'info',
-        type: 'system',
-        message: 'System audit logs refreshed by administrator',
-        details: 'Manual refresh triggered. All supplier feed channels and active background sync traces verified.',
+        type: 'sync',
+        supplierName: 'Shift4Shop Gateway',
+        message: 'Shift4Shop REST API catalog sync heartbeat check successful [200 OK]',
+        details: 'API endpoint https://apirest.3dcart.com/v2/Products responded in 48ms. All authorization tokens valid.',
       }
 
-      setLogs([freshLog, ...mockLogs])
+      setLogs([freshLog, ...logs])
       setIsRefreshing(false)
-      showNotification('System logs refreshed successfully!')
-    }, 1000)
+      showNotification('System logs refreshed with latest operational traces!')
+    }, 800)
+  }
+
+  const handleClearLogs = () => {
+    setLogs(prev => prev.filter(l => l.level === 'error'))
+    setClearConfirmOpen(false)
+    showNotification('Resolved non-critical audit logs cleared. Error traces retained for security compliance.')
   }
 
   const handleExportLogsJSON = () => {
-    showNotification('Exporting logs JSON file...')
+    showNotification('Exporting audit logs as JSON file...')
     const jsonString = JSON.stringify(filteredLogs, null, 2)
     const blob = new Blob([jsonString], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -69,7 +70,7 @@ export const Logs: React.FC = () => {
   }
 
   const handleExportLogsCSV = () => {
-    showNotification('Exporting logs CSV file...')
+    showNotification('Exporting audit logs as CSV file...')
     const csvHeaders = 'Log ID,Timestamp,Level,Type,Supplier,Message,Details\n'
     const csvRows = filteredLogs.map(l =>
       `"${l.id}","${l.timestamp}","${l.level}","${l.type}","${l.supplierName || ''}","${l.message.replace(/"/g, '""')}","${(l.details || '').replace(/"/g, '""')}"`
@@ -91,13 +92,13 @@ export const Logs: React.FC = () => {
   const getLevelBadge = (level: LogLevel) => {
     switch (level) {
       case 'error':
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg bg-rose-50 text-rose-700 border border-rose-200/80 shadow-2xs"><AlertCircle size={14} /> Error</span>
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-bold rounded-md bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400 border border-rose-200 dark:border-rose-800"><AlertCircle size={12} /> ERROR</span>
       case 'warning':
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg bg-amber-50 text-amber-700 border border-amber-200/80 shadow-2xs"><AlertTriangle size={14} /> Warning</span>
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-bold rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-200 dark:border-amber-800"><AlertTriangle size={12} /> WARN</span>
       case 'success':
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-2xs"><CheckCircle2 size={14} /> Success</span>
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-bold rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"><CheckCircle2 size={12} /> OK</span>
       default:
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg bg-sky-50 text-sky-700 border border-sky-200/80 shadow-2xs"><Info size={14} /> Info</span>
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-bold rounded-md bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-400 border border-sky-200 dark:border-sky-800"><Info size={12} /> INFO</span>
     }
   }
 
@@ -115,7 +116,7 @@ export const Logs: React.FC = () => {
   }
 
   return (
-    <div className="relative space-y-6">
+    <div className="space-y-6">
       {/* Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
@@ -123,7 +124,7 @@ export const Logs: React.FC = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold"
+            className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold border border-slate-700"
           >
             <CheckCircle2 size={16} className="text-emerald-400" />
             {toastMessage}
@@ -131,68 +132,71 @@ export const Logs: React.FC = () => {
         )}
       </AnimatePresence>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">System Audit Logs</h1>
-          <p className="text-slate-500 text-xs font-medium mt-1">Monitor background syncs, API requests, feed imports, and system events in real time.</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={handleExportLogsCSV}
-            className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
-            title="Download Logs as CSV"
-          >
-            <FileSpreadsheet size={14} className="text-emerald-600" /> Export CSV
-          </button>
-          <button
-            onClick={handleExportLogsJSON}
-            className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
-            title="Download Logs as JSON"
-          >
-            <FileCode size={14} className="text-indigo-600" /> Export JSON
-          </button>
-          <button
-            onClick={handleRefreshLogs}
-            disabled={isRefreshing}
-            className="btn-primary btn-sm flex items-center gap-2 font-bold cursor-pointer"
-          >
-            <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh Logs'}
-          </button>
-        </div>
-      </div>
+      <SectionHeader
+        title="System Audit & Integration Logs"
+        subtitle="Real-time audit trails of supplier feeds, Shift4Shop API publishing, validation exceptions, and security events"
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setClearConfirmOpen(true)}
+              className="btn-secondary btn-sm flex items-center gap-1.5 hover:text-rose-600"
+              title="Clear Non-critical Resolved Logs"
+            >
+              <Trash2 size={14} /> Flush Logs
+            </button>
+            <button
+              onClick={handleExportLogsCSV}
+              className="btn-secondary btn-sm flex items-center gap-1.5"
+              title="Download Logs as CSV"
+            >
+              <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" /> Export CSV
+            </button>
+            <button
+              onClick={handleExportLogsJSON}
+              className="btn-secondary btn-sm flex items-center gap-1.5"
+              title="Download Logs as JSON"
+            >
+              <FileCode size={14} className="text-indigo-600 dark:text-indigo-400" /> Export JSON
+            </button>
+            <button
+              onClick={handleRefreshLogs}
+              disabled={isRefreshing}
+              className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20"
+            >
+              <RefreshCw size={14} className={isRefreshing ? 'animate-spin text-white' : ''} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh Logs'}
+            </button>
+          </div>
+        }
+      />
 
-      {/* KPI Stats Grid */}
+      {/* Log Summary Statistics */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Log Entries', value: logs.length, color: 'text-slate-900', bg: 'bg-white', icon: <Terminal size={18} className="text-slate-700" /> },
-          { label: 'Error Traces', value: logs.filter(l => l.level === 'error').length, color: 'text-rose-700', bg: 'bg-rose-50/80 border-rose-100', icon: <AlertCircle size={18} className="text-rose-600" /> },
-          { label: 'Warnings Recorded', value: logs.filter(l => l.level === 'warning').length, color: 'text-amber-700', bg: 'bg-amber-50/80 border-amber-100', icon: <AlertTriangle size={18} className="text-amber-600" /> },
-          { label: 'System Successes', value: logs.filter(l => l.level === 'success' || l.level === 'info').length, color: 'text-emerald-700', bg: 'bg-emerald-50/80 border-emerald-100', icon: <CheckCircle2 size={18} className="text-emerald-600" /> },
+          { label: 'Total Event Traces', value: logs.length, color: 'text-slate-800 dark:text-slate-100' },
+          { label: 'Errors Reported', value: logs.filter(l => l.level === 'error').length, color: 'text-rose-600 dark:text-rose-400' },
+          { label: 'Warnings Triggered', value: logs.filter(l => l.level === 'warning').length, color: 'text-amber-600 dark:text-amber-400' },
+          { label: 'Successful Syncs', value: logs.filter(l => l.level === 'success').length, color: 'text-emerald-600 dark:text-emerald-400' },
         ].map(s => (
-          <div key={s.label} className={`card p-4 flex items-center gap-3.5 border ${s.bg}`}>
-            <div className="p-2.5 rounded-xl bg-white shadow-2xs">
-              {s.icon}
-            </div>
-            <div>
-              <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
-              <p className="text-xs text-slate-500 font-semibold mt-0.5">{s.label}</p>
-            </div>
+          <div key={s.label} className="card p-4 text-center">
+            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+            <p className="text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
+      {/* Log Filters & List */}
+      <div className="card overflow-hidden">
         {/* Filters */}
-        <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col md:flex-row gap-3">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input
               type="text"
-              placeholder="Search logs by message, supplier name, details..."
+              placeholder="Search logs by SKU, message, supplier, error code..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input pl-10 pr-4 py-2 text-sm font-medium"
+              className="input pl-9"
             />
           </div>
 
@@ -200,7 +204,7 @@ export const Logs: React.FC = () => {
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
-              className="select input-sm w-auto min-w-[130px] font-medium"
+              className="select input-sm w-auto min-w-[130px]"
             >
               <option value="all">All Levels</option>
               <option value="info">Info</option>
@@ -212,77 +216,127 @@ export const Logs: React.FC = () => {
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="select input-sm w-auto min-w-[130px] font-medium"
+              className="select input-sm w-auto min-w-[140px]"
             >
-              <option value="all">All Types</option>
-              <option value="sync">Sync</option>
-              <option value="api">API</option>
-              <option value="import">Import</option>
-              <option value="ftp">FTP</option>
-              <option value="validation">Validation</option>
-              <option value="audit">Audit</option>
-              <option value="system">System</option>
+              <option value="all">All Source Modules</option>
+              <option value="sync">Sync Pipeline</option>
+              <option value="api">API Gateway</option>
+              <option value="import">File Import Feed</option>
+              <option value="ftp">FTP/SFTP Server</option>
+              <option value="validation">Validation Center</option>
+              <option value="audit">Security Audit</option>
+              <option value="system">System Kernel</option>
             </select>
           </div>
         </div>
 
-        {/* Logs List */}
-        <div className="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
+        {/* Log Stream */}
+        <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[550px] overflow-y-auto scrollbar-hide">
           {filteredLogs.length > 0 ? (
             filteredLogs.map((log) => (
               <div
                 key={log.id}
                 onClick={() => toggleExpand(log.id)}
-                className={`group cursor-pointer hover:bg-slate-50/80 transition duration-200 ${expandedLog === log.id ? 'bg-slate-50' : ''}`}
+                className={`group cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-850/60 transition duration-150 ${expandedLog === log.id ? 'bg-slate-50 dark:bg-slate-850/80' : ''}`}
               >
-                <div className="p-4 flex items-start gap-4">
-                  <div className="pt-1 text-slate-400 group-hover:text-slate-600 transition">
-                    {expandedLog === log.id ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                <div className="p-4 flex items-start gap-3">
+                  <div className="pt-0.5 text-slate-400 group-hover:text-slate-600 transition">
+                    {expandedLog === log.id ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
                       {getLevelBadge(log.level)}
-                      <span className="px-2.5 py-0.5 text-xs font-bold bg-slate-100 text-slate-700 rounded-md uppercase tracking-wider border border-slate-200">{log.type}</span>
+                      <span className="px-2 py-0.5 text-2xs font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded uppercase tracking-wider">{log.type}</span>
                       {log.supplierName && (
-                        <span className="text-xs text-slate-600 font-semibold">
+                        <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
                           • {log.supplierName}
                         </span>
                       )}
-                      <span className="text-xs text-slate-400 ml-auto font-mono">
+                      <span className="text-2xs text-slate-400 ml-auto font-mono">
                         {new Date(log.timestamp).toLocaleString()}
                       </span>
                     </div>
 
-                    <p className="text-sm font-bold text-slate-800 leading-relaxed truncate">{log.message}</p>
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200 leading-snug truncate">{log.message}</p>
 
                     {expandedLog === log.id && (
-                      <div className="mt-4 p-4 rounded-xl bg-slate-900 text-slate-300 font-mono text-xs leading-relaxed overflow-x-auto shadow-inner border border-slate-800">
-                        <div className="mb-2 text-slate-400 font-bold border-b border-slate-800 pb-1.5 flex justify-between">
-                          <span>LOG TRACE DETAILS (ID: {log.id})</span>
-                          <span>Timestamp: {log.timestamp}</span>
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="mt-3 p-4 rounded-2xl bg-slate-950 text-slate-200 font-mono text-2xs leading-relaxed overflow-x-auto shadow-2xl border border-slate-800"
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <div className="mb-2 text-slate-400 font-bold border-b border-slate-800 pb-2 flex justify-between items-center">
+                          <span>SYSTEM TRACE DETAILS (ID: {log.id})</span>
+                          <button
+                            onClick={() => setActiveLogModal(log)}
+                            className="text-primary-400 hover:underline flex items-center gap-1 text-2xs font-bold"
+                          >
+                            Expand JSON Modal <ArrowUpRight size={12} />
+                          </button>
                         </div>
                         {log.details ? (
-                          <p className="whitespace-pre-wrap">{log.details}</p>
+                          <p className="whitespace-pre-wrap text-slate-300">{log.details}</p>
                         ) : (
-                          <p className="text-slate-500 italic">No additional execution trace logs recorded for this event.</p>
+                          <p className="text-slate-500 italic">No stack trace or extended payload recorded.</p>
                         )}
-                        {log.jobId && <div className="mt-2 text-primary-400"><span className="text-slate-500 font-bold">Related Job ID:</span> {log.jobId}</div>}
-                        {log.userId && <div className="mt-1 text-primary-400"><span className="text-slate-500 font-bold">Triggered By User ID:</span> {log.userId}</div>}
-                      </div>
+                        <div className="mt-3 pt-2 border-t border-slate-900 flex flex-wrap gap-4 text-slate-400 text-2xs">
+                          {log.jobId && <div><span className="text-slate-500">Job ID:</span> <code className="text-cyan-400">{log.jobId}</code></div>}
+                          {log.userId && <div><span className="text-slate-500">Triggered By:</span> <code className="text-cyan-400">{log.userId}</code></div>}
+                          <div><span className="text-slate-500">Server Endpoint:</span> <code className="text-emerald-400">https://apirest.3dcart.com/v2/</code></div>
+                        </div>
+                      </motion.div>
                     )}
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <div className="p-16 text-center">
+            <div className="p-12 text-center">
               <AlertCircle className="mx-auto text-slate-300 mb-3" size={32} />
-              <p className="text-sm font-bold text-slate-500">No logs found matching your filter criteria.</p>
+              <p className="text-sm font-semibold text-slate-500">No logs found matching search query "{searchTerm}".</p>
             </div>
           )}
         </div>
       </div>
+
+      {/* LOG JSON MODAL */}
+      {activeLogModal && (
+        <Modal
+          open
+          onClose={() => setActiveLogModal(null)}
+          title={`Trace Payload: ${activeLogModal.id}`}
+          subtitle={`Full JSON log entry for ${activeLogModal.message}`}
+          size="lg"
+        >
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              {getLevelBadge(activeLogModal.level)}
+              <span className="text-2xs font-mono text-slate-400">{activeLogModal.timestamp}</span>
+            </div>
+            <div className="bg-slate-950 text-emerald-400 font-mono text-xs p-4 rounded-2xl overflow-x-auto border border-slate-800">
+              <pre>{JSON.stringify(activeLogModal, null, 2)}</pre>
+            </div>
+            <div className="flex justify-end pt-2">
+              <button onClick={() => setActiveLogModal(null)} className="btn-secondary">Close</button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* CLEAR LOGS CONFIRM DIALOG */}
+      {clearConfirmOpen && (
+        <ConfirmDialog
+          open
+          onClose={() => setClearConfirmOpen(false)}
+          onConfirm={handleClearLogs}
+          title="Flush Non-critical System Logs?"
+          message="Are you sure you want to clear info, warning, and success logs? Error traces will be preserved for security audit compliance."
+          confirmLabel="Flush Logs"
+          danger
+        />
+      )}
     </div>
   )
 }
