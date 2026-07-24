@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { RefreshCw, PlayCircle, CheckCircle2, XCircle, TrendingDown, TrendingUp, ArrowRight } from 'lucide-react'
 import { SectionHeader, HealthIndicator, ProgressBar } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
@@ -7,20 +8,51 @@ import { mockSyncChartData } from '../../data/mockData'
 
 export const InventorySync: React.FC = () => {
   const [syncing, setSyncing] = useState(false)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+
+  const showNotification = (msg: string) => {
+    setToastMessage(msg)
+    setTimeout(() => setToastMessage(null), 3000)
+  }
+
+  const handleSyncNow = () => {
+    setSyncing(true)
+    showNotification('Inventory sync initialized for all suppliers...')
+    setTimeout(() => {
+      setSyncing(false)
+      showNotification('Inventory synchronization completed! 342 stock levels updated.')
+    }, 2000)
+  }
 
   return (
-    <div>
+    <div className="relative">
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold"
+          >
+            <CheckCircle2 size={16} className="text-emerald-400" />
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <SectionHeader
         title="Inventory Synchronization"
-        subtitle="Manage inventory synchronization from suppliers to master catalog and stores"
+        subtitle="Manage stock levels, automated supplier feeds, and store stock adjustments"
         actions={
-          <button className="btn-primary" onClick={() => setSyncing(!syncing)}>
-            <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} /> {syncing ? 'Syncing...' : 'Sync All Now'}
+          <button className="btn-primary flex items-center gap-1.5" disabled={syncing} onClick={handleSyncNow}>
+            <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
+            {syncing ? 'Syncing Stock...' : 'Sync All Inventory Now'}
           </button>
         }
       />
 
-      {/* Status Cards */}
+      {/* Status KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         {[
           { label: 'Last Full Sync', value: '28 min ago', color: 'text-slate-700', sub: 'PrimeSupply Corp' },
@@ -36,10 +68,10 @@ export const InventorySync: React.FC = () => {
         ))}
       </div>
 
-      {/* Supplier Inventory Status */}
+      {/* Supplier Inventory Status & Trend Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <div className="card p-5">
-          <h3 className="text-sm font-semibold text-slate-800 mb-4">Supplier Sync Status</h3>
+          <h3 className="text-sm font-semibold text-slate-800 mb-4">Supplier Sync Progress</h3>
           <div className="space-y-4">
             {[
               { name: 'TechParts International', products: 18420, pending: 0, progress: 100, status: 'healthy' as const, lastSync: '4 min ago' },
@@ -52,12 +84,12 @@ export const InventorySync: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-slate-700 truncate">{s.name}</span>
-                    <span className="text-xs text-slate-400 flex-shrink-0 ml-2">{s.lastSync}</span>
+                    <span className="text-xs text-slate-400 flex-shrink-0 ml-2 font-mono">{s.lastSync}</span>
                   </div>
                   <ProgressBar value={s.progress} color={s.progress === 100 ? 'emerald' : s.progress > 50 ? 'primary' : 'rose'} />
                   <div className="flex justify-between mt-0.5">
                     <span className="text-2xs text-slate-400">{s.products.toLocaleString()} products</span>
-                    {s.pending > 0 && <span className="text-2xs text-amber-600">{s.pending} pending</span>}
+                    {s.pending > 0 && <span className="text-2xs text-amber-600 font-semibold">{s.pending} pending</span>}
                   </div>
                 </div>
                 <HealthIndicator status={s.status} label={s.status === 'healthy' ? 'OK' : s.status === 'degraded' ? 'Lag' : 'Error'} />
@@ -89,10 +121,21 @@ export const InventorySync: React.FC = () => {
 
       {/* Recent Inventory Changes */}
       <div className="card p-5">
-        <h3 className="text-sm font-semibold text-slate-800 mb-4">Recent Inventory Changes</h3>
+        <h3 className="text-sm font-semibold text-slate-800 mb-4">Recent Inventory Changes Log</h3>
         <div className="table-container">
           <table className="table">
-            <thead><tr><th>Product</th><th>SKU</th><th>Supplier</th><th>Change</th><th>Old Stock</th><th>New Stock</th><th>Status</th><th>Time</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Supplier</th>
+                <th>Change</th>
+                <th>Old Stock</th>
+                <th>New Stock</th>
+                <th>Status</th>
+                <th>Time</th>
+              </tr>
+            </thead>
             <tbody>
               {[
                 { name: 'AMD X570 ATX Motherboard', sku: 'MB-X570-001', supplier: 'TechParts', change: +45, old: 75, new: 120, ok: true },
@@ -114,7 +157,7 @@ export const InventorySync: React.FC = () => {
                   <td><span className="text-slate-600">{row.old}</span></td>
                   <td><span className="font-semibold text-slate-800">{row.new}</span></td>
                   <td><Badge variant={row.ok ? 'success' : 'warning'}>{row.ok ? 'Synced' : 'Pending'}</Badge></td>
-                  <td><span className="text-xs text-slate-400">Just now</span></td>
+                  <td><span className="text-xs text-slate-400 font-mono">Just now</span></td>
                 </tr>
               ))}
             </tbody>

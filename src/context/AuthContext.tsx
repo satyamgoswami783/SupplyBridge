@@ -1,11 +1,15 @@
 import React, { createContext, useContext, useState } from 'react'
 import type { UserRole, User } from '../types'
-import { Lock, Mail, Shield, Zap, ArrowRight, CheckCircle2, UserCheck } from 'lucide-react'
+import { Lock, Mail, Shield, Zap, ArrowRight, CheckCircle2, UserCheck, Layers, RefreshCw, Globe, Database } from 'lucide-react'
 
 interface AuthContextType {
   currentUser: User
   role: UserRole
   setRole: (role: UserRole) => void
+  permissionsConfig: Record<UserRole, string[]>
+  updateRolePermission: (targetRole: UserRole, module: string, hasAccess: boolean) => void
+  setBulkRolePermissions: (targetRole: UserRole, modules: string[]) => void
+  resetPermissionsToDefault: () => void
   hasPermission: (module: string) => boolean
   logout: () => void
   viewProfileUser: User | null
@@ -13,12 +17,12 @@ interface AuthContextType {
   openCurrentUserProfile: () => void
 }
 
-const rolePermissions: Record<UserRole, string[]> = {
+export const DEFAULT_ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   super_admin:         ['*'],
-  admin:               ['dashboard', 'suppliers', 'integrations', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation', 'inventory_sync', 'pricing_sync', 'image_sync', 'store_management', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports', 'users', 'roles', 'permissions', 'settings'],
-  catalog_manager:     ['dashboard', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation'],
-  integration_manager: ['dashboard', 'suppliers', 'integrations', 'mapping', 'inventory_sync', 'pricing_sync', 'image_sync', 'website_sync', 'sync_jobs', 'import_queue', 'logs'],
-  operations_staff:    ['dashboard', 'validation', 'monitoring', 'reports', 'logs'],
+  admin:               ['dashboard', 'suppliers', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation', 'inventory_sync', 'pricing_sync', 'image_sync', 'store_management', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports'],
+  catalog_manager:     ['dashboard', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation', 'reports'],
+  integration_manager: ['dashboard', 'suppliers', 'integrations', 'mapping', 'inventory_sync', 'pricing_sync', 'image_sync', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports'],
+  operations_staff:    ['dashboard', 'validation', 'monitoring', 'reports', 'logs', 'sync_jobs'],
 }
 
 const demoUsers: Record<UserRole, User> = {
@@ -40,9 +44,27 @@ const ROLE_PRESETS: { role: UserRole; label: string; email: string; desc: string
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [role, setRole] = useState<UserRole>('super_admin')
+  const [role, setRoleState] = useState<UserRole>(() => {
+    const savedRole = localStorage.getItem('supplybridge_role') as UserRole
+    return (savedRole && demoUsers[savedRole]) ? savedRole : 'super_admin'
+  })
+
+  const [permissionsConfig, setPermissionsConfig] = useState<Record<UserRole, string[]>>(() => {
+    const saved = localStorage.getItem('supplybridge_permissions_config')
+    if (saved) {
+      try {
+        return JSON.parse(saved)
+      } catch (e) {
+        return DEFAULT_ROLE_PERMISSIONS
+      }
+    }
+    return DEFAULT_ROLE_PERMISSIONS
+  })
+
   const [viewProfileUser, setViewProfileUser] = useState<User | null>(null)
-  const [isLoggedOut, setIsLoggedOut] = useState(false)
+  const [isLoggedOut, setIsLoggedOutState] = useState<boolean>(() => {
+    return localStorage.getItem('supplybridge_is_logged_out') === 'true'
+  })
 
   // Login form states
   const [email, setEmail] = useState('alex@supplybridge.io')
@@ -52,13 +74,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const currentUser = demoUsers[role]
 
-  const hasPermission = (module: string): boolean => {
-    const perms = rolePermissions[role]
-    return perms.includes('*') || perms.includes(module)
+  const setRole = (newRole: UserRole) => {
+    localStorage.setItem('supplybridge_role', newRole)
+    setRoleState(newRole)
+  }
+
+  const updateRolePermission = (targetRole: UserRole, moduleKey: string, hasAccess: boolean) => {
+    setPermissionsConfig(prev => {
+      const currentList = prev[targetRole] || []
+      let updated: string[] = []
+      if (hasAccess) {
+        updated = currentList.includes(moduleKey) ? currentList : [...currentList, moduleKey]
+      } else {
+        updated = currentList.filter(m => m !== moduleKey)
+      }
+      const nextConfig = { ...prev, [targetRole]: updated }
+      localStorage.setItem('supplybridge_permissions_config', JSON.stringify(nextConfig))
+      return nextConfig
+    })
+  }
+
+  const setBulkRolePermissions = (targetRole: UserRole, modules: string[]) => {
+    setPermissionsConfig(prev => {
+      const nextConfig = { ...prev, [targetRole]: modules }
+      localStorage.setItem('supplybridge_permissions_config', JSON.stringify(nextConfig))
+      return nextConfig
+    })
+  }
+
+  const resetPermissionsToDefault = () => {
+    setPermissionsConfig(DEFAULT_ROLE_PERMISSIONS)
+    localStorage.setItem('supplybridge_permissions_config', JSON.stringify(DEFAULT_ROLE_PERMISSIONS))
+  }
+
+  const hasPermission = (moduleKey: string): boolean => {
+    const perms = permissionsConfig[role] || []
+    return perms.includes('*') || perms.includes(moduleKey)
   }
 
   const logout = () => {
-    setIsLoggedOut(true)
+    localStorage.setItem('supplybridge_is_logged_out', 'true')
+    setIsLoggedOutState(true)
   }
 
   const openCurrentUserProfile = () => {
@@ -82,127 +138,182 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setTimeout(() => {
       setRole(matchedRole)
-      setIsLoggedOut(false)
+      localStorage.setItem('supplybridge_is_logged_out', 'false')
+      setIsLoggedOutState(false)
       setIsLoggingIn(false)
     }, 400)
   }
 
   if (isLoggedOut) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
-        {/* Background glow effects */}
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-gradient-mesh relative overflow-hidden">
+        {/* Ambient background glow accents */}
+        <div className="absolute top-10 left-10 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
 
-        <div className="card max-w-lg w-full p-8 bg-slate-900/90 border-slate-800 text-white shadow-2xl backdrop-blur-xl relative z-10 rounded-3xl">
-          {/* Header Branding */}
-          <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-primary flex items-center justify-center mx-auto mb-3 shadow-glow-primary text-white">
-              <Zap size={28} />
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">SupplyBridge Enterprise</h1>
-            <p className="text-xs text-slate-400 mt-1">Middleware + PIM + Supplier Integration Platform</p>
-          </div>
+        {/* 2-Column Responsive Card */}
+        <div className="max-w-5xl w-full bg-white rounded-3xl border border-slate-200/90 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 relative z-10">
+          
+          {/* Left Column: FULL DISPLAY HERO IMAGE COVER */}
+          <div className="lg:col-span-5 relative min-h-[450px] lg:min-h-full flex flex-col justify-between p-8 lg:p-10 text-white overflow-hidden">
+            {/* Full Display Background Cover Image */}
+            <img
+              src="/login_hero.png"
+              alt="SupplyBridge Middleware Architecture"
+              className="absolute inset-0 w-full h-full object-cover z-0 scale-105"
+            />
+            {/* Dark Gradient Overlay for high text contrast */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/70 to-indigo-950/80 z-10" />
 
-          {/* Login Form */}
-          <form onSubmit={handleLoginSubmit} className="space-y-4">
-            <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1.5 flex items-center gap-1.5">
-                <Mail size={13} className="text-slate-400" /> Email Address
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="name@company.com"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
-              />
-            </div>
+            {/* Top Brand Logo */}
+            <div className="relative z-20">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-black shadow-lg border border-white/20">
+                  <Zap size={22} />
+                </div>
+                <div>
+                  <h1 className="font-extrabold text-white text-lg tracking-tight">SupplyBridge</h1>
+                  <p className="text-2xs text-cyan-300 font-bold uppercase tracking-wider">Enterprise Middleware & PIM</p>
+                </div>
+              </div>
 
-            <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1.5 flex items-center gap-1.5">
-                <Lock size={13} className="text-slate-400" /> Password
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
-              />
-            </div>
+              <h2 className="text-3xl font-black tracking-tight text-white mb-3 leading-tight drop-shadow-md">
+                Centralized Product & Supplier Hub
+              </h2>
+              <p className="text-xs text-slate-200 leading-relaxed mb-6 font-medium drop-shadow-sm">
+                Automated multi-supplier normalization, inventory sync & Shift4Shop publishing engine.
+              </p>
 
-            {/* Main Login Button */}
-            <button
-              type="submit"
-              disabled={isLoggingIn}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-primary hover:opacity-95 text-white font-bold text-sm shadow-glow-primary flex items-center justify-center gap-2 transition-all duration-200"
-            >
-              {isLoggingIn ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Authenticating...
-                </>
-              ) : (
-                <>
-                  Sign In to Dashboard <ArrowRight size={16} />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Divider */}
-          <div className="relative my-6 text-center">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-800" /></div>
-            <span className="relative px-3 bg-slate-900 text-2xs uppercase tracking-wider text-slate-500 font-semibold">
-              Or Auto-fill Quick Role Preset
-            </span>
-          </div>
-
-          {/* 5 Quick Role Preset Buttons */}
-          <div className="space-y-2">
-            {ROLE_PRESETS.map(preset => {
-              const isSelected = selectedRole === preset.role && email === preset.email
-              return (
-                <button
-                  key={preset.role}
-                  type="button"
-                  onClick={() => handleRoleSelect(preset)}
-                  className={`w-full p-3 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between group ${
-                    isSelected
-                      ? 'bg-slate-800 border-primary-500 ring-2 ring-primary-500/30'
-                      : 'bg-slate-800/40 border-slate-800 hover:bg-slate-800/80 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${preset.color} flex items-center justify-center text-white text-xs font-bold shadow-sm flex-shrink-0`}>
-                      {preset.label.charAt(0)}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-xs font-bold text-white group-hover:text-primary-300 transition-colors">
-                          {preset.label}
-                        </p>
-                        {isSelected && <span className="text-2xs bg-primary-500/20 text-primary-300 font-semibold px-2 py-0.5 rounded-full">Selected</span>}
-                      </div>
-                      <p className="text-2xs text-slate-400 truncate">{preset.email}</p>
-                    </div>
+              {/* Feature Points */}
+              <div className="space-y-2.5">
+                {[
+                  { icon: <Database size={14} />, text: 'Single Source of Truth Master Catalog' },
+                  { icon: <RefreshCw size={14} />, text: 'Real-time Inventory & Pricing Pipeline' },
+                  { icon: <Globe size={14} />, text: 'Multi-Storefront Validation & Sync' },
+                ].map((f, i) => (
+                  <div key={i} className="flex items-center gap-2.5 text-xs text-white font-bold bg-slate-900/60 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-white/20">
+                    <span className="text-cyan-400">{f.icon}</span>
+                    <span>{f.text}</span>
                   </div>
+                ))}
+              </div>
+            </div>
 
-                  <span className="text-xs text-slate-500 group-hover:text-slate-300 font-medium transition-colors">
-                    Click to fill →
-                  </span>
-                </button>
-              )
-            })}
+            {/* Bottom Status Indicator */}
+            <div className="relative z-20 flex items-center justify-between pt-6 border-t border-white/20 mt-8">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-glow-emerald" />
+                <span className="text-xs font-bold text-white">Live Data Middleware Active</span>
+              </div>
+              <span className="text-2xs text-slate-300 font-semibold">ISO 27001</span>
+            </div>
           </div>
 
-          {/* Footer note */}
-          <p className="text-2xs text-slate-500 text-center mt-6">
-            SupplyBridge Enterprise Middleware & Platform Security System © 2026
-          </p>
+          {/* Right Column: Interactive Login Form & Role Selector */}
+          <div className="lg:col-span-7 p-8 lg:p-10 bg-white flex flex-col justify-center">
+            <div className="max-w-md mx-auto w-full">
+              <div className="mb-6">
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Sign In</h2>
+                <p className="text-xs font-medium text-slate-500 mt-1">Enter your credentials or choose a quick demo role to autofill.</p>
+              </div>
+
+              {/* Login Form */}
+              <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center gap-1.5">
+                    <Mail size={13} className="text-slate-400" /> Email Address
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="name@supplybridge.io"
+                    className="input focus:ring-2 focus:ring-primary-500/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center gap-1.5">
+                    <Lock size={13} className="text-slate-400" /> Password
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="input focus:ring-2 focus:ring-primary-500/20"
+                  />
+                </div>
+
+                {/* Main Login Button */}
+                <button
+                  type="submit"
+                  disabled={isLoggingIn}
+                  className="btn-primary w-full py-3 text-sm font-bold shadow-md shadow-indigo-500/20 mt-2"
+                >
+                  {isLoggingIn ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Authenticating...
+                    </>
+                  ) : (
+                    <>
+                      Sign In to Dashboard <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* Divider */}
+              <div className="relative my-6 text-center">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+                <span className="relative px-3 bg-white text-2xs uppercase tracking-wider text-slate-400 font-bold">
+                  Or Auto-fill Quick Role Preset
+                </span>
+              </div>
+
+              {/* 5 Role Preset Buttons */}
+              <div className="space-y-2">
+                {ROLE_PRESETS.map(preset => {
+                  const isSelected = selectedRole === preset.role && email === preset.email
+                  return (
+                    <button
+                      key={preset.role}
+                      type="button"
+                      onClick={() => handleRoleSelect(preset)}
+                      className={`w-full p-2.5 rounded-xl border text-left transition-all duration-200 flex items-center justify-between group ${
+                        isSelected
+                          ? 'bg-primary-50/90 border-primary-500 ring-2 ring-primary-500/20'
+                          : 'bg-slate-50/70 border-slate-200/90 hover:bg-slate-100 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${preset.color} flex items-center justify-center text-white text-xs font-bold shadow-sm flex-shrink-0`}>
+                          {preset.label.charAt(0)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-bold text-slate-800 group-hover:text-primary-700 transition-colors">
+                              {preset.label}
+                            </p>
+                            {isSelected && <span className="text-2xs bg-primary-600 text-white font-bold px-2 py-0.5 rounded-full">Selected</span>}
+                          </div>
+                          <p className="text-2xs text-slate-500 truncate">{preset.email}</p>
+                        </div>
+                      </div>
+
+                      <span className="text-xs text-primary-600 font-bold opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">
+                        Fill →
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     )
@@ -213,6 +324,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentUser,
       role,
       setRole,
+      permissionsConfig,
+      updateRolePermission,
+      setBulkRolePermissions,
+      resetPermissionsToDefault,
       hasPermission,
       logout,
       viewProfileUser,

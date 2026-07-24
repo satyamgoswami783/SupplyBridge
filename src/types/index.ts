@@ -2,6 +2,9 @@
 export type Status = 'active' | 'inactive' | 'pending' | 'failed' | 'success' | 'warning' | 'processing' | 'queued' | 'cancelled'
 export type ConnectionType = 'api' | 'ftp' | 'sftp' | 'csv' | 'excel' | 'xml'
 export type SyncType = 'inventory' | 'pricing' | 'image' | 'website' | 'full'
+export type ProductStatus = 'published' | 'unpublished' | 'draft' | 'validation_required' | 'failed'
+export type ValidationStatus = 'passed' | 'failed' | 'pending' | 'review'
+export type SupplierStatus = 'connected' | 'disconnected' | 'error' | 'syncing'
 
 // ─── Auth / RBAC ─────────────────────────────────────────
 export type UserRole = 'super_admin' | 'admin' | 'catalog_manager' | 'integration_manager' | 'operations_staff'
@@ -46,15 +49,15 @@ export interface Supplier {
   website?: string
   country: string
   connectionType: ConnectionType
-  status: 'connected' | 'disconnected' | 'error' | 'syncing'
+  status: SupplierStatus
   productCount: number
   lastSync?: string
   nextSync?: string
   errorCount: number
   createdAt: string
   credentials?: SupplierCredentials
-  importHistory: ImportRecord[]
-  tags: string[]
+  importHistory?: ImportRecord[]
+  tags?: string[]
 }
 
 export interface SupplierCredentials {
@@ -95,8 +98,8 @@ export interface Product {
   supplierId: string
   supplierName: string
   supplierSku: string
-  status: 'published' | 'unpublished' | 'draft' | 'validation_required' | 'failed'
-  validationStatus: 'passed' | 'failed' | 'pending' | 'review'
+  status: ProductStatus
+  validationStatus: ValidationStatus
   images: ProductImage[]
   variants: ProductVariant[]
   attributes: ProductAttribute[]
@@ -117,6 +120,7 @@ export interface ProductImage {
   isPrimary: boolean
   syncStatus: 'synced' | 'pending' | 'failed' | 'broken'
   sourceUrl?: string
+  position?: number
 }
 
 export interface ProductVariant {
@@ -142,6 +146,8 @@ export interface ProductPricing {
   supplierPrice: number
   costPrice: number
   retailPrice: number
+  wholesalePrice?: number
+  mapPrice?: number
   compareAtPrice?: number
   margin: number
   currency: string
@@ -154,6 +160,7 @@ export interface ProductInventory {
   warehouseStock: number
   reservedStock: number
   availableStock: number
+  totalStock?: number
   lowStockThreshold: number
   status: 'in_stock' | 'low_stock' | 'out_of_stock'
   lastSynced: string
@@ -169,6 +176,7 @@ export interface Category {
   productCount: number
   status: 'active' | 'inactive'
   createdAt: string
+  updatedAt?: string
 }
 
 // ─── Brands ──────────────────────────────────────────────
@@ -181,6 +189,7 @@ export interface Brand {
   productCount: number
   status: 'active' | 'inactive'
   createdAt: string
+  updatedAt?: string
 }
 
 // ─── Variants ────────────────────────────────────────────
@@ -189,7 +198,7 @@ export interface VariantType {
   name: string
   values: string[]
   productCount: number
-  createdAt: string
+  createdAt?: string
 }
 
 // ─── Sync Jobs ────────────────────────────────────────────
@@ -253,6 +262,8 @@ export interface ImportQueueItem {
   completedAt?: string
   errorMessage?: string
 }
+
+export type ImportJob = ImportQueueItem
 
 // ─── Stores ───────────────────────────────────────────────
 export interface Store {
