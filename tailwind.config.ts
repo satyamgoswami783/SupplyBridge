@@ -63,12 +63,12 @@ const config: Config = {
           text:       '#94a3b8',
           textActive: '#ffffff',
         },
-        // Modern SaaS Surfaces
+        // Modern SaaS Surfaces - Rich contrast
         surface: {
-          bg:      '#f6f8fd',
+          bg:      '#f4f6fc',
           card:    '#ffffff',
           border:  '#e2e8f0',
-          hover:   '#f1f5f9',
+          hover:   '#eef2ff',
         },
         dark: {
           bg:     '#090d16',
@@ -85,9 +85,9 @@ const config: Config = {
         '2xs': ['0.625rem', { lineHeight: '0.875rem' }],
       },
       boxShadow: {
-        'card':       '0 2px 10px 0 rgba(15, 23, 42, 0.04), 0 1px 3px 0 rgba(15, 23, 42, 0.02)',
-        'card-md':    '0 8px 24px -4px rgba(79, 70, 229, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04)',
-        'card-lg':    '0 20px 35px -8px rgba(79, 70, 229, 0.14), 0 8px 16px -4px rgba(15, 23, 42, 0.06)',
+        'card':       '0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03)',
+        'card-md':    '0 12px 28px -4px rgba(79, 70, 229, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06)',
+        'card-lg':    '0 24px 48px -12px rgba(79, 70, 229, 0.18), 0 8px 24px -4px rgba(15, 23, 42, 0.08)',
         'glow-primary': '0 0 25px rgba(99, 102, 241, 0.35)',
         'glow-cyan':    '0 0 25px rgba(6, 182, 212, 0.35)',
         'glow-emerald': '0 0 25px rgba(16, 185, 129, 0.35)',
@@ -100,6 +100,7 @@ const config: Config = {
         'gradient-emerald': 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
         'gradient-amber':   'linear-gradient(135deg, #f59e0b 0%, #f43f5e 100%)',
         'gradient-sidebar': 'linear-gradient(180deg, #0e1424 0%, #070a12 100%)',
+        'gradient-mesh':    'radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.04) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.04) 0px, transparent 50%)',
       },
       borderRadius: {
         '2xl': '1rem',

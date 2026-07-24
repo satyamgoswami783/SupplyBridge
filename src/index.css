@@ -17,11 +17,11 @@
   }
 
   body {
-    @apply bg-surface-bg text-slate-900 selection:bg-primary-500 selection:text-white transition-colors duration-200;
+    @apply bg-surface-bg text-slate-900 bg-gradient-mesh selection:bg-primary-500 selection:text-white transition-colors duration-200;
   }
 
   body.dark {
-    @apply bg-dark-bg text-slate-100;
+    @apply bg-dark-bg text-slate-100 bg-none;
   }
 
   ::-webkit-scrollbar {
@@ -41,16 +41,16 @@
 @layer components {
   /* ─── Cards ─────────────────────────────────────────── */
   .card {
-    @apply bg-surface-card rounded-2xl shadow-card border border-surface-border
-           transition-all duration-300 hover:border-slate-300/80;
+    @apply bg-surface-card rounded-2xl shadow-card border border-slate-200/90
+           transition-all duration-300 hover:border-slate-300 hover:shadow-card-md;
   }
 
   .card-interactive {
-    @apply card hover:-translate-y-1 hover:shadow-card-md hover:border-primary-400/40 cursor-pointer;
+    @apply card hover:-translate-y-1 hover:shadow-card-md hover:border-primary-400/50 cursor-pointer;
   }
 
   .card-glass {
-    @apply bg-white/80 backdrop-blur-md rounded-2xl shadow-card border border-white/80;
+    @apply bg-white/90 backdrop-blur-md rounded-2xl shadow-card border border-slate-200/80;
   }
 
   /* ─── Buttons ────────────────────────────────────────── */
@@ -62,26 +62,26 @@
 
   .btn-primary {
     @apply btn bg-gradient-primary text-white hover:opacity-95 focus:ring-primary-500
-           shadow-sm hover:shadow-glow-primary hover:-translate-y-0.5;
+           shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5;
   }
 
   .btn-secondary {
-    @apply btn bg-white text-slate-700 border border-slate-200/90 hover:bg-slate-50 hover:border-slate-300
-           focus:ring-primary-500 shadow-sm hover:shadow-sm hover:text-slate-900;
+    @apply btn bg-white text-slate-800 border border-slate-200/90 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900
+           focus:ring-primary-500 shadow-sm hover:shadow-md;
   }
 
   .btn-ghost {
-    @apply btn bg-transparent text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 focus:ring-primary-500;
+    @apply btn bg-transparent text-slate-700 hover:bg-slate-200/60 hover:text-slate-900 focus:ring-primary-500;
   }
 
   .btn-danger {
     @apply btn bg-gradient-to-r from-rose-600 to-rose-700 text-white hover:opacity-95 focus:ring-rose-500
-           shadow-sm hover:shadow-glow-rose hover:-translate-y-0.5;
+           shadow-md shadow-rose-500/20 hover:shadow-lg hover:shadow-rose-500/30 hover:-translate-y-0.5;
   }
 
   .btn-success {
     @apply btn bg-gradient-emerald text-white hover:opacity-95 focus:ring-emerald-500
-           shadow-sm hover:shadow-glow-emerald hover:-translate-y-0.5;
+           shadow-md shadow-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5;
   }
 
   .btn-sm {
@@ -94,7 +94,7 @@
 
   .btn-icon {
     @apply inline-flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200
-           hover:bg-slate-100 text-slate-500 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500/30;
+           hover:bg-slate-200/70 text-slate-600 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/30;
   }
 
   /* ─── Badges ─────────────────────────────────────────── */
@@ -102,13 +102,13 @@
     @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold tracking-tight shadow-sm;
   }
 
-  .badge-primary   { @apply badge bg-primary-50 text-primary-700 border border-primary-200/80; }
-  .badge-success   { @apply badge bg-emerald-50 text-emerald-700 border border-emerald-200/80; }
-  .badge-warning   { @apply badge bg-amber-50 text-amber-700 border border-amber-200/80; }
-  .badge-danger    { @apply badge bg-rose-50 text-rose-700 border border-rose-200/80; }
-  .badge-info      { @apply badge bg-cyan-50 text-cyan-700 border border-cyan-200/80; }
-  .badge-neutral   { @apply badge bg-slate-100 text-slate-600 border border-slate-200/80; }
-  .badge-purple    { @apply badge bg-violet-50 text-violet-700 border border-violet-200/80; }
+  .badge-primary   { @apply badge bg-primary-100/80 text-primary-800 border border-primary-200; }
+  .badge-success   { @apply badge bg-emerald-100/80 text-emerald-800 border border-emerald-200; }
+  .badge-warning   { @apply badge bg-amber-100/80 text-amber-900 border border-amber-200; }
+  .badge-danger    { @apply badge bg-rose-100/80 text-rose-800 border border-rose-200; }
+  .badge-info      { @apply badge bg-cyan-100/80 text-cyan-800 border border-cyan-200; }
+  .badge-neutral   { @apply badge bg-slate-200/70 text-slate-800 border border-slate-300/80; }
+  .badge-purple    { @apply badge bg-violet-100/80 text-violet-800 border border-violet-200; }
 
   /* ─── Inputs ─────────────────────────────────────────── */
   .input {
@@ -136,19 +136,19 @@
   }
 
   .table thead {
-    @apply bg-slate-50/80 border-b border-slate-200/80 backdrop-blur-sm;
+    @apply bg-slate-100/90 border-b-2 border-slate-200 backdrop-blur-sm;
   }
 
   .table thead th {
-    @apply px-4 py-3.5 font-bold text-slate-500 text-2xs uppercase tracking-wider whitespace-nowrap;
+    @apply px-4 py-3.5 font-bold text-slate-600 text-2xs uppercase tracking-wider whitespace-nowrap;
   }
 
   .table tbody tr {
-    @apply border-b border-slate-100/80 hover:bg-indigo-50/30 transition-colors duration-150;
+    @apply border-b border-slate-200/60 hover:bg-primary-50/40 transition-colors duration-150;
   }
 
   .table tbody td {
-    @apply px-4 py-3.5 text-slate-700 font-medium;
+    @apply px-4 py-3.5 text-slate-800 font-semibold;
   }
 
   /* ─── Status Dots ────────────────────────────────────── */
@@ -186,12 +186,12 @@
   }
 
   .page-subtitle {
-    @apply text-xs font-medium text-slate-500 mt-0.5;
+    @apply text-xs font-semibold text-slate-500 mt-0.5;
   }
 
   /* ─── KPI Cards ──────────────────────────────────────── */
   .kpi-card {
-    @apply card p-5 flex flex-col gap-3 hover:shadow-card-md hover:-translate-y-0.5 transition-all duration-300 cursor-default;
+    @apply card p-5 flex flex-col gap-3 hover:shadow-card-md hover:-translate-y-0.5 transition-all duration-300 cursor-default border-t-2 border-t-primary-500/20;
   }
 
   .kpi-value {
@@ -199,7 +199,7 @@
   }
 
   .kpi-label {
-    @apply text-2xs font-bold text-slate-400 uppercase tracking-wider;
+    @apply text-2xs font-bold text-slate-500 uppercase tracking-wider;
   }
 
   /* ─── Modal overlay ──────────────────────────────────── */
@@ -208,11 +208,11 @@
   }
 
   .modal-panel {
-    @apply bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-slate-200/80;
+    @apply bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-slate-200;
   }
 
   .modal-header {
-    @apply px-6 py-4 border-b border-slate-100 flex items-center justify-between;
+    @apply px-6 py-4 border-b border-slate-200/80 flex items-center justify-between;
   }
 
   .modal-body {
@@ -220,12 +220,12 @@
   }
 
   .modal-footer {
-    @apply px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-3;
+    @apply px-6 py-4 border-t border-slate-200/80 flex items-center justify-end gap-3;
   }
 
   /* ─── Tabs ───────────────────────────────────────────── */
   .tab-bar {
-    @apply flex gap-1 p-1 bg-slate-200/60 rounded-2xl border border-slate-200/50;
+    @apply flex gap-1 p-1 bg-slate-200/80 rounded-2xl border border-slate-300/60;
   }
 
   .tab-item {
@@ -234,12 +234,35 @@
   }
 
   .tab-item-active {
-    @apply bg-white text-primary-700 shadow-sm font-black;
+    @apply bg-white text-primary-700 shadow-md font-black;
   }
 
   /* ─── Code / Mono ────────────────────────────────────── */
   .mono {
-    @apply font-mono text-2xs bg-slate-100 border border-slate-200/80 px-2 py-0.5 rounded-md text-slate-800 font-semibold;
+    @apply font-mono text-2xs bg-slate-100 border border-slate-200/90 px-2 py-0.5 rounded-md text-slate-800 font-bold;
+  }
+
+  /* ─── Light Mode Stat Box Enhancements ──────────────── */
+  .bg-emerald-50 {
+    @apply bg-emerald-50/90 text-emerald-900 border border-emerald-200/80 shadow-sm;
+  }
+  .bg-cyan-50 {
+    @apply bg-cyan-50/90 text-cyan-900 border border-cyan-200/80 shadow-sm;
+  }
+  .bg-amber-50 {
+    @apply bg-amber-50/90 text-amber-900 border border-amber-200/80 shadow-sm;
+  }
+  .bg-rose-50 {
+    @apply bg-rose-50/90 text-rose-900 border border-rose-200/80 shadow-sm;
+  }
+  .bg-violet-50 {
+    @apply bg-violet-50/90 text-violet-900 border border-violet-200/80 shadow-sm;
+  }
+  .bg-primary-50 {
+    @apply bg-primary-50/90 text-primary-900 border border-primary-200/80 shadow-sm;
+  }
+  .bg-slate-50 {
+    @apply bg-slate-100/70 border border-slate-200/80;
   }
 
   /* ─── Global Dark Mode Overrides ────────────────────────────────────── */
