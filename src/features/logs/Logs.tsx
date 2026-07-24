@@ -112,7 +112,7 @@ export const Logs: React.FC = () => {
         title="Activity & Logs"
         subtitle="Real-time audit trails, integration events, synchronization actions, and system error logs"
         actions={
-          <button onClick={handleRefresh} className="btn-secondary btn-sm flex items-center gap-1.5">
+          <button onClick={handleRefresh} className="btn-secondary btn-sm flex items-center gap-1.5 hover:bg-primary-600 hover:text-white hover:border-primary-600 transition-all duration-200 shadow-sm">
             <RefreshCw size={14} className={refreshKey > 0 ? "animate-spin" : ""} />
             Refresh Logs
           </button>
@@ -122,22 +122,31 @@ export const Logs: React.FC = () => {
       {/* KPI Cards for System Issues */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Total Logged Events', value: mockLogs.length, sub: 'Last 24 hours', icon: <FileText size={16} className="text-primary-600" />, bg: 'bg-primary-50' },
-          { label: 'Errors Logged', value: mockLogs.filter(l => l.level === 'error').length, sub: 'Requires attention', icon: <ShieldAlert size={16} className="text-rose-600" />, bg: 'bg-rose-50' },
-          { label: 'Warnings', value: mockLogs.filter(l => l.level === 'warning').length, sub: 'System warnings', icon: <AlertTriangle size={16} className="text-amber-600" />, bg: 'bg-amber-50' },
-          { label: 'Sync & Import Success', value: '98.4%', sub: 'Avg success rate', icon: <CheckCircle2 size={16} className="text-emerald-600" />, bg: 'bg-emerald-50' },
-        ].map((card, idx) => (
-          <div key={idx} className="card p-5 flex items-start justify-between">
-            <div>
-              <p className="text-2xl font-bold text-slate-900">{card.value}</p>
-              <p className="text-xs font-semibold text-slate-800 mt-1">{card.label}</p>
-              <p className="text-xxs text-slate-400 mt-0.5">{card.sub}</p>
+          { id: 'all', label: 'Total Logged Events', value: mockLogs.length, sub: 'Last 24 hours', icon: <FileText size={16} className="text-primary-600" />, bg: 'bg-primary-50', activeClass: 'border-primary-500 ring-2 ring-primary-500/10 bg-primary-25/50', activeNumberClass: 'text-primary-600' },
+          { id: 'error', label: 'Errors Logged', value: mockLogs.filter(l => l.level === 'error').length, sub: 'Requires attention', icon: <ShieldAlert size={16} className="text-rose-600" />, bg: 'bg-rose-50', activeClass: 'border-rose-500 ring-2 ring-rose-500/10 bg-rose-25/50', activeNumberClass: 'text-rose-600' },
+          { id: 'warning', label: 'Warnings', value: mockLogs.filter(l => l.level === 'warning').length, sub: 'System warnings', icon: <AlertTriangle size={16} className="text-amber-600" />, bg: 'bg-amber-50', activeClass: 'border-amber-500 ring-2 ring-amber-500/10 bg-amber-25/50', activeNumberClass: 'text-amber-600' },
+          { id: 'info', label: 'Sync & Import Success', value: '98.4%', sub: 'Avg success rate', icon: <CheckCircle2 size={16} className="text-emerald-600" />, bg: 'bg-emerald-50', activeClass: 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-25/50', activeNumberClass: 'text-emerald-600' },
+        ].map((card) => {
+          const isSelected = activeTab === card.id;
+          return (
+            <div
+              key={card.label}
+              onClick={() => setActiveTab(card.id)}
+              className={`card p-5 flex items-start justify-between transition-all duration-200 cursor-pointer hover:shadow-card-md hover:border-slate-300 ${
+                isSelected ? card.activeClass : 'border-surface-border'
+              }`}
+            >
+              <div>
+                <p className={`text-2xl font-bold transition-colors duration-200 ${isSelected ? card.activeNumberClass : 'text-slate-900'}`}>{card.value}</p>
+                <p className="text-xs font-semibold text-slate-800 mt-1">{card.label}</p>
+                <p className="text-xxs text-slate-400 mt-0.5">{card.sub}</p>
+              </div>
+              <div className={`w-9 h-9 rounded-xl ${card.bg} flex items-center justify-center flex-shrink-0`}>
+                {card.icon}
+              </div>
             </div>
-            <div className={`w-9 h-9 rounded-xl ${card.bg} flex items-center justify-center`}>
-              {card.icon}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Quick Filter Tabs */}
@@ -236,7 +245,7 @@ export const Logs: React.FC = () => {
                     <td className="py-3.5 px-4 text-center">
                       <button
                         onClick={() => setSelectedLog(log)}
-                        className="btn-icon mx-auto text-slate-400 hover:text-primary-600"
+                        className="btn-icon mx-auto text-slate-400 hover:bg-primary-600 hover:text-white transition-all duration-200"
                         title="View Details"
                       >
                         <Eye size={14} />

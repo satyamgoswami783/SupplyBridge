@@ -18,6 +18,7 @@ import { WebsiteSync } from '../features/sync/WebsiteSync'
 import { SyncJobs } from '../features/sync/SyncJobs'
 import { ImportQueue } from '../features/import/ImportQueue'
 import { Logs } from '../features/logs/Logs'
+import { Notifications } from '../features/notifications/Notifications'
 import { Monitoring } from '../features/monitoring/Monitoring'
 import { Reports } from '../features/reports/Reports'
 import { Users } from '../features/users/Users'
@@ -57,6 +58,7 @@ export const AppRouter: React.FC = () => (
         <Route path="stores" element={<StoreManagement />} />
         <Route path="import-queue" element={<ImportQueue />} />
         <Route path="logs" element={<Logs />} />
+        <Route path="notifications" element={<Notifications />} />
         <Route path="monitoring" element={<Monitoring />} />
         <Route path="reports" element={<Reports />} />
         <Route path="users" element={<Users />} />
