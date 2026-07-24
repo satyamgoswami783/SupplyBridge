@@ -1,12 +1,10 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Truck, Package, AlertTriangle, CheckCircle2, RefreshCw,
   DollarSign, Image, Briefcase, XCircle, PlayCircle,
   Globe, Wifi, Server, Database, Clock, TrendingUp,
-  ArrowUpRight, ArrowDownRight, Activity, Zap, RotateCcw,
-  ShieldCheck, UserCheck
+  Activity, Zap, RotateCcw
 } from 'lucide-react'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis,
@@ -56,13 +54,12 @@ const stagger = {
 const m = mockDashboardMetrics
 
 export const Dashboard: React.FC = () => {
-  const navigate = useNavigate()
   const { role, currentUser } = useAuth()
-  const roleInfo = ROLE_DESCRIPTIONS[role] || ROLE_DESCRIPTIONS.super_admin
+  const roleInfo = ROLE_DESCRIPTIONS[role] || ROLE_DESCRIPTIONS.integration_manager
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [lastUpdated, setLastUpdated] = useState('Updated just now')
 
-  // Quick Action Modal states
+  // Action Modal states
   const [manualSyncOpen, setManualSyncOpen] = useState(false)
   const [retryModalOpen, setRetryModalOpen] = useState(false)
   const [selectedSupplier, setSelectedSupplier] = useState('TechParts International')
@@ -96,7 +93,7 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="relative space-y-6">
-      {/* Header Banner */}
+      {/* Static Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-card">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
@@ -107,7 +104,7 @@ export const Dashboard: React.FC = () => {
           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">{roleInfo.subtitle}</p>
         </div>
 
-        {/* Header Quick Action Controls */}
+        {/* Header Action Controls */}
         <div className="flex items-center gap-2 flex-wrap self-start sm:self-center">
           <HealthIndicator status="operational" label="All Systems" />
 
@@ -155,7 +152,7 @@ export const Dashboard: React.FC = () => {
         </motion.div>
       )}
 
-      {/* Top KPI Grid */}
+      {/* Static Top KPI Grid */}
       <motion.div
         className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4"
         variants={stagger.parent}
@@ -163,36 +160,35 @@ export const Dashboard: React.FC = () => {
         animate="animate"
       >
         {[
-          { label: 'Connected Suppliers', value: m.connectedSuppliers, icon: <Truck size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+2 this week', changeType: 'positive' as const, path: '/suppliers' },
-          { label: 'Disconnected',        value: m.disconnectedSuppliers, icon: <Wifi size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '-1 resolved', changeType: 'positive' as const, path: '/suppliers' },
-          { label: 'Total Products',      value: formatNumber(m.totalProducts), icon: <Package size={18} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const, path: '/mapping/products' },
-          { label: 'Pending Validation',  value: m.pendingProducts, icon: <AlertTriangle size={18} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const, path: '/validation' },
-          { label: 'Published Products',  value: formatNumber(m.publishedProducts), icon: <CheckCircle2 size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+982 today', changeType: 'positive' as const, path: '/sync/website' },
-          { label: 'Failed Products',     value: m.failedProducts, icon: <XCircle size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '+12 today', changeType: 'negative' as const, path: '/import-queue' },
+          { label: 'Connected Suppliers', value: m.connectedSuppliers, icon: <Truck size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+2 this week', changeType: 'positive' as const },
+          { label: 'Disconnected',        value: m.disconnectedSuppliers, icon: <Wifi size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '-1 resolved', changeType: 'positive' as const },
+          { label: 'Total Products',      value: formatNumber(m.totalProducts), icon: <Package size={18} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const },
+          { label: 'Pending Validation',  value: m.pendingProducts, icon: <AlertTriangle size={18} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const },
+          { label: 'Published Products',  value: formatNumber(m.publishedProducts), icon: <CheckCircle2 size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+982 today', changeType: 'positive' as const },
+          { label: 'Failed Products',     value: m.failedProducts, icon: <XCircle size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '+12 today', changeType: 'negative' as const },
         ].map((item, i) => (
           <motion.div key={i} variants={stagger.child} transition={{ duration: 0.3 }}>
-            <StatsCard {...item} onClick={() => navigate(item.path)} />
+            <StatsCard {...item} />
           </motion.div>
         ))}
       </motion.div>
 
-      {/* Sync Status + Jobs Summary + System Health */}
+      {/* Static Sync Status + Jobs Summary + System Health */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Sync Status */}
+        {/* Sync Channels */}
         <div className="card p-5 border border-slate-200 dark:border-slate-800">
           <p className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
             <RefreshCw size={16} className="text-primary-600 dark:text-primary-400" /> Synchronization Channels
           </p>
           <div className="space-y-3.5">
             {[
-              { label: 'Inventory Sync', status: m.inventorySyncStatus, last: '4 min ago', icon: <RefreshCw size={14} />, path: '/sync/inventory' },
-              { label: 'Pricing Sync',   status: m.pricingSyncStatus,   last: '12 min ago', icon: <DollarSign size={14} />, path: '/sync/pricing' },
-              { label: 'Image Sync',     status: m.imageSyncStatus,     last: '2 hr ago', icon: <Image size={14} />, path: '/sync/images' },
+              { label: 'Inventory Sync', status: m.inventorySyncStatus, last: '4 min ago', icon: <RefreshCw size={14} /> },
+              { label: 'Pricing Sync',   status: m.pricingSyncStatus,   last: '12 min ago', icon: <DollarSign size={14} /> },
+              { label: 'Image Sync',     status: m.imageSyncStatus,     last: '2 hr ago', icon: <Image size={14} /> },
             ].map(s => (
               <div
                 key={s.label}
-                onClick={() => navigate(s.path)}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 transition-colors cursor-pointer"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/60"
               >
                 <div className="flex items-center gap-2.5 text-slate-800 dark:text-slate-200 text-xs font-bold">
                   <span className="text-slate-400">{s.icon}</span>
@@ -207,7 +203,7 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Jobs Status Summary */}
+        {/* Job Execution Summary */}
         <div className="card p-5 border border-slate-200 dark:border-slate-800">
           <p className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
             <Briefcase size={16} className="text-primary-600 dark:text-primary-400" /> Job Execution Summary
@@ -221,8 +217,7 @@ export const Dashboard: React.FC = () => {
             ].map(j => (
               <div
                 key={j.label}
-                onClick={() => navigate('/sync/jobs')}
-                className={`${j.bg} rounded-xl p-3 flex flex-col gap-1 cursor-pointer hover:opacity-90 transition-opacity`}
+                className={`${j.bg} rounded-xl p-3 flex flex-col gap-1`}
               >
                 <span>{j.icon}</span>
                 <p className={`text-2xl font-black ${j.color}`}>{j.value.toLocaleString()}</p>
@@ -232,7 +227,7 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* System Health */}
+        {/* System Infrastructure */}
         <div className="card p-5 border border-slate-200 dark:border-slate-800">
           <p className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
             <Server size={16} className="text-primary-600 dark:text-primary-400" /> System Infrastructure
@@ -336,12 +331,7 @@ export const Dashboard: React.FC = () => {
             <p className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Activity size={16} className="text-primary-600 dark:text-primary-400" /> Recent Activity Feed
             </p>
-            <button
-              onClick={() => navigate('/logs')}
-              className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 font-medium hover:underline cursor-pointer flex items-center gap-1"
-            >
-              View all logs →
-            </button>
+            <span className="text-xs text-slate-400 font-medium">Live Audit Log</span>
           </div>
           <div className="space-y-3.5">
             {mockActivities.map(act => {
@@ -353,7 +343,7 @@ export const Dashboard: React.FC = () => {
                 violet:  'bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-400',
               }
               return (
-                <div key={act.id} className="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                <div key={act.id} className="flex items-start gap-3 p-2 rounded-xl">
                   <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${colorMap[act.color]}`}>
                     <span className="text-xs font-bold">●</span>
                   </div>
@@ -370,10 +360,7 @@ export const Dashboard: React.FC = () => {
         {/* Queue + Store Status */}
         <div className="space-y-5">
           {/* Import Queue */}
-          <div
-            onClick={() => navigate('/import-queue')}
-            className="card p-5 border border-slate-200 dark:border-slate-800 cursor-pointer hover:shadow-card-md transition-all"
-          >
+          <div className="card p-5 border border-slate-200 dark:border-slate-800">
             <p className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
               <Database size={16} className="text-primary-600 dark:text-primary-400" /> Active Import Queue Capacity
             </p>
@@ -394,10 +381,7 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Store Status */}
-          <div
-            onClick={() => navigate('/sync/website')}
-            className="card p-5 border border-slate-200 dark:border-slate-800 cursor-pointer hover:shadow-card-md transition-all"
-          >
+          <div className="card p-5 border border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <Globe size={16} className="text-primary-600 dark:text-primary-400" /> Multi-Store Status
