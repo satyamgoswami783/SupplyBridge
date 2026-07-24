@@ -46,6 +46,7 @@ export const AppRouter: React.FC = () => (
           <Route path="products" element={<ProtectedRoute module="mapping" moduleName="Product Mapping"><ProductMapping /></ProtectedRoute>} />
           <Route path="categories" element={<ProtectedRoute module="mapping" moduleName="Category Mapping"><ProductMapping /></ProtectedRoute>} />
           <Route path="variants" element={<ProtectedRoute module="mapping" moduleName="Variant Mapping"><ProductMapping /></ProtectedRoute>} />
+          <Route path="attributes" element={<ProtectedRoute module="mapping" moduleName="Attribute Mapping"><ProductMapping /></ProtectedRoute>} />
           <Route path="suppliers" element={<ProtectedRoute module="mapping" moduleName="Supplier Mapping"><ProductMapping /></ProtectedRoute>} />
         </Route>
         <Route path="validation" element={<ProtectedRoute module="validation" moduleName="Validation Center"><ValidationCenter /></ProtectedRoute>} />
