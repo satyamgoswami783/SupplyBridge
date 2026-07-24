@@ -276,39 +276,41 @@ export const ValidationCenter: React.FC = () => {
               className="card p-5 hover:shadow-card-md transition-all cursor-pointer"
               onClick={() => handleOpenReview(item)}
             >
-              <div className="flex items-start gap-4">
-                <input
-                  type="checkbox"
-                  className="rounded border-slate-300 mt-1 flex-shrink-0"
-                  checked={selectedIds.includes(item.id)}
-                  onChange={() => toggleSelect(item.id)}
-                  onClick={e => e.stopPropagation()}
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold text-slate-800">{item.productName}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        SKU: <code className="mono">{item.supplierSku}</code> · {item.supplierName} · {timeAgo(item.createdAt)}
-                      </p>
-                    </div>
-                    <Badge variant={statusToVariant(item.status)}>{item.status}</Badge>
-                  </div>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {item.errors.map((err, i) => (
-                      <div
-                        key={i}
-                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                          err.severity === 'error' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
-                        }`}
-                      >
-                        {err.severity === 'error' ? <XCircle size={11} /> : <AlertTriangle size={11} />}
-                        {errorTypeLabel[err.type] ?? err.type}
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <div className="flex items-start gap-4 flex-1 min-w-0">
+                  <input
+                    type="checkbox"
+                    className="rounded border-slate-300 mt-1 flex-shrink-0"
+                    checked={selectedIds.includes(item.id)}
+                    onChange={() => toggleSelect(item.id)}
+                    onClick={e => e.stopPropagation()}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-semibold text-slate-800">{item.productName}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          SKU: <code className="mono">{item.supplierSku}</code> · {item.supplierName} · {timeAgo(item.createdAt)}
+                        </p>
                       </div>
-                    ))}
+                      <Badge variant={statusToVariant(item.status)}>{item.status}</Badge>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {item.errors.map((err, i) => (
+                        <div
+                          key={i}
+                          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+                            err.severity === 'error' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
+                          }`}
+                        >
+                          {err.severity === 'error' ? <XCircle size={11} /> : <AlertTriangle size={11} />}
+                          {errorTypeLabel[err.type] ?? err.type}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-2 flex-shrink-0" onClick={e => e.stopPropagation()}>
+                <div className="flex flex-wrap gap-2 flex-shrink-0 justify-end w-full sm:w-auto pt-3 sm:pt-0 border-t border-slate-100 sm:border-t-0" onClick={e => e.stopPropagation()}>
                   {role !== 'operations_staff' && (
                     <>
                       <button
