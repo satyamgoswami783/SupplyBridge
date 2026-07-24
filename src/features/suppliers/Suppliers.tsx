@@ -25,7 +25,6 @@ import {
 import { Badge } from '../../components/ui/Badge'
 import { SectionHeader, FilterBar, EmptyState, ConfirmDialog } from '../../components/ui'
 import { Modal } from '../../components/ui/Modal'
-import { mockSuppliers } from '../../data/mockData'
 import { statusToVariant, connectionTypeLabel, formatDateTime, timeAgo } from '../../utils'
 import type { Supplier, ConnectionType, SupplierStatus } from '../../types'
 import { useAuth } from '../../context/AuthContext'

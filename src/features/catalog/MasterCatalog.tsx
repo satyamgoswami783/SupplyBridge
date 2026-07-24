@@ -27,19 +27,19 @@ import {
 import { Badge } from '../../components/ui/Badge'
 import { SectionHeader, FilterBar, Tabs, ConfirmDialog } from '../../components/ui'
 import { Modal } from '../../components/ui/Modal'
-import { mockProducts } from '../../data/mockData'
 import { statusToVariant, timeAgo } from '../../utils'
 import type { Product, ProductStatus, ValidationStatus } from '../../types'
 
 import { useAuth } from '../../context/AuthContext'
 import { useSuppliers } from '../../context/SupplierContext'
+import { useProducts } from '../../context/ProductContext'
 
 export const MasterCatalog: React.FC = () => {
   const { role } = useAuth()
   const { suppliersList } = useSuppliers()
+  const { productsList, setProductsList } = useProducts()
   const canManageCatalog = role === 'super_admin' || role === 'admin' || role === 'catalog_manager'
   const canDelete = role === 'super_admin' || role === 'admin'
-  const [productsList, setProductsList] = useState<Product[]>(mockProducts)
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
