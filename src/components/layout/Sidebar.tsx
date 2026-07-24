@@ -5,7 +5,8 @@ import {
   LayoutDashboard, Truck, Plug, Database, Package, Tag, Award,
   Layers, ArrowLeftRight, ShieldCheck, RefreshCw, DollarSign,
   Image, Store, Globe, Briefcase, Download, FileText, Activity,
-  BarChart3, Users, UserCog, Lock, Settings, ChevronRight, Zap, X, LogOut, User
+  BarChart3, Users, UserCog, Lock, Settings, ChevronDown,
+  ChevronRight, Zap, X, Menu, User, LogOut
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { cn, getInitials } from '../../utils'
@@ -72,10 +73,11 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
   const [expanded, setExpanded] = useState(true)
   const location = useLocation()
   const { hasPermission } = useAuth()
+  
   const visibleChildren = item.children?.filter(c => !c.module || hasPermission(c.module)) || []
-  const isChildActive = visibleChildren.some(c => c.path && location.pathname.startsWith(c.path))
-
   if (visibleChildren.length === 0) return null
+
+  const isChildActive = visibleChildren.some(c => c.path && location.pathname.startsWith(c.path))
 
   return (
     <div>
@@ -137,7 +139,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
     return true
   })
 
-  const sidebarContent = (
+  return (
     <div className="flex flex-col h-full bg-gradient-sidebar border-r border-slate-800/80">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-slate-800/80 flex items-center justify-between">
@@ -234,38 +236,5 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         </div>
       </div>
     </div>
-  )
-
-  return (
-    <>
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-60 flex-col h-screen sticky top-0 flex-shrink-0 z-30">
-        {sidebarContent}
-      </aside>
-
-      {/* Mobile drawer */}
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              className="fixed inset-0 bg-black/60 z-40 lg:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={onClose}
-            />
-            <motion.aside
-              className="fixed inset-y-0 left-0 w-72 flex flex-col z-50 lg:hidden"
-              initial={{ x: -288 }}
-              animate={{ x: 0 }}
-              exit={{ x: -288 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 280 }}
-            >
-              {sidebarContent}
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-    </>
   )
 }

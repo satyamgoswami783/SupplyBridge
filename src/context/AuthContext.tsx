@@ -15,7 +15,7 @@ interface AuthContextType {
 
 const rolePermissions: Record<UserRole, string[]> = {
   super_admin:         ['*'],
-  admin:               ['dashboard', 'suppliers', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation', 'inventory_sync', 'pricing_sync', 'image_sync', 'website_sync', 'reports'],
+  admin:               ['dashboard', 'suppliers', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation', 'inventory_sync', 'pricing_sync', 'image_sync', 'store_management', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'reports'],
   catalog_manager:     ['dashboard', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation', 'reports'],
   integration_manager: ['dashboard', 'suppliers', 'integrations', 'import_queue', 'sync_jobs', 'inventory_sync', 'pricing_sync', 'image_sync', 'logs', 'monitoring', 'reports'],
   operations_staff:    ['dashboard', 'validation', 'monitoring', 'reports', 'logs', 'sync_jobs'],
@@ -141,158 +141,172 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               </p>
 
               {/* Feature Points */}
-              <div className="space-y-2.5">
+              <div className="space-y-3 pt-2">
                 {[
-                  { icon: <Database size={14} />, text: 'Single Source of Truth Master Catalog' },
-                  { icon: <RefreshCw size={14} />, text: 'Real-time Inventory & Pricing Pipeline' },
-                  { icon: <Globe size={14} />, text: 'Multi-Storefront Validation & Sync' },
-                ].map((f, i) => (
-                  <div key={i} className="flex items-center gap-2.5 text-xs text-white font-bold bg-slate-900/60 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-white/20">
-                    <span className="text-cyan-400">{f.icon}</span>
-                    <span>{f.text}</span>
+                  { icon: <Database size={15} className="text-cyan-400" />, text: 'PIM Master Catalog Normalization' },
+                  { icon: <RefreshCw size={15} className="text-emerald-400" />, text: 'Real-time Stock & Price Sync Engine' },
+                  { icon: <Globe size={15} className="text-indigo-400" />, text: 'Multi-Storefront Shift4Shop Automation' },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2.5 text-xs text-slate-200 font-semibold bg-slate-900/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/10">
+                    {item.icon}
+                    <span>{item.text}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Bottom Status Indicator */}
-            <div className="relative z-20 flex items-center justify-between pt-6 border-t border-white/20 mt-8">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-glow-emerald" />
-                <span className="text-xs font-bold text-white">Live Data Middleware Active</span>
-              </div>
-              <span className="text-2xs text-slate-300 font-semibold">ISO 27001</span>
+            {/* Footer Tagline */}
+            <div className="relative z-20 pt-8 text-2xs text-slate-300 font-medium">
+              Enterprise Integration Engine v2.4 · Multi-Tenant Architecture
             </div>
           </div>
 
-          {/* Right Column: Interactive Login Form & Role Selector */}
-          <div className="lg:col-span-7 p-8 lg:p-10 bg-white flex flex-col justify-center">
-            <div className="max-w-md mx-auto w-full">
+          {/* Right Column: LOGIN FORM & ROLE SELECTOR */}
+          <div className="lg:col-span-7 p-8 lg:p-12 flex flex-col justify-between bg-white">
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 tracking-tight">Account Authentication</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Select a role profile or enter enterprise credentials</p>
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold border border-emerald-200">
+                  <Shield size={13} strokeWidth={2.5} />
+                  <span>2FA Active</span>
+                </div>
+              </div>
+
+              {/* Quick Role Selector Chips */}
               <div className="mb-6">
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Sign In</h2>
-                <p className="text-xs font-medium text-slate-500 mt-1">Enter your credentials or choose a quick demo role to autofill.</p>
+                <label className="text-2xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                  Select Role Persona (Demo Mode)
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {ROLE_PRESETS.map((preset) => {
+                    const isSelected = selectedRole === preset.role
+                    return (
+                      <button
+                        key={preset.role}
+                        type="button"
+                        onClick={() => handleRoleSelect(preset)}
+                        className={`p-2.5 rounded-2xl text-left border transition-all duration-200 flex flex-col justify-between ${
+                          isSelected
+                            ? 'bg-slate-900 text-white border-slate-900 shadow-md ring-2 ring-slate-900/20 scale-[1.02]'
+                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-100'
+                        }`}
+                      >
+                        <div>
+                          <p className={`text-xs font-extrabold ${isSelected ? 'text-white' : 'text-slate-800'}`}>
+                            {preset.label}
+                          </p>
+                          <p className={`text-3xs mt-0.5 font-medium line-clamp-1 ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
+                            {preset.desc}
+                          </p>
+                        </div>
+                        {isSelected && (
+                          <div className="flex justify-end mt-1">
+                            <CheckCircle2 size={12} className="text-cyan-400" />
+                          </div>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
 
               {/* Login Form */}
               <form onSubmit={handleLoginSubmit} className="space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center gap-1.5">
-                    <Mail size={13} className="text-slate-400" /> Email Address
+                  <label className="text-xs font-semibold text-slate-700 block mb-1.5">
+                    User Email Address
                   </label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    placeholder="name@supplybridge.io"
-                    className="input focus:ring-2 focus:ring-primary-500/20"
-                  />
+                  <div className="relative">
+                    <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="input pl-10 h-11 text-sm bg-slate-50 border-slate-200 focus:bg-white"
+                      placeholder="user@supplybridge.io"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center gap-1.5">
-                    <Lock size={13} className="text-slate-400" /> Password
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    placeholder="••••••••••••"
-                    className="input focus:ring-2 focus:ring-primary-500/20"
-                  />
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-semibold text-slate-700">Password</label>
+                    <span className="text-2xs text-primary-600 font-bold hover:underline cursor-pointer">
+                      Forgot Password?
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="input pl-10 h-11 text-sm bg-slate-50 border-slate-200 focus:bg-white"
+                      placeholder="••••••••••••"
+                    />
+                  </div>
                 </div>
 
-                {/* Main Login Button */}
                 <button
                   type="submit"
                   disabled={isLoggingIn}
-                  className="btn-primary w-full py-3 text-sm font-bold shadow-md shadow-indigo-500/20 mt-2"
+                  className="w-full h-11 btn-primary text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary-600/20 hover:shadow-primary-600/30 transition-all rounded-2xl mt-2"
                 >
                   {isLoggingIn ? (
                     <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Authenticating...
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Authenticating Session...</span>
                     </>
                   ) : (
                     <>
-                      Sign In to Dashboard <ArrowRight size={16} />
+                      <span>Sign In to Dashboard</span>
+                      <ArrowRight size={16} />
                     </>
                   )}
                 </button>
               </form>
+            </div>
 
-              {/* Divider */}
-              <div className="relative my-6 text-center">
-                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
-                <span className="relative px-3 bg-white text-2xs uppercase tracking-wider text-slate-400 font-bold">
-                  Or Auto-fill Quick Role Preset
-                </span>
-              </div>
-
-              {/* 5 Role Preset Buttons */}
-              <div className="space-y-2">
-                {ROLE_PRESETS.map(preset => {
-                  const isSelected = selectedRole === preset.role && email === preset.email
-                  return (
-                    <button
-                      key={preset.role}
-                      type="button"
-                      onClick={() => handleRoleSelect(preset)}
-                      className={`w-full p-2.5 rounded-xl border text-left transition-all duration-200 flex items-center justify-between group ${
-                        isSelected
-                          ? 'bg-primary-50/90 border-primary-500 ring-2 ring-primary-500/20'
-                          : 'bg-slate-50/70 border-slate-200/90 hover:bg-slate-100 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${preset.color} flex items-center justify-center text-white text-xs font-bold shadow-sm flex-shrink-0`}>
-                          {preset.label.charAt(0)}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="text-xs font-bold text-slate-800 group-hover:text-primary-700 transition-colors">
-                              {preset.label}
-                            </p>
-                            {isSelected && <span className="text-2xs bg-primary-600 text-white font-bold px-2 py-0.5 rounded-full">Selected</span>}
-                          </div>
-                          <p className="text-2xs text-slate-500 truncate">{preset.email}</p>
-                        </div>
-                      </div>
-
-                      <span className="text-xs text-primary-600 font-bold opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">
-                        Fill →
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
+            {/* Bottom Footer Security Info */}
+            <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between text-2xs text-slate-400 font-medium">
+              <span className="flex items-center gap-1">
+                <Shield size={12} className="text-emerald-500" /> TLS 1.3 Encrypted Session
+              </span>
+              <span>SupplyBridge Enterprise PIM v2.4</span>
             </div>
           </div>
-
         </div>
       </div>
     )
   }
 
   return (
-    <AuthContext.Provider value={{
-      currentUser,
-      role,
-      setRole,
-      hasPermission,
-      logout,
-      viewProfileUser,
-      setViewProfileUser,
-      openCurrentUserProfile
-    }}>
+    <AuthContext.Provider
+      value={{
+        currentUser,
+        role,
+        setRole,
+        hasPermission,
+        logout,
+        viewProfileUser,
+        setViewProfileUser,
+        openCurrentUserProfile,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )
 }
 
-export const useAuth = (): AuthContextType => {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
-  return ctx
+export const useAuth = () => {
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
 }
