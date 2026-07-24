@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { mockLogs } from '../../data/mockData';
-import { LogEntry, LogLevel } from '../../types';
-import { 
-  AlertCircle, 
-  Info, 
-  CheckCircle2, 
-  AlertTriangle, 
-  Search, 
-  RefreshCw, 
-  ChevronRight, 
-  ChevronDown 
+import type { LogEntry, LogLevel } from '../../types';
+import {
+  AlertCircle,
+  Info,
+  CheckCircle2,
+  AlertTriangle,
+  Search,
+  RefreshCw,
+  ChevronRight,
+  ChevronDown
 } from 'lucide-react';
 
 export const Logs: React.FC = () => {
@@ -34,8 +34,8 @@ export const Logs: React.FC = () => {
 
   const filteredLogs = logs.filter(log => {
     const matchesSearch = log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          (log.supplierName && log.supplierName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                          (log.details && log.details.toLowerCase().includes(searchTerm.toLowerCase()));
+      (log.supplierName && log.supplierName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (log.details && log.details.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesLevel = selectedLevel === 'all' || log.level === selectedLevel;
     const matchesType = selectedType === 'all' || log.type === selectedType;
     return matchesSearch && matchesLevel && matchesType;
@@ -52,7 +52,7 @@ export const Logs: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">System Logs</h1>
           <p className="text-slate-500 text-sm mt-1">Monitor background syncs, API calls, and integration events.</p>
         </div>
-        <button 
+        <button
           onClick={() => setLogs(mockLogs)}
           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 active:scale-98 transition duration-200 shadow-sm"
         >
@@ -73,7 +73,7 @@ export const Logs: React.FC = () => {
               className="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition duration-200"
             />
           </div>
-          
+
           <div className="flex flex-wrap gap-2">
             <select
               value={selectedLevel}
@@ -108,8 +108,8 @@ export const Logs: React.FC = () => {
         <div className="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
           {filteredLogs.length > 0 ? (
             filteredLogs.map((log) => (
-              <div 
-                key={log.id} 
+              <div
+                key={log.id}
                 onClick={() => toggleExpand(log.id)}
                 className={`group cursor-pointer hover:bg-slate-50 transition duration-200 ${expandedLog === log.id ? 'bg-slate-50' : ''}`}
               >
@@ -117,7 +117,7 @@ export const Logs: React.FC = () => {
                   <div className="pt-0.5 text-slate-400 group-hover:text-slate-600 transition">
                     {expandedLog === log.id ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1.5">
                       {getLevelBadge(log.level)}
@@ -131,9 +131,9 @@ export const Logs: React.FC = () => {
                         {new Date(log.timestamp).toLocaleString()}
                       </span>
                     </div>
-                    
+
                     <p className="text-sm font-medium text-slate-700 leading-relaxed truncate">{log.message}</p>
-                    
+
                     {expandedLog === log.id && (
                       <div className="mt-4 p-4 rounded-xl bg-slate-900 text-slate-300 font-mono text-xs leading-relaxed overflow-x-auto shadow-inner">
                         <div className="mb-2 text-slate-500 font-bold border-b border-slate-800 pb-1.5 flex justify-between">
