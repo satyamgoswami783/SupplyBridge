@@ -273,16 +273,6 @@ export const Categories: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">URL Slug</label>
-            <input
-              className="input font-mono text-xs"
-              placeholder="auto-generated from name"
-              value={formData.slug}
-              onChange={e => setFormData({ ...formData, slug: e.target.value })}
-            />
-          </div>
-
-          <div>
             <label className="text-xs font-semibold text-slate-600 block mb-1.5">Parent Category</label>
             <select
               className="select"
@@ -332,15 +322,6 @@ export const Categories: React.FC = () => {
               className="input"
               value={formData.name}
               onChange={e => setFormData({ ...formData, name: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">URL Slug</label>
-            <input
-              className="input font-mono text-xs"
-              value={formData.slug}
-              onChange={e => setFormData({ ...formData, slug: e.target.value })}
             />
           </div>
 

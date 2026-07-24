@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Truck, Package, AlertTriangle, CheckCircle2, RefreshCw,
   DollarSign, Image, Briefcase, XCircle, PlayCircle,
   Globe, Wifi, Server, Database, Clock, TrendingUp,
+
   ArrowUpRight, ArrowDownRight, Activity, ShieldCheck, UserCheck, Tag,
   Zap, RotateCcw
 } from 'lucide-react'
@@ -51,19 +52,29 @@ const ROLE_DESCRIPTIONS: Record<UserRole, { title: string; subtitle: string; foc
 
 const stagger = {
   parent: { transition: { staggerChildren: 0.05 } },
-  child:  { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } },
+  child: { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } },
 }
 
 const m = mockDashboardMetrics
 
 export const Dashboard: React.FC = () => {
-  const navigate = useNavigate()
+  const [activeCard, setActiveCard] = useState<string | null>(null)
+
+  const cards = [
+    { id: 'connected', label: 'Connected Suppliers', value: m.connectedSuppliers, icon: <Truck size={13} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+2 this week', changeType: 'positive' as const, activeClass: 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-25/50', activeNumberClass: 'text-emerald-600' },
+    { id: 'disconnected', label: 'Disconnected', value: m.disconnectedSuppliers, icon: <Wifi size={13} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '-1 resolved', changeType: 'positive' as const, activeClass: 'border-rose-500 ring-2 ring-rose-500/10 bg-rose-25/50', activeNumberClass: 'text-rose-600' },
+    { id: 'total-products', label: 'Total Products', value: formatNumber(m.totalProducts), icon: <Package size={13} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const, activeClass: 'border-primary-500 ring-2 ring-primary-500/10 bg-primary-25/50', activeNumberClass: 'text-primary-600' },
+    { id: 'pending-validation', label: 'Pending Validation', value: m.pendingProducts, icon: <AlertTriangle size={13} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const, activeClass: 'border-amber-500 ring-2 ring-amber-500/10 bg-amber-25/50', activeNumberClass: 'text-amber-600' },
+    { id: 'published-products', label: 'Published Products', value: formatNumber(m.publishedProducts), icon: <CheckCircle2 size={13} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+982 today', changeType: 'positive' as const, activeClass: 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-25/50', activeNumberClass: 'text-emerald-600' },
+    { id: 'failed-products', label: 'Failed Products', value: m.failedProducts, icon: <XCircle size={13} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '+12 today', changeType: 'negative' as const, activeClass: 'border-rose-500 ring-2 ring-rose-500/10 bg-rose-25/50', activeNumberClass: 'text-rose-600' },
+  ]
+
   const { role, currentUser } = useAuth()
-  const roleInfo = ROLE_DESCRIPTIONS[role] || ROLE_DESCRIPTIONS.super_admin
+  const roleInfo = ROLE_DESCRIPTIONS[role] || ROLE_DESCRIPTIONS.integration_manager
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [lastUpdated, setLastUpdated] = useState('Updated just now')
 
-  // Quick Action Modal states
+  // Action Modal states
   const [manualSyncOpen, setManualSyncOpen] = useState(false)
   const [retryModalOpen, setRetryModalOpen] = useState(false)
   const [selectedSupplier, setSelectedSupplier] = useState('TechParts International')
@@ -98,28 +109,28 @@ export const Dashboard: React.FC = () => {
   const getKpis = () => {
     if (role === 'catalog_manager') {
       return [
-        { label: 'Total Products',      value: formatNumber(m.totalProducts), icon: <Package size={18} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const },
-        { label: 'Pending Validation',  value: m.pendingProducts, icon: <AlertTriangle size={18} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const },
-        { label: 'Draft Products',      value: formatNumber(Math.round(m.totalProducts * 0.12)), icon: <Clock size={18} className="text-slate-600" />, iconBg: 'bg-slate-50', change: '+32 this week', changeType: 'positive' as const },
+        { label: 'Total Products', value: formatNumber(m.totalProducts), icon: <Package size={18} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const },
+        { label: 'Pending Validation', value: m.pendingProducts, icon: <AlertTriangle size={18} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const },
+        { label: 'Draft Products', value: formatNumber(Math.round(m.totalProducts * 0.12)), icon: <Clock size={18} className="text-slate-600" />, iconBg: 'bg-slate-50', change: '+32 this week', changeType: 'positive' as const },
         { label: 'Products Missing Images', value: 8, icon: <Image size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: 'Require review', changeType: 'negative' as const },
-        { label: 'Missing Categories',  value: 3, icon: <Tag size={18} className="text-violet-600" />, iconBg: 'bg-violet-50', change: 'Require review', changeType: 'negative' as const },
-        { label: 'Duplicate SKU Count',  value: 1, icon: <XCircle size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: 'High priority', changeType: 'negative' as const },
+        { label: 'Missing Categories', value: 3, icon: <Tag size={18} className="text-violet-600" />, iconBg: 'bg-violet-50', change: 'Require review', changeType: 'negative' as const },
+        { label: 'Duplicate SKU Count', value: 1, icon: <XCircle size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: 'High priority', changeType: 'negative' as const },
       ]
     }
     // Default KPIs for other roles
     return [
       { label: 'Connected Suppliers', value: m.connectedSuppliers, icon: <Truck size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+2 this week', changeType: 'positive' as const },
-      { label: 'Disconnected',        value: m.disconnectedSuppliers, icon: <Wifi size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '-1 resolved', changeType: 'positive' as const },
-      { label: 'Total Products',      value: formatNumber(m.totalProducts), icon: <Package size={18} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const },
-      { label: 'Pending Validation',  value: m.pendingProducts, icon: <AlertTriangle size={18} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const },
-      { label: 'Published Products',  value: formatNumber(m.publishedProducts), icon: <CheckCircle2 size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+982 today', changeType: 'positive' as const },
-      { label: 'Failed Products',     value: m.failedProducts, icon: <XCircle size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '+12 today', changeType: 'negative' as const },
+      { label: 'Disconnected', value: m.disconnectedSuppliers, icon: <Wifi size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '-1 resolved', changeType: 'positive' as const },
+      { label: 'Total Products', value: formatNumber(m.totalProducts), icon: <Package size={18} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const },
+      { label: 'Pending Validation', value: m.pendingProducts, icon: <AlertTriangle size={18} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const },
+      { label: 'Published Products', value: formatNumber(m.publishedProducts), icon: <CheckCircle2 size={18} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+982 today', changeType: 'positive' as const },
+      { label: 'Failed Products', value: m.failedProducts, icon: <XCircle size={18} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '+12 today', changeType: 'negative' as const },
     ]
   }
 
   return (
     <div className="relative space-y-6">
-      {/* Header Banner */}
+      {/* Static Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-card">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
@@ -130,7 +141,7 @@ export const Dashboard: React.FC = () => {
           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">{roleInfo.subtitle}</p>
         </div>
 
-        {/* Header Quick Action Controls */}
+        {/* Header Action Controls */}
         <div className="flex items-center gap-2 flex-wrap self-start sm:self-center">
           <HealthIndicator status="operational" label="All Systems" />
 
@@ -178,37 +189,70 @@ export const Dashboard: React.FC = () => {
         </motion.div>
       )}
 
-      {/* Top KPI Grid */}
+      {/* Static Top KPI Grid */}
       <motion.div
         className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4"
         variants={stagger.parent}
         initial="initial"
         animate="animate"
       >
+
         {getKpis().map((item, i) => (
           <motion.div key={i} variants={stagger.child} transition={{ duration: 0.3 }}>
             <StatsCard {...item} />
           </motion.div>
         ))}
+
+        {cards.map((card) => {
+          const isSelected = activeCard === card.id;
+          return (
+            <motion.div
+              key={card.id}
+              variants={stagger.child}
+              transition={{ duration: 0.3 }}
+              onClick={() => setActiveCard(prev => (prev === card.id ? null : card.id))}
+              className={`kpi-card group cursor-pointer transition-all duration-200 ${isSelected ? card.activeClass : 'border-surface-border'
+                }`}
+            >
+              <div className="flex items-start justify-between">
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${card.iconBg}`}>
+                  {card.icon}
+                </div>
+                {card.change && (
+                  <span className={`text-2xs font-semibold px-1.5 py-0.5 rounded-full ${card.changeType === 'positive' ? 'text-emerald-700 bg-emerald-50' : 'text-rose-700 bg-rose-50'
+                    }`}>
+                    {card.change}
+                  </span>
+                )}
+              </div>
+              <div>
+                <p className="kpi-label">{card.label}</p>
+                <p className={`kpi-value mt-0.5 transition-colors duration-200 ${isSelected ? card.activeNumberClass : 'text-slate-900'
+                  }`}>
+                  {typeof card.value === 'number' ? card.value.toLocaleString() : card.value}
+                </p>
+              </div>
+            </motion.div>
+          );
+        })}
       </motion.div>
 
-      {/* Sync Status + Jobs Summary + System Health */}
+      {/* Static Sync Status + Jobs Summary + System Health */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Sync Status */}
+        {/* Sync Channels */}
         <div className="card p-5 border border-slate-200 dark:border-slate-800">
           <p className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
             <RefreshCw size={16} className="text-primary-600 dark:text-primary-400" /> Synchronization Channels
           </p>
           <div className="space-y-3.5">
             {[
-              { label: 'Inventory Sync', status: m.inventorySyncStatus, last: '4 min ago', icon: <RefreshCw size={14} />, path: '/sync/inventory' },
-              { label: 'Pricing Sync',   status: m.pricingSyncStatus,   last: '12 min ago', icon: <DollarSign size={14} />, path: '/sync/pricing' },
-              { label: 'Image Sync',     status: m.imageSyncStatus,     last: '2 hr ago', icon: <Image size={14} />, path: '/sync/images' },
+              { label: 'Inventory Sync', status: m.inventorySyncStatus, last: '4 min ago', icon: <RefreshCw size={14} /> },
+              { label: 'Pricing Sync', status: m.pricingSyncStatus, last: '12 min ago', icon: <DollarSign size={14} /> },
+              { label: 'Image Sync', status: m.imageSyncStatus, last: '2 hr ago', icon: <Image size={14} /> },
             ].map(s => (
               <div
                 key={s.label}
-                onClick={() => navigate(s.path)}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 transition-colors cursor-pointer"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/60"
               >
                 <div className="flex items-center gap-2.5 text-slate-800 dark:text-slate-200 text-xs font-bold">
                   <span className="text-slate-400">{s.icon}</span>
@@ -223,22 +267,21 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Jobs Status Summary */}
+        {/* Job Execution Summary */}
         <div className="card p-5 border border-slate-200 dark:border-slate-800">
           <p className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
             <Briefcase size={16} className="text-primary-600 dark:text-primary-400" /> Job Execution Summary
           </p>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: 'Running',   value: m.runningJobs,   color: 'text-cyan-700 dark:text-cyan-400',    bg: 'bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-100 dark:border-cyan-900/50',    icon: <RefreshCw size={16} className="animate-spin text-cyan-600" /> },
-              { label: 'Queued',    value: m.queuedJobs,    color: 'text-amber-700 dark:text-amber-400',   bg: 'bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900/50',   icon: <Clock size={16} className="text-amber-600" /> },
+              { label: 'Running', value: m.runningJobs, color: 'text-cyan-700 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-100 dark:border-cyan-900/50', icon: <RefreshCw size={16} className="animate-spin text-cyan-600" /> },
+              { label: 'Queued', value: m.queuedJobs, color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900/50', icon: <Clock size={16} className="text-amber-600" /> },
               { label: 'Completed', value: m.completedJobs, color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/50', icon: <CheckCircle2 size={16} className="text-emerald-600" /> },
-              { label: 'Failed',    value: m.failedJobs,    color: 'text-rose-700 dark:text-rose-400',    bg: 'bg-rose-50 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-900/50',    icon: <XCircle size={16} className="text-rose-600" /> },
+              { label: 'Failed', value: m.failedJobs, color: 'text-rose-700 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-900/50', icon: <XCircle size={16} className="text-rose-600" /> },
             ].map(j => (
               <div
                 key={j.label}
-                onClick={() => navigate('/sync/jobs')}
-                className={`${j.bg} rounded-xl p-3 flex flex-col gap-1 cursor-pointer hover:opacity-90 transition-opacity`}
+                className={`${j.bg} rounded-xl p-3 flex flex-col gap-1`}
               >
                 <span>{j.icon}</span>
                 <p className={`text-2xl font-black ${j.color}`}>{j.value.toLocaleString()}</p>
@@ -248,17 +291,17 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* System Health */}
+        {/* System Infrastructure */}
         <div className="card p-5 border border-slate-200 dark:border-slate-800">
           <p className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
             <Server size={16} className="text-primary-600 dark:text-primary-400" /> System Infrastructure
           </p>
           <div className="space-y-3">
             {[
-              { label: 'API Gateway',    status: m.apiStatus,    icon: <Wifi size={14} /> },
-              { label: 'FTP Service',    status: m.ftpStatus,    icon: <Server size={14} /> },
-              { label: 'Import Queue',   status: 'operational',  icon: <Database size={14} /> },
-              { label: 'Stores Online',  status: m.storesSynced === m.totalStores ? 'operational' : 'degraded', icon: <Globe size={14} /> },
+              { label: 'API Gateway', status: m.apiStatus, icon: <Wifi size={14} /> },
+              { label: 'FTP Service', status: m.ftpStatus, icon: <Server size={14} /> },
+              { label: 'Import Queue', status: 'operational', icon: <Database size={14} /> },
+              { label: 'Stores Online', status: m.storesSynced === m.totalStores ? 'operational' : 'degraded', icon: <Globe size={14} /> },
             ].map(s => (
               <div key={s.label} className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
                 <div className="flex items-center gap-2">
@@ -320,8 +363,8 @@ export const Dashboard: React.FC = () => {
               <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }} />
               <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
               <Area type="monotone" dataKey="inventory" name="Inventory Sync" stroke="#4f46e5" strokeWidth={2} fill="url(#colInv)" dot={false} />
-              <Area type="monotone" dataKey="pricing"   name="Pricing Sync"   stroke="#10b981" strokeWidth={2} fill="url(#colPri)" dot={false} />
-              <Area type="monotone" dataKey="image"     name="Image Sync"     stroke="#06b6d4" strokeWidth={2} fill="url(#colImg)" dot={false} />
+              <Area type="monotone" dataKey="pricing" name="Pricing Sync" stroke="#10b981" strokeWidth={2} fill="url(#colPri)" dot={false} />
+              <Area type="monotone" dataKey="image" name="Image Sync" stroke="#06b6d4" strokeWidth={2} fill="url(#colImg)" dot={false} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -352,24 +395,19 @@ export const Dashboard: React.FC = () => {
             <p className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Activity size={16} className="text-primary-600 dark:text-primary-400" /> Recent Activity Feed
             </p>
-            <button
-              onClick={() => navigate('/logs')}
-              className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 font-medium hover:underline cursor-pointer flex items-center gap-1"
-            >
-              View all logs →
-            </button>
+            <Link to="/logs" className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 font-medium">View all logs →</Link>
           </div>
           <div className="space-y-3.5">
             {mockActivities.map(act => {
               const colorMap: Record<string, string> = {
                 emerald: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400',
-                blue:    'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400',
-                rose:    'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400',
-                amber:   'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400',
-                violet:  'bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-400',
+                blue: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400',
+                rose: 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400',
+                amber: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400',
+                violet: 'bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-400',
               }
               return (
-                <div key={act.id} className="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                <div key={act.id} className="flex items-start gap-3 p-2 rounded-xl">
                   <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${colorMap[act.color]}`}>
                     <span className="text-xs font-bold">●</span>
                   </div>
@@ -386,10 +424,7 @@ export const Dashboard: React.FC = () => {
         {/* Queue + Store Status */}
         <div className="space-y-5">
           {/* Import Queue */}
-          <div
-            onClick={() => navigate('/import-queue')}
-            className="card p-5 border border-slate-200 dark:border-slate-800 cursor-pointer hover:shadow-card-md transition-all"
-          >
+          <div className="card p-5 border border-slate-200 dark:border-slate-800">
             <p className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
               <Database size={16} className="text-primary-600 dark:text-primary-400" /> Active Import Queue Capacity
             </p>
@@ -410,10 +445,7 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Store Status */}
-          <div
-            onClick={() => navigate('/sync/website')}
-            className="card p-5 border border-slate-200 dark:border-slate-800 cursor-pointer hover:shadow-card-md transition-all"
-          >
+          <div className="card p-5 border border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <Globe size={16} className="text-primary-600 dark:text-primary-400" /> Multi-Store Status
@@ -423,7 +455,7 @@ export const Dashboard: React.FC = () => {
             <div className="grid grid-cols-4 gap-2">
               {[
                 { label: 'US Store', ok: true }, { label: 'EU Store', ok: true },
-                { label: 'TechHub', ok: true },  { label: 'UK Store', ok: true },
+                { label: 'TechHub', ok: true }, { label: 'UK Store', ok: true },
                 { label: 'CA Store', ok: false }, { label: 'AutoParts', ok: true },
                 { label: 'SportGear', ok: false },
               ].map((s, i) => (
@@ -489,19 +521,18 @@ export const Dashboard: React.FC = () => {
             <div className="grid grid-cols-2 gap-2">
               {[
                 { id: 'Inventory Sync', label: 'Inventory Sync', desc: 'Stock level updates' },
-                { id: 'Pricing Sync',   label: 'Pricing Sync',   desc: 'Cost & MSRP updates' },
-                { id: 'Image Sync',     label: 'Image Sync',     desc: 'Media & gallery sync' },
-                { id: 'Full Sync',      label: 'Full Pipeline',  desc: 'Complete data pull' },
+                { id: 'Pricing Sync', label: 'Pricing Sync', desc: 'Cost & MSRP updates' },
+                { id: 'Image Sync', label: 'Image Sync', desc: 'Media & gallery sync' },
+                { id: 'Full Sync', label: 'Full Pipeline', desc: 'Complete data pull' },
               ].map(st => (
                 <button
                   key={st.id}
                   type="button"
                   onClick={() => setSelectedSyncType(st.id)}
-                  className={`p-3 rounded-xl border text-left transition-all ${
-                    selectedSyncType === st.id
-                      ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-950/40 ring-2 ring-primary-500/20'
-                      : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
-                  }`}
+                  className={`p-3 rounded-xl border text-left transition-all ${selectedSyncType === st.id
+                    ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-950/40 ring-2 ring-primary-500/20'
+                    : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    }`}
                 >
                   <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{st.label}</p>
                   <p className="text-2xs text-slate-500 dark:text-slate-400 mt-0.5">{st.desc}</p>

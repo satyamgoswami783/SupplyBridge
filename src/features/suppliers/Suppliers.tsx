@@ -335,14 +335,14 @@ export const Suppliers: React.FC = () => {
       {/* Summary KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Connected',    value: suppliersList.filter(s => s.status === 'connected').length,    color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Disconnected', value: suppliersList.filter(s => s.status === 'disconnected').length, color: 'text-slate-500',   bg: 'bg-slate-100' },
-          { label: 'Error State',  value: suppliersList.filter(s => s.status === 'error').length,        color: 'text-rose-600',    bg: 'bg-rose-50' },
-          { label: 'Syncing',      value: suppliersList.filter(s => s.status === 'syncing').length,      color: 'text-cyan-600',    bg: 'bg-cyan-50' },
+          { label: 'Connected',    value: suppliersList.filter(s => s.status === 'connected').length,    color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/50' },
+          { label: 'Disconnected', value: suppliersList.filter(s => s.status === 'disconnected').length, color: 'text-amber-600 dark:text-amber-400',   bg: 'bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/50' },
+          { label: 'Error State',  value: suppliersList.filter(s => s.status === 'error').length,        color: 'text-rose-600 dark:text-rose-400',    bg: 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/50' },
+          { label: 'Syncing',      value: suppliersList.filter(s => s.status === 'syncing').length,      color: 'text-cyan-600 dark:text-cyan-400',    bg: 'bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200/80 dark:border-cyan-900/50' },
         ].map(c => (
-          <div key={c.label} className={`${c.bg} rounded-2xl p-4 cursor-pointer transition-transform hover:scale-[1.01]`} onClick={() => setStatusFilter(c.label.toLowerCase().includes('connected') ? 'connected' : c.label.toLowerCase().includes('disconnected') ? 'disconnected' : c.label.toLowerCase().includes('error') ? 'error' : 'syncing')}>
+          <div key={c.label} className={`${c.bg} rounded-2xl p-4 cursor-pointer transition-transform hover:scale-[1.01] shadow-xs`} onClick={() => setStatusFilter(c.label.toLowerCase().includes('connected') ? 'connected' : c.label.toLowerCase().includes('disconnected') ? 'disconnected' : c.label.toLowerCase().includes('error') ? 'error' : 'syncing')}>
             <p className={`text-2xl font-bold ${c.color}`}>{c.value}</p>
-            <p className="text-xs text-slate-500 mt-0.5 font-medium">{c.label}</p>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 font-medium">{c.label}</p>
           </div>
         ))}
       </div>

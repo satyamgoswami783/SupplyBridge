@@ -254,24 +254,6 @@ export const Brands: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">URL Slug</label>
-            <input
-              className="input font-mono text-xs"
-              placeholder="auto-generated"
-              value={formData.slug}
-              onChange={e => setFormData({ ...formData, slug: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Logo URL</label>
-            <input
-              className="input"
-              placeholder="https://cdn.brand.com/logo.png"
-              value={formData.logo}
-              onChange={e => setFormData({ ...formData, logo: e.target.value })}
-            />
-          </div>
-          <div>
             <label className="text-xs font-semibold text-slate-600 block mb-1.5">Description</label>
             <textarea
               className="input"
@@ -305,14 +287,6 @@ export const Brands: React.FC = () => {
               className="input"
               value={formData.name}
               onChange={e => setFormData({ ...formData, name: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-slate-600 block mb-1.5">URL Slug</label>
-            <input
-              className="input font-mono text-xs"
-              value={formData.slug}
-              onChange={e => setFormData({ ...formData, slug: e.target.value })}
             />
           </div>
           <div>
