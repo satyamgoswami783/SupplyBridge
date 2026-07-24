@@ -218,11 +218,11 @@
 
   /* ─── KPI Cards ──────────────────────────────────────── */
   .kpi-card {
-    @apply card p-5 flex flex-col gap-3 hover:shadow-card-md hover:-translate-y-0.5 transition-all duration-300 cursor-default border-t-2 border-t-primary-500/20;
+    @apply card p-2.5 flex flex-col gap-1.5 hover:shadow-card-md hover:-translate-y-0.5 transition-all duration-300 cursor-default border-t-2 border-t-primary-500/20;
   }
 
   .kpi-value {
-    @apply text-3xl font-extrabold text-slate-900 tracking-tight;
+    @apply text-xl font-extrabold text-slate-900 tracking-tight;
   }
 
   .kpi-label {

@@ -7,6 +7,7 @@ import { Modal } from '../../components/ui/Modal'
 import { mockSyncJobs } from '../../data/mockData'
 import { statusToVariant, timeAgo, formatDateTime } from '../../utils'
 import type { SyncJob } from '../../types'
+import { useAuth } from '../../context/AuthContext'
 
 const jobTypeColor: Record<string, string> = {
   inventory: 'bg-primary-50 text-primary-700 border-primary-100',
@@ -17,6 +18,7 @@ const jobTypeColor: Record<string, string> = {
 }
 
 export const SyncJobs: React.FC = () => {
+  const { role } = useAuth()
   const [jobsList, setJobsList] = useState<SyncJob[]>(mockSyncJobs)
   const [tab, setTab] = useState('all')
   const [search, setSearch] = useState('')
@@ -179,9 +181,11 @@ export const SyncJobs: React.FC = () => {
             >
               <RefreshCw size={14} /> Refresh
             </button>
-            <button onClick={handleTriggerSync} className="btn-primary btn-sm flex items-center gap-1.5 cursor-pointer">
-              <PlayCircle size={14} /> Trigger Sync
-            </button>
+            {role !== 'operations_staff' && (
+              <button onClick={handleTriggerSync} className="btn-primary btn-sm flex items-center gap-1.5 cursor-pointer">
+                <PlayCircle size={14} /> Trigger Sync
+              </button>
+            )}
           </>
         }
       />
@@ -269,7 +273,7 @@ export const SyncJobs: React.FC = () => {
                   <td><span className="text-xs text-slate-700 font-medium whitespace-nowrap">{job.triggeredBy}</span></td>
                   <td className="text-right">
                     <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
-                      {job.status === 'running' && (
+                      {role !== 'operations_staff' && job.status === 'running' && (
                         <button
                           onClick={() => handleCancelJob(job.id, job.name)}
                           className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50 flex items-center gap-1 font-semibold cursor-pointer"
@@ -277,13 +281,16 @@ export const SyncJobs: React.FC = () => {
                           <XCircle size={13} /> Cancel
                         </button>
                       )}
-                      {job.canRetry && (
+                      {role !== 'operations_staff' && job.canRetry && (
                         <button
                           onClick={() => handleRetryJob(job.id, job.name)}
                           className="btn-secondary btn-sm flex items-center gap-1 font-semibold cursor-pointer"
                         >
                           <RotateCcw size={13} /> Retry
                         </button>
+                      )}
+                      {role === 'operations_staff' && (
+                        <span className="text-xs text-slate-400 italic pr-1">View Only</span>
                       )}
                     </div>
                   </td>
@@ -305,7 +312,7 @@ export const SyncJobs: React.FC = () => {
           footer={
             <>
               <button onClick={() => setDetailJob(null)} className="btn-secondary">Close</button>
-              {detailJob.canRetry && (
+              {role !== 'operations_staff' && detailJob.canRetry && (
                 <button
                   onClick={() => { handleRetryJob(detailJob.id, detailJob.name); setDetailJob(null); }}
                   className="btn-primary flex items-center gap-1.5 cursor-pointer font-bold"
