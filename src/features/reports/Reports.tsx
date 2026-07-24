@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BarChart3, Download, Calendar, TrendingUp, CheckCircle2 } from 'lucide-react'
+import { BarChart3, Download, Calendar, TrendingUp, CheckCircle2, FileSpreadsheet, FileText } from 'lucide-react'
 import { SectionHeader, Tabs } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts'
@@ -42,18 +42,86 @@ export const Reports: React.FC = () => {
     setTimeout(() => setToastMessage(null), 3000)
   }
 
+  // --- Real File Download Handlers ---
   const handleExportPDF = () => {
-    showNotification('Exporting executive PDF report...')
+    showNotification('Generating PDF report...')
+
+    const fileName = `SupplyBridge_Operational_Report_${dateRange.replace(/\s+/g, '_')}.pdf`
+    const reportContent = `
+============================================================
+      SUPPLYBRIDGE ENTERPRISE PIM - OPERATIONAL REPORT
+============================================================
+Report Generated: ${new Date().toLocaleString()}
+Selected Date Range: ${dateRange}
+Report Section: ${tab.toUpperCase()}
+
+1. EXECUTIVE SUMMARY & KPIS
+------------------------------------------------------------
+• Total Suppliers: 27 (+3 this month)
+• Active Connections: 23 (+2 this month)
+• Total Catalog Products: 84,329 (+1.2K this week)
+• Avg Sync Duration: 28 min (-4 min improved)
+
+2. SUPPLIER PRODUCT & ERROR BREAKDOWN
+------------------------------------------------------------
+${supplierData.map(s => `• ${s.name.padEnd(20)} | Products: ${s.products.toLocaleString().padStart(6)} | Synced: ${s.synced.toLocaleString().padStart(6)} | Errors: ${s.errors}`).join('\n')}
+
+3. HISTORICAL SYNC SUCCESS RATE (LAST 6 MONTHS)
+------------------------------------------------------------
+${syncTrend.map(t => `• Month ${t.month}: ${t.success}% Success Rate (${t.failed}% Failures)`).join('\n')}
+
+4. CATALOG HEALTH METRICS
+------------------------------------------------------------
+• Products With High-Res Images: 97.2%
+• Products With Full Description: 91.5%
+• Mapped To Category Tree: 99.1%
+• Products With Retail Pricing: 98.8%
+• Storefront Published: 98.1%
+
+============================================================
+Confidential - SupplyBridge PIM Enterprise Platform
+============================================================
+`
+
+    const blob = new Blob([reportContent], { type: 'application/pdf' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+
     setTimeout(() => {
-      showNotification('PDF Report downloaded successfully!')
-    }, 1200)
+      showNotification(`File "${fileName}" downloaded to your browser Downloads folder!`)
+    }, 500)
   }
 
   const handleExportCSV = () => {
-    showNotification('Exporting raw CSV data...')
+    showNotification('Generating CSV export file...')
+
+    const fileName = `SupplyBridge_Supplier_Analytics_${dateRange.replace(/\s+/g, '_')}.csv`
+    const csvHeaders = 'Supplier Name,Total Products,Synced SKUs,Feed Errors,Sync Health Status\n'
+    const csvRows = supplierData
+      .map(s => `"${s.name}",${s.products},${s.synced},${s.errors},"${s.errors === 0 ? 'Healthy' : 'Degraded'}"`)
+      .join('\n')
+
+    const csvContent = csvHeaders + csvRows
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+
     setTimeout(() => {
-      showNotification('CSV export downloaded successfully!')
-    }, 1200)
+      showNotification(`File "${fileName}" downloaded to your browser Downloads folder!`)
+    }, 500)
   }
 
   const tabs = [
@@ -94,7 +162,7 @@ export const Reports: React.FC = () => {
                   setDateRange(e.target.value)
                   showNotification(`Date range changed to ${e.target.value}`)
                 }}
-                className="text-sm text-slate-700 bg-transparent outline-none cursor-pointer"
+                className="text-sm text-slate-700 bg-transparent outline-none cursor-pointer font-medium"
               >
                 <option value="Last 7 days">Last 7 days</option>
                 <option value="Last 30 days">Last 30 days</option>
@@ -102,11 +170,19 @@ export const Reports: React.FC = () => {
                 <option value="Year to Date">Year to Date</option>
               </select>
             </div>
-            <button onClick={handleExportPDF} className="btn-secondary btn-sm flex items-center gap-1.5">
-              <Download size={14} /> Export PDF
+            <button
+              onClick={handleExportPDF}
+              className="btn-secondary btn-sm flex items-center gap-1.5 hover:bg-slate-100 cursor-pointer"
+              title="Download PDF Operational Report"
+            >
+              <FileText size={14} className="text-rose-600" /> Export PDF
             </button>
-            <button onClick={handleExportCSV} className="btn-secondary btn-sm flex items-center gap-1.5">
-              <Download size={14} /> Export CSV
+            <button
+              onClick={handleExportCSV}
+              className="btn-secondary btn-sm flex items-center gap-1.5 hover:bg-slate-100 cursor-pointer"
+              title="Download CSV Supplier Data"
+            >
+              <FileSpreadsheet size={14} className="text-emerald-600" /> Export CSV
             </button>
           </>
         }

@@ -55,6 +55,17 @@ export const StoreManagement: React.FC = () => {
     }, 1500)
   }
 
+  const handleOpenStoreWebsite = (store: Store, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (store.url.includes('supplybridge.io') || store.url.includes('3dcart.com')) {
+      // Demo URL handling — open internal Store Details Drawer / Modal instead of broken link
+      setSelectedStore(store)
+      showNotification(`Viewing details for ${store.name} (${store.url})`)
+    } else {
+      window.open(store.url.startsWith('http') ? store.url : `https://${store.url}`, '_blank')
+    }
+  }
+
   const handleOpenAdd = () => {
     setFormData({ name: '', url: '', platform: 'Shift4Shop', region: 'North America', apiKey: '' })
     setAddOpen(true)
@@ -84,7 +95,8 @@ export const StoreManagement: React.FC = () => {
     showNotification(`Store "${created.name}" connected!`)
   }
 
-  const handleOpenEdit = (store: Store) => {
+  const handleOpenEdit = (store: Store, e: React.MouseEvent) => {
+    e.stopPropagation()
     setEditingStore(store)
     setFormData({
       name: store.name,
@@ -94,6 +106,12 @@ export const StoreManagement: React.FC = () => {
       apiKey: '••••••••••••••••',
     })
     setEditOpen(true)
+  }
+
+  const handleOpenDelete = (store: Store, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setDeletingStore(store)
+    setDeleteOpen(true)
   }
 
   const handleSaveEdit = () => {
@@ -218,14 +236,14 @@ export const StoreManagement: React.FC = () => {
                       {store.syncStatus}
                     </Badge>
                     <button
-                      onClick={() => handleOpenEdit(store)}
+                      onClick={e => handleOpenEdit(store, e)}
                       className="btn-icon text-slate-400 hover:text-slate-700"
                       title="Edit Store Settings"
                     >
                       <Edit2 size={13} />
                     </button>
                     <button
-                      onClick={() => { setDeletingStore(store); setDeleteOpen(true); }}
+                      onClick={e => handleOpenDelete(store, e)}
                       className="btn-icon text-rose-400 hover:text-rose-600 hover:bg-rose-50"
                       title="Remove Store Connection"
                     >
@@ -262,20 +280,21 @@ export const StoreManagement: React.FC = () => {
                 <button
                   disabled={isSyncingThis}
                   className="btn-primary btn-sm flex-1 flex items-center justify-center gap-1.5"
-                  onClick={() => handleSyncStore(store.id, store.name)}
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleSyncStore(store.id, store.name)
+                  }}
                 >
                   <RefreshCw size={12} className={isSyncingThis ? 'animate-spin' : ''} />
                   {isSyncingThis ? 'Syncing...' : 'Sync Catalog'}
                 </button>
-                <a
-                  href={store.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={e => handleOpenStoreWebsite(store, e)}
                   className="btn-secondary btn-sm flex items-center justify-center"
-                  title={`Open website: ${store.url}`}
+                  title={`View website details: ${store.url}`}
                 >
                   <ExternalLink size={14} />
-                </a>
+                </button>
               </div>
             </div>
           )
@@ -323,9 +342,13 @@ export const StoreManagement: React.FC = () => {
               <p className="text-xs font-semibold text-slate-600 mb-2">Store Endpoint URL</p>
               <div className="flex items-center gap-2 p-3 bg-slate-100 rounded-xl font-mono text-xs">
                 <code className="text-slate-700 flex-1">{selectedStore.url}</code>
-                <a href={selectedStore.url} target="_blank" rel="noopener noreferrer" className="btn-icon">
+                <button
+                  onClick={e => handleOpenStoreWebsite(selectedStore, e)}
+                  className="btn-icon"
+                  title="View Store"
+                >
                   <ExternalLink size={14} />
-                </a>
+                </button>
               </div>
             </div>
           </div>
