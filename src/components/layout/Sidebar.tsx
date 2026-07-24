@@ -72,7 +72,12 @@ interface SidebarProps {
 const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onClose }) => {
   const [expanded, setExpanded] = useState(true)
   const location = useLocation()
-  const isChildActive = item.children?.some(c => c.path && location.pathname.startsWith(c.path))
+  const { hasPermission } = useAuth()
+  
+  const allowedChildren = item.children?.filter(c => !c.module || hasPermission(c.module)) || []
+  if (allowedChildren.length === 0) return null
+
+  const isChildActive = allowedChildren.some(c => c.path && location.pathname.startsWith(c.path))
 
   return (
     <div>
@@ -101,7 +106,7 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
             className="overflow-hidden"
           >
             <div className="ml-3 pl-3 border-l border-slate-700/60 mt-0.5 mb-0.5 space-y-0.5">
-              {item.children?.map(child => (
+              {allowedChildren.map(child => (
                 <NavLink
                   key={child.id}
                   to={child.path!}
