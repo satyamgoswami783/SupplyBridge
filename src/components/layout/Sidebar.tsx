@@ -202,24 +202,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             )
           })}
 
-          {/* Profile & Logout Section at bottom of menu */}
-          <div className="pt-3 mt-3 border-t border-slate-800/80 space-y-1">
-            <button
-              onClick={() => { onClose(); openCurrentUserProfile(); }}
-              className="sidebar-item w-full text-slate-300 hover:bg-slate-800/80 hover:text-white"
-            >
-              <User size={18} className="opacity-70" />
-              <span>My Profile</span>
-            </button>
-
-            <button
-              onClick={() => { onClose(); logout(); }}
-              className="sidebar-item w-full text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 font-bold"
-            >
-              <LogOut size={18} className="text-rose-400 opacity-90" />
-              <span>Logout</span>
-            </button>
-          </div>
         </nav>
 
         {/* User Profile Footer Card */}
