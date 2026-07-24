@@ -141,101 +141,122 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   })
 
   return (
-    <div className="flex flex-col h-full bg-gradient-sidebar border-r border-slate-800/80">
-      {/* Logo */}
-      <div className="px-5 py-5 border-b border-slate-800/80 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-aurora flex items-center justify-center shadow-glow-primary text-white font-black">
-            <Zap size={18} />
-          </div>
-          <div>
-            <span className="font-extrabold text-white text-sm tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-              SupplyBridge
-            </span>
-            <span className="block text-2xs text-cyan-400 font-semibold tracking-wider uppercase">Enterprise PIM</span>
-          </div>
-        </div>
-        <button onClick={onClose} className="lg:hidden btn-icon text-slate-400 hover:text-white hover:bg-slate-800">
-          <X size={16} />
-        </button>
-      </div>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-slate-950/65 z-30 lg:hidden backdrop-blur-xs"
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-1 scrollbar-hide">
-        {visibleItems.map(item => {
-          if (item.children) {
-            return <NavGroup key={item.id} item={item} onClose={onClose} />
-          }
-          return (
-            <NavLink
-              key={item.id}
-              to={item.path!}
-              end={item.path === '/'}
-              onClick={onClose}
-              className={({ isActive }) =>
-                cn('sidebar-item', isActive && 'sidebar-item-active')
-              }
+      {/* Sidebar Container */}
+      <div
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 w-64 lg:static lg:translate-x-0 flex flex-col h-full bg-gradient-sidebar border-r border-slate-800/80 transition-transform duration-300 ease-in-out flex-shrink-0",
+          open ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Logo */}
+        <div className="px-5 py-5 border-b border-slate-800/80 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-aurora flex items-center justify-center shadow-glow-primary text-white font-black">
+              <Zap size={18} />
+            </div>
+            <div>
+              <span className="font-extrabold text-white text-sm tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                SupplyBridge
+              </span>
+              <span className="block text-2xs text-cyan-400 font-semibold tracking-wider uppercase">Enterprise PIM</span>
+            </div>
+          </div>
+          <button onClick={onClose} className="lg:hidden btn-icon text-slate-400 hover:text-white hover:bg-slate-800">
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-1 scrollbar-hide">
+          {visibleItems.map(item => {
+            if (item.children) {
+              return <NavGroup key={item.id} item={item} onClose={onClose} />
+            }
+            return (
+              <NavLink
+                key={item.id}
+                to={item.path!}
+                end={item.path === '/'}
+                onClick={onClose}
+                className={({ isActive }) =>
+                  cn('sidebar-item', isActive && 'sidebar-item-active')
+                }
+              >
+                <span className="opacity-80">{item.icon}</span>
+                {item.label}
+              </NavLink>
+            )
+          })}
+
+          {/* Profile & Logout Section at bottom of menu */}
+          <div className="pt-3 mt-3 border-t border-slate-800/80 space-y-1">
+            <button
+              onClick={() => { onClose(); openCurrentUserProfile(); }}
+              className="sidebar-item w-full text-slate-300 hover:bg-slate-800/80 hover:text-white"
             >
-              <span className="opacity-80">{item.icon}</span>
-              {item.label}
-            </NavLink>
-          )
-        })}
+              <User size={18} className="opacity-70" />
+              <span>My Profile</span>
+            </button>
 
-        {/* Profile & Logout Section at bottom of menu */}
-        <div className="pt-3 mt-3 border-t border-slate-800/80 space-y-1">
-          <button
-            onClick={() => { onClose(); openCurrentUserProfile(); }}
-            className="sidebar-item w-full text-slate-300 hover:bg-slate-800/80 hover:text-white"
+            <button
+              onClick={() => { onClose(); logout(); }}
+              className="sidebar-item w-full text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 font-bold"
+            >
+              <LogOut size={18} className="text-rose-400 opacity-90" />
+              <span>Logout</span>
+            </button>
+          </div>
+        </nav>
+
+        {/* User Profile Footer Card */}
+        <div className="p-3 border-t border-slate-800/80 bg-slate-950/80 space-y-2 backdrop-blur-md">
+          <div
+            onClick={openCurrentUserProfile}
+            className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-900/80 border border-slate-800/80 hover:border-primary-500/40 hover:bg-slate-850 transition-all duration-200 cursor-pointer group"
+            title="Click to view profile"
           >
-            <User size={18} className="opacity-70" />
-            <span>My Profile</span>
+            <div className="w-8 h-8 rounded-xl bg-gradient-aurora flex items-center justify-center text-xs font-black text-white shadow-glow-primary flex-shrink-0 group-hover:scale-105 transition-transform">
+              {getInitials(currentUser.name)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-white truncate group-hover:text-cyan-300 transition-colors">{currentUser.name}</p>
+              <p className="text-2xs text-slate-400 truncate font-medium capitalize">{currentUser.role.replace('_', ' ')}</p>
+            </div>
+            <User size={14} className="text-slate-400 group-hover:text-white transition-colors" />
+          </div>
+
+          {/* Direct Logout Button in Sidebar Footer */}
+          <button
+            onClick={logout}
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold border border-rose-500/20 transition-all duration-200 shadow-glow-rose"
+          >
+            <LogOut size={14} />
+            Logout
           </button>
 
-          <button
-            onClick={() => { onClose(); logout(); }}
-            className="sidebar-item w-full text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 font-bold"
-          >
-            <LogOut size={18} className="text-rose-400 opacity-90" />
-            <span>Logout</span>
-          </button>
-        </div>
-      </nav>
-
-      {/* User Profile Footer Card */}
-      <div className="p-3 border-t border-slate-800/80 bg-slate-950/80 space-y-2 backdrop-blur-md">
-        <div
-          onClick={openCurrentUserProfile}
-          className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-900/80 border border-slate-800/80 hover:border-primary-500/40 hover:bg-slate-850 transition-all duration-200 cursor-pointer group"
-          title="Click to view profile"
-        >
-          <div className="w-8 h-8 rounded-xl bg-gradient-aurora flex items-center justify-center text-xs font-black text-white shadow-glow-primary flex-shrink-0 group-hover:scale-105 transition-transform">
-            {getInitials(currentUser.name)}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-white truncate group-hover:text-cyan-300 transition-colors">{currentUser.name}</p>
-            <p className="text-2xs text-slate-400 truncate font-medium capitalize">{currentUser.role.replace('_', ' ')}</p>
-          </div>
-          <User size={14} className="text-slate-400 group-hover:text-white transition-colors" />
-        </div>
-
-        {/* Direct Logout Button in Sidebar Footer */}
-        <button
-          onClick={logout}
-          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold border border-rose-500/20 transition-all duration-200 shadow-glow-rose"
-        >
-          <LogOut size={14} />
-          Logout
-        </button>
-
-        <div className="flex items-center justify-between px-2 pt-1">
-          <span className="text-2xs text-slate-500 font-semibold uppercase tracking-wider">System Status</span>
-          <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-slow shadow-glow-emerald" />
-            <span className="text-2xs text-emerald-400 font-bold">Operational</span>
+          <div className="flex items-center justify-between px-2 pt-1">
+            <span className="text-2xs text-slate-500 font-semibold uppercase tracking-wider">System Status</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-slow shadow-glow-emerald" />
+              <span className="text-2xs text-emerald-400 font-bold">Operational</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
