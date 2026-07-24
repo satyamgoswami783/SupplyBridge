@@ -735,6 +735,104 @@ export const ProductMapping: React.FC = () => {
           </div>
         </Modal>
       )}
+
+      {/* --- EDIT VARIANT MAPPING MODAL --- */}
+      {editVariantMapping && (
+        <Modal
+          open
+          onClose={() => setEditVariantMapping(null)}
+          title={`Edit Variant Mapping: ${editVariantMapping.supplierVariantKey}`}
+          subtitle={`Supplier: ${editVariantMapping.supplierName}`}
+          size="md"
+          footer={
+            <>
+              <button onClick={() => setEditVariantMapping(null)} className="btn-secondary">Cancel</button>
+              <button
+                onClick={() => {
+                  setVariantMappings(prev =>
+                    prev.map(v =>
+                      v.id === editVariantMapping.id
+                        ? { ...v, masterVariantDimension: formData.field2, status: 'mapped' }
+                        : v
+                    )
+                  )
+                  setEditVariantMapping(null)
+                  showNotification(`Variant mapping saved for "${editVariantMapping.supplierVariantKey}"`)
+                }}
+                className="btn-primary flex items-center gap-1.5"
+              >
+                <Save size={14} /> Save Variant Mapping
+              </button>
+            </>
+          }
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Supplier Variant Key</label>
+              <input className="input font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" readOnly value={editVariantMapping.supplierVariantKey} />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Target Master Variant Dimension *</label>
+              <input
+                className="input font-semibold"
+                placeholder="e.g. Color, Storage Capacity, Size"
+                value={formData.field2}
+                onChange={e => setFormData({ ...formData, field2: e.target.value })}
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* --- EDIT SUPPLIER MAPPING MODAL --- */}
+      {editSupplierMapping && (
+        <Modal
+          open
+          onClose={() => setEditSupplierMapping(null)}
+          title={`Edit Supplier Feed Link: ${editSupplierMapping.feedId}`}
+          subtitle={`Supplier Source: ${editSupplierMapping.supplierName}`}
+          size="md"
+          footer={
+            <>
+              <button onClick={() => setEditSupplierMapping(null)} className="btn-secondary">Cancel</button>
+              <button
+                onClick={() => {
+                  setSupplierMappings(prev =>
+                    prev.map(s =>
+                      s.id === editSupplierMapping.id
+                        ? { ...s, assignedEntity: formData.field2, status: 'mapped' }
+                        : s
+                    )
+                  )
+                  setEditSupplierMapping(null)
+                  showNotification(`Supplier feed link saved for "${editSupplierMapping.feedId}"`)
+                }}
+                className="btn-primary flex items-center gap-1.5"
+              >
+                <Save size={14} /> Save Feed Link
+              </button>
+            </>
+          }
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Supplier Feed Identifier</label>
+              <input className="input font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" readOnly value={editSupplierMapping.feedId} />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Assigned PIM Supplier Entity *</label>
+              <input
+                className="input font-semibold"
+                placeholder="e.g. TechParts International Inc."
+                value={formData.field2}
+                onChange={e => setFormData({ ...formData, field2: e.target.value })}
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }
