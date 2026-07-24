@@ -15,10 +15,10 @@ interface AuthContextType {
 
 const rolePermissions: Record<UserRole, string[]> = {
   super_admin:         ['*'],
-  admin:               ['dashboard', 'suppliers', 'integrations', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation', 'inventory_sync', 'pricing_sync', 'image_sync', 'store_management', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports', 'users', 'roles', 'permissions', 'settings'],
-  catalog_manager:     ['dashboard', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation'],
-  integration_manager: ['dashboard', 'suppliers', 'integrations', 'mapping', 'inventory_sync', 'pricing_sync', 'image_sync', 'website_sync', 'sync_jobs', 'import_queue', 'logs'],
-  operations_staff:    ['dashboard', 'validation', 'monitoring', 'reports', 'logs'],
+  admin:               ['dashboard', 'suppliers', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation', 'inventory_sync', 'pricing_sync', 'image_sync', 'website_sync', 'reports'],
+  catalog_manager:     ['dashboard', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation', 'reports'],
+  integration_manager: ['dashboard', 'suppliers', 'integrations', 'import_queue', 'sync_jobs', 'inventory_sync', 'pricing_sync', 'image_sync', 'logs', 'monitoring', 'reports'],
+  operations_staff:    ['dashboard', 'validation', 'monitoring', 'reports', 'logs', 'sync_jobs'],
 }
 
 const demoUsers: Record<UserRole, User> = {
