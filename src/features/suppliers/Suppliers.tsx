@@ -262,6 +262,25 @@ export const Suppliers: React.FC = () => {
     currentPage * pageSize
   )
 
+  const handleExportSuppliersCSV = () => {
+    showNotification('Generating Suppliers Directory CSV export...')
+    const csvHeaders = 'Supplier Name,Code,Connection Type,Status,Products Count,Errors,Contact Email,Country,Last Sync\n'
+    const csvRows = suppliersList.map(s =>
+      `"${s.name}","${s.code}","${s.connectionType}","${s.status}",${s.productCount},${s.errorCount},"${s.contactEmail || ''}","${s.country || ''}","${s.lastSync || ''}"`
+    ).join('\n')
+    const csvContent = csvHeaders + csvRows
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `SupplyBridge_Suppliers_Directory_${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    showNotification('Suppliers Directory CSV file downloaded!')
+  }
+
   return (
     <div className="relative">
       {/* Toast Notification Banner */}
@@ -283,24 +302,33 @@ export const Suppliers: React.FC = () => {
         title="Suppliers"
         subtitle={`${suppliersList.length} suppliers configured — ${suppliersList.filter(s => s.status === 'connected').length} connected`}
         actions={
-          canManageSuppliers ? (
-            <>
-              <button
-                onClick={handleSyncAll}
-                disabled={isSyncingAll}
-                className="btn-secondary btn-sm flex items-center gap-1.5"
-              >
-                <RefreshCw size={14} className={isSyncingAll ? 'animate-spin text-primary-600' : ''} />
-                {isSyncingAll ? 'Syncing All...' : 'Sync All'}
-              </button>
-              <button
-                onClick={() => setAddOpen(true)}
-                className="btn-primary btn-sm flex items-center gap-1.5"
-              >
-                <Plus size={14} /> Add Supplier
-              </button>
-            </>
-          ) : undefined
+          <>
+            <button
+              onClick={handleExportSuppliersCSV}
+              className="btn-secondary btn-sm flex items-center gap-1.5 cursor-pointer"
+              title="Download Suppliers CSV Directory"
+            >
+              <Download size={14} className="text-emerald-600" /> Export CSV
+            </button>
+            {canManageSuppliers && (
+              <>
+                <button
+                  onClick={handleSyncAll}
+                  disabled={isSyncingAll}
+                  className="btn-secondary btn-sm flex items-center gap-1.5"
+                >
+                  <RefreshCw size={14} className={isSyncingAll ? 'animate-spin text-primary-600' : ''} />
+                  {isSyncingAll ? 'Syncing All...' : 'Sync All'}
+                </button>
+                <button
+                  onClick={() => setAddOpen(true)}
+                  className="btn-primary btn-sm flex items-center gap-1.5"
+                >
+                  <Plus size={14} /> Add Supplier
+                </button>
+              </>
+            )}
+          </>
         }
       />
 

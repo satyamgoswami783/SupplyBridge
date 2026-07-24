@@ -18,7 +18,8 @@ import {
   Tag,
   DollarSign,
   Boxes,
-  Check
+  Check,
+  Download
 } from 'lucide-react'
 import { Badge } from '../../components/ui/Badge'
 import { SectionHeader, FilterBar, Tabs, ConfirmDialog } from '../../components/ui'
@@ -304,7 +305,24 @@ export const MasterCatalog: React.FC = () => {
     showNotification(`Product "${newProduct.name}" updated successfully!`)
   }
 
-  const newSupplierVal = (val: string, fallback: string) => (val.trim() ? val : fallback)
+  const handleExportCatalogCSV = () => {
+    showNotification('Generating Master Catalog CSV export...')
+    const csvHeaders = 'SKU,Product Name,Supplier,Category,Brand,Retail Price,Cost Price,Stock,Status,Validation\n'
+    const csvRows = productsList.map(p =>
+      `"${p.sku}","${p.name.replace(/"/g, '""')}","${p.supplierName}","${p.categoryName || ''}","${p.brand || ''}",${p.pricing.retailPrice},${p.pricing.costPrice},${p.inventory.availableStock},"${p.status}","${p.validationStatus}"`
+    ).join('\n')
+    const csvContent = csvHeaders + csvRows
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `SupplyBridge_Master_Catalog_${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    showNotification('Master Catalog CSV file downloaded!')
+  }
 
   return (
     <div className="relative">
@@ -328,6 +346,13 @@ export const MasterCatalog: React.FC = () => {
         subtitle="Single source of truth for all product data across suppliers and stores"
         actions={
           <>
+            <button
+              onClick={handleExportCatalogCSV}
+              className="btn-secondary btn-sm flex items-center gap-1.5 cursor-pointer"
+              title="Download Catalog CSV File"
+            >
+              <Download size={14} className="text-emerald-600" /> Export CSV
+            </button>
             <button
               onClick={() => {
                 setSearch('')

@@ -79,6 +79,26 @@ export const ImportQueue: React.FC = () => {
     return matchTab && matchSearch
   })
 
+  const handleExportQueueCSV = () => {
+    showNotification('Generating Import Queue CSV export...')
+    const csvHeaders = 'Job ID,Supplier Name,Source File,Format,Total Records,Processed Records,Failed Records,Status,Created At\n'
+    const csvRows = importsList.map(i =>
+      `"${i.id}","${i.supplierName}","${i.fileName || ''}","${i.format || ''}",${i.totalRecords},${i.processedRecords},${i.failedRecords},"${i.status}","${i.createdAt || ''}"`
+    ).join('\n')
+    const csvContent = csvHeaders + csvRows
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `SupplyBridge_Import_Queue_${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    showNotification('Import Queue CSV file downloaded!')
+  }
+
   return (
     <div className="relative">
       {/* Toast Notification */}
@@ -100,12 +120,21 @@ export const ImportQueue: React.FC = () => {
         title="Import Queue"
         subtitle="Monitor and manage product feed import jobs from all suppliers"
         actions={
-          <button
-            onClick={() => showNotification('Import queue refreshed.')}
-            className="btn-secondary btn-sm flex items-center gap-1.5"
-          >
-            <RefreshCw size={14} /> Refresh Queue
-          </button>
+          <>
+            <button
+              onClick={handleExportQueueCSV}
+              className="btn-secondary btn-sm flex items-center gap-1.5 cursor-pointer"
+              title="Download Import Queue CSV File"
+            >
+              <Download size={14} className="text-emerald-600" /> Export CSV
+            </button>
+            <button
+              onClick={() => showNotification('Import queue refreshed.')}
+              className="btn-secondary btn-sm flex items-center gap-1.5"
+            >
+              <RefreshCw size={14} /> Refresh Queue
+            </button>
+          </>
         }
       />
 
