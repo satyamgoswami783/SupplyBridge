@@ -27,7 +27,12 @@ import { mockProducts } from '../../data/mockData'
 import { statusToVariant, timeAgo } from '../../utils'
 import type { Product, ProductStatus, ValidationStatus } from '../../types'
 
+import { useAuth } from '../../context/AuthContext'
+
 export const MasterCatalog: React.FC = () => {
+  const { role } = useAuth()
+  const canManageCatalog = role === 'super_admin' || role === 'admin' || role === 'catalog_manager'
+  const canDelete = role === 'super_admin' || role === 'admin'
   const [productsList, setProductsList] = useState<Product[]>(mockProducts)
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('all')
@@ -182,6 +187,8 @@ export const MasterCatalog: React.FC = () => {
     const created: Product = {
       id: `p_${Date.now()}`,
       sku: newProduct.sku.toUpperCase(),
+      masterSku: newProduct.sku.toUpperCase(),
+      supplierSku: newProduct.sku.toUpperCase(),
       name: newProduct.name,
       description: 'Master Catalog Product',
       brand: newProduct.brand || 'Generic',
@@ -190,6 +197,7 @@ export const MasterCatalog: React.FC = () => {
       supplierId: 's1',
       supplierName: newProduct.supplierName,
       pricing: {
+        supplierPrice: Number(newProduct.costPrice),
         costPrice: Number(newProduct.costPrice),
         wholesalePrice: Number(newProduct.costPrice) * 1.2,
         retailPrice: Number(newProduct.retailPrice),
@@ -199,13 +207,17 @@ export const MasterCatalog: React.FC = () => {
           ((Number(newProduct.retailPrice) - Number(newProduct.costPrice)) /
             Number(newProduct.retailPrice)) *
           100,
+        lastUpdated: new Date().toISOString(),
       },
       inventory: {
+        supplierStock: Number(newProduct.stock),
+        warehouseStock: Number(newProduct.stock),
         totalStock: Number(newProduct.stock),
         availableStock: Number(newProduct.stock),
         reservedStock: 0,
         lowStockThreshold: 10,
         status: Number(newProduct.stock) > 0 ? 'in_stock' : 'out_of_stock',
+        lastSynced: new Date().toISOString(),
       },
       status: 'published',
       validationStatus: 'passed',
@@ -214,12 +226,13 @@ export const MasterCatalog: React.FC = () => {
           id: 'img1',
           url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=150&auto=format&fit=crop&q=80',
           isPrimary: true,
+          syncStatus: 'synced',
           position: 0,
         },
       ],
-      attributes: {},
+      attributes: [],
       variants: [],
-      storeAssignments: ['store1'],
+      stores: ['store1'],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
@@ -326,12 +339,14 @@ export const MasterCatalog: React.FC = () => {
             >
               <Filter size={14} /> Reset Filters
             </button>
-            <button
-              onClick={() => setAddModalOpen(true)}
-              className="btn-primary btn-sm flex items-center gap-1.5"
-            >
-              <Plus size={14} /> Add Product
-            </button>
+            {canManageCatalog && (
+              <button
+                onClick={() => setAddModalOpen(true)}
+                className="btn-primary btn-sm flex items-center gap-1.5"
+              >
+                <Plus size={14} /> Add Product
+              </button>
+            )}
           </>
         }
       />

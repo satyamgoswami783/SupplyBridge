@@ -28,6 +28,7 @@ import { Modal } from '../../components/ui/Modal'
 import { mockSuppliers } from '../../data/mockData'
 import { statusToVariant, connectionTypeLabel, formatDateTime, timeAgo } from '../../utils'
 import type { Supplier, ConnectionType, SupplierStatus } from '../../types'
+import { useAuth } from '../../context/AuthContext'
 
 const CONNECTION_TYPES: { value: ConnectionType; label: string }[] = [
   { value: 'api',   label: 'REST API' },
@@ -43,6 +44,8 @@ const connTypeIcon: Record<ConnectionType, string> = {
 }
 
 export const Suppliers: React.FC = () => {
+  const { role } = useAuth()
+  const canManageSuppliers = role === 'super_admin' || role === 'admin' || role === 'integration_manager'
   const [suppliersList, setSuppliersList] = useState<Supplier[]>(mockSuppliers)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -280,22 +283,24 @@ export const Suppliers: React.FC = () => {
         title="Suppliers"
         subtitle={`${suppliersList.length} suppliers configured — ${suppliersList.filter(s => s.status === 'connected').length} connected`}
         actions={
-          <>
-            <button
-              onClick={handleSyncAll}
-              disabled={isSyncingAll}
-              className="btn-secondary btn-sm flex items-center gap-1.5"
-            >
-              <RefreshCw size={14} className={isSyncingAll ? 'animate-spin text-primary-600' : ''} />
-              {isSyncingAll ? 'Syncing All...' : 'Sync All'}
-            </button>
-            <button
-              onClick={() => setAddOpen(true)}
-              className="btn-primary btn-sm flex items-center gap-1.5"
-            >
-              <Plus size={14} /> Add Supplier
-            </button>
-          </>
+          canManageSuppliers ? (
+            <>
+              <button
+                onClick={handleSyncAll}
+                disabled={isSyncingAll}
+                className="btn-secondary btn-sm flex items-center gap-1.5"
+              >
+                <RefreshCw size={14} className={isSyncingAll ? 'animate-spin text-primary-600' : ''} />
+                {isSyncingAll ? 'Syncing All...' : 'Sync All'}
+              </button>
+              <button
+                onClick={() => setAddOpen(true)}
+                className="btn-primary btn-sm flex items-center gap-1.5"
+              >
+                <Plus size={14} /> Add Supplier
+              </button>
+            </>
+          ) : undefined
         }
       />
 
