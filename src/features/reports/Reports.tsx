@@ -375,14 +375,14 @@ export const Reports: React.FC = () => {
             </div>
           </div>
 
-          {/* Supplier Performance Table — Exact Image 1 UI with Responsive Horizontal Scroll */}
-          <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-card w-full">
+          {/* Supplier Performance Table */}
+          <div className="card overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-card w-full">
             <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Supplier Feed Performance Index</h3>
               <span className="text-2xs text-slate-400 font-semibold">{dateRange}</span>
             </div>
             <div className="table-container w-full overflow-x-auto scrollbar-thin">
-              <table className="table min-w-[850px] w-full">
+              <table className="table min-w-0 sm:min-w-[850px] w-full">
                 <thead>
                   <tr className="bg-slate-100/90 dark:bg-slate-950/90 border-b-2 border-slate-200 dark:border-slate-800">
                     <th className="whitespace-nowrap px-4 py-3.5">SUPPLIER PARTNER</th>
@@ -397,13 +397,13 @@ export const Reports: React.FC = () => {
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {supplierData.map(s => (
                     <tr key={s.name} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-800 dark:text-slate-200">{s.name}</td>
-                      <td className="whitespace-nowrap px-4 py-3.5"><span className="text-2xs font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">{s.type}</span></td>
-                      <td className="whitespace-nowrap px-4 py-3.5 font-semibold">{s.products.toLocaleString()}</td>
-                      <td className="whitespace-nowrap px-4 py-3.5 text-emerald-600 font-bold">{s.synced.toLocaleString()}</td>
-                      <td className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-700 dark:text-slate-300">{s.passRate}%</td>
-                      <td className="whitespace-nowrap px-4 py-3.5 text-xs text-slate-500 font-mono">{s.uptime}</td>
-                      <td className="whitespace-nowrap px-4 py-3.5">
+                      <td data-label="Supplier Partner" className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-800 dark:text-slate-200">{s.name}</td>
+                      <td data-label="Protocol" className="whitespace-nowrap px-4 py-3.5"><span className="text-2xs font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">{s.type}</span></td>
+                      <td data-label="Total SKUs" className="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-800 dark:text-slate-200">{s.products.toLocaleString()}</td>
+                      <td data-label="Synced SKUs" className="whitespace-nowrap px-4 py-3.5 text-emerald-600 dark:text-emerald-400 font-bold">{s.synced.toLocaleString()}</td>
+                      <td data-label="Validation Pass" className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-700 dark:text-slate-300">{s.passRate}%</td>
+                      <td data-label="Connection Uptime" className="whitespace-nowrap px-4 py-3.5 text-xs text-slate-500 dark:text-slate-400 font-mono">{s.uptime}</td>
+                      <td data-label="Status" className="whitespace-nowrap px-4 py-3.5">
                         <Badge variant={s.errors === 0 ? 'success' : 'warning'}>
                           {s.errors === 0 ? 'Optimal' : `${s.errors} Errors`}
                         </Badge>
