@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BarChart3, Download, Calendar, TrendingUp, CheckCircle2, FileSpreadsheet, FileText, Package, RefreshCw, AlertTriangle, ShieldCheck, Truck, Database } from 'lucide-react'
+import { BarChart3, Download, Calendar, TrendingUp, CheckCircle2, FileSpreadsheet, FileText, Package, RefreshCw, AlertTriangle, ShieldCheck, Truck, Database, ChevronDown } from 'lucide-react'
 import { SectionHeader, Tabs } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts'
@@ -43,6 +43,20 @@ export const Reports: React.FC = () => {
   const [tab, setTab] = useState('supplier')
   const [dateRange, setDateRange] = useState('Last 30 days')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const showNotification = (msg: string) => {
     setToastMessage(msg)
@@ -288,21 +302,55 @@ export const Reports: React.FC = () => {
         subtitle="Comprehensive operational reports across supplier feeds, PIM catalog health, inventory buffers, and Shift4Shop sync throughput"
         actions={
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5">
-              <Calendar size={14} className="text-slate-400" />
-              <select
-                value={dateRange}
-                onChange={e => {
-                  setDateRange(e.target.value)
-                  showNotification(`Date range changed to ${e.target.value}`)
-                }}
-                className="text-xs text-slate-700 dark:text-slate-200 bg-transparent outline-none cursor-pointer font-bold"
+            {/* Custom Styled Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors shadow-sm cursor-pointer select-none"
               >
-                <option value="Last 7 days">Last 7 days</option>
-                <option value="Last 30 days">Last 30 days</option>
-                <option value="Last 90 days">Last 90 days</option>
-                <option value="Year to Date">Year to Date</option>
-              </select>
+                <Calendar size={14} className="text-slate-400" />
+                <span>{dateRange}</span>
+                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 sm:left-0 mt-2 w-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden z-30"
+                  >
+                    <div className="p-1 space-y-0.5">
+                      {[
+                        'Last 7 days',
+                        'Last 30 days',
+                        'Last 90 days',
+                        'Year to Date'
+                      ].map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => {
+                            setDateRange(option)
+                            setIsDropdownOpen(false)
+                            showNotification(`Date range changed to ${option}`)
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                            dateRange === option
+                              ? 'bg-primary-600 text-white shadow-sm'
+                              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
+                          }`}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
             <button
               onClick={handleExportPDF}

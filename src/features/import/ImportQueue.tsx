@@ -296,19 +296,19 @@ export const ImportQueue: React.FC = () => {
                       <AlertCircle size={13} /> Error: {item.errorMessage}
                     </p>
                   )}
-                  <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-600 dark:text-slate-300 mt-2">
-                    <span>
-                      <CheckCircle2 size={12} className="inline mr-1 text-emerald-500" />
-                      <strong className="text-slate-800 dark:text-slate-100">{item.processedRecords.toLocaleString()}</strong> processed
+                  <div className="grid grid-cols-2 gap-y-2 gap-x-4 md:flex md:flex-wrap md:items-center md:gap-x-4 md:gap-y-0 text-xs font-medium text-slate-600 dark:text-slate-300 mt-2">
+                    <span className="flex items-center gap-1">
+                      <CheckCircle2 size={12} className="text-emerald-500" />
+                      <span><strong className="text-slate-800 dark:text-slate-100">{item.processedRecords.toLocaleString()}</strong> processed</span>
                     </span>
                     {item.failedRecords > 0 && (
-                      <span className="text-rose-600 font-bold">
-                        <XCircle size={12} className="inline mr-1 text-rose-500" />
-                        {item.failedRecords.toLocaleString()} failed
+                      <span className="text-rose-600 font-bold flex items-center gap-1">
+                        <XCircle size={12} className="text-rose-500" />
+                        <span>{item.failedRecords.toLocaleString()} failed</span>
                       </span>
                     )}
                     <span>Total: <strong className="text-slate-800 dark:text-slate-100">{item.totalRecords.toLocaleString()}</strong> SKUs</span>
-                    <span className="text-slate-400 font-mono">• {timeAgo(item.createdAt)}</span>
+                    <span className="text-slate-400 font-mono md:before:content-['•_'] md:before:mr-1">{timeAgo(item.createdAt)}</span>
                   </div>
                   {item.status === 'processing' && (
                     <ProgressBar
@@ -323,7 +323,7 @@ export const ImportQueue: React.FC = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-start sm:justify-end pt-3 sm:pt-0 pl-[54px] sm:pl-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/60" onClick={e => e.stopPropagation()}>
                 <button
                   onClick={() => setPreviewItem(item)}
                   className="btn-ghost btn-sm font-bold flex items-center gap-1 text-primary-600 dark:text-primary-400 cursor-pointer"
