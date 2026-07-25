@@ -302,10 +302,10 @@ export const Suppliers: React.FC = () => {
         title="Suppliers"
         subtitle={`${suppliersList.length} suppliers configured — ${suppliersList.filter(s => s.status === 'connected').length} connected`}
         actions={
-          <>
+          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
             <button
               onClick={handleExportSuppliersCSV}
-              className="btn-secondary btn-sm flex items-center gap-1.5 cursor-pointer"
+              className="btn-secondary btn-sm flex items-center gap-1.5 cursor-pointer flex-1 sm:flex-initial justify-center"
               title="Download Suppliers CSV Directory"
             >
               <Download size={14} className="text-emerald-600" /> Export CSV
@@ -315,82 +315,87 @@ export const Suppliers: React.FC = () => {
                 <button
                   onClick={handleSyncAll}
                   disabled={isSyncingAll}
-                  className="btn-secondary btn-sm flex items-center gap-1.5"
+                  className="btn-secondary btn-sm flex items-center gap-1.5 flex-1 sm:flex-initial justify-center"
                 >
                   <RefreshCw size={14} className={isSyncingAll ? 'animate-spin text-primary-600' : ''} />
                   {isSyncingAll ? 'Syncing All...' : 'Sync All'}
                 </button>
                 <button
                   onClick={() => setAddOpen(true)}
-                  className="btn-primary btn-sm flex items-center gap-1.5"
+                  className="btn-primary btn-sm flex items-center gap-1.5 flex-1 sm:flex-initial justify-center"
                 >
                   <Plus size={14} /> Add Supplier
                 </button>
               </>
             )}
-          </>
+          </div>
         }
       />
 
       {/* Summary KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
         {[
           { label: 'Connected',    value: suppliersList.filter(s => s.status === 'connected').length,    color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/50' },
           { label: 'Disconnected', value: suppliersList.filter(s => s.status === 'disconnected').length, color: 'text-amber-600 dark:text-amber-400',   bg: 'bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/50' },
           { label: 'Error State',  value: suppliersList.filter(s => s.status === 'error').length,        color: 'text-rose-600 dark:text-rose-400',    bg: 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/50' },
           { label: 'Syncing',      value: suppliersList.filter(s => s.status === 'syncing').length,      color: 'text-cyan-600 dark:text-cyan-400',    bg: 'bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200/80 dark:border-cyan-900/50' },
         ].map(c => (
-          <div key={c.label} className={`${c.bg} rounded-2xl p-4 cursor-pointer transition-transform hover:scale-[1.01] shadow-xs`} onClick={() => setStatusFilter(c.label.toLowerCase().includes('connected') ? 'connected' : c.label.toLowerCase().includes('disconnected') ? 'disconnected' : c.label.toLowerCase().includes('error') ? 'error' : 'syncing')}>
-            <p className={`text-2xl font-bold ${c.color}`}>{c.value}</p>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 font-medium">{c.label}</p>
+          <div key={c.label} className={`${c.bg} rounded-2xl p-3 sm:p-4 cursor-pointer transition-transform hover:scale-[1.01] shadow-xs`} onClick={() => setStatusFilter(c.label.toLowerCase().includes('connected') ? 'connected' : c.label.toLowerCase().includes('disconnected') ? 'disconnected' : c.label.toLowerCase().includes('error') ? 'error' : 'syncing')}>
+            <p className={`text-xl sm:text-2xl font-bold ${c.color}`}>{c.value}</p>
+            <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 mt-0.5 font-medium">{c.label}</p>
           </div>
         ))}
       </div>
 
       {/* Filters */}
       <FilterBar search={search} onSearch={v => { setSearch(v); setCurrentPage(1); }} placeholder="Search by name, code, or email...">
-        <div className="flex w-full gap-3 sm:w-auto">
-          <Select
-            className="w-full"
+        <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto">
+          <select
+            className="select w-full sm:w-auto min-w-[130px] input-sm"
             value={statusFilter}
-            onChange={v => { setStatusFilter(v); setCurrentPage(1); }}
-            options={[
-              { label: 'All Status', value: 'all' },
-              { label: 'Connected', value: 'connected' },
-              { label: 'Disconnected', value: 'disconnected' },
-              { label: 'Error', value: 'error' },
-              { label: 'Syncing', value: 'syncing' }
-            ]}
-          />
-          <Select
-            className="w-full"
+            onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }}
+          >
+            <option value="all">All Status</option>
+            <option value="connected">Connected</option>
+            <option value="disconnected">Disconnected</option>
+            <option value="error">Error</option>
+            <option value="syncing">Syncing</option>
+          </select>
+          <select
+            className="select w-full sm:w-auto min-w-[130px] input-sm"
             value={typeFilter}
-            onChange={v => { setTypeFilter(v); setCurrentPage(1); }}
-            options={[
-              { label: 'All Types', value: 'all' },
-              ...CONNECTION_TYPES
-            ]}
-          />
+            onChange={e => { setTypeFilter(e.target.value); setCurrentPage(1); }}
+          >
+            <option value="all">All Types</option>
+            {CONNECTION_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+          </select>
         </div>
       </FilterBar>
 
+<<<<<<< HEAD
       {/* Table */}
       <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <div className="table-container">
           <table className="table">
+=======
+      {/* Exact Table UI from Image 1 with Responsive Horizontal Scroll */}
+      <div className="card overflow-hidden w-full">
+        <div className="table-container w-full overflow-x-auto scrollbar-thin">
+          <table className="table min-w-[850px] w-full">
+>>>>>>> c038a6255de0cec8bcd111372000ba1cb3a2aa1f
             <thead>
-              <tr>
-                <th>Supplier</th>
-                <th>Connection</th>
-                <th>Status</th>
-                <th>Products</th>
-                <th>Last Sync</th>
-                <th>Next Sync</th>
-                <th>Errors</th>
-                <th className="text-right">Actions</th>
+              <tr className="bg-slate-100/90 dark:bg-slate-950/90 border-b-2 border-slate-200 dark:border-slate-800">
+                <th className="whitespace-nowrap px-4 py-3.5">SUPPLIER</th>
+                <th className="whitespace-nowrap px-4 py-3.5">CONNECTION</th>
+                <th className="whitespace-nowrap px-4 py-3.5">STATUS</th>
+                <th className="whitespace-nowrap px-4 py-3.5">PRODUCTS</th>
+                <th className="whitespace-nowrap px-4 py-3.5">LAST SYNC</th>
+                <th className="whitespace-nowrap px-4 py-3.5">NEXT SYNC</th>
+                <th className="whitespace-nowrap px-4 py-3.5">ERRORS</th>
+                <th className="whitespace-nowrap px-4 py-3.5 text-right pr-4">ACTIONS</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {paginatedSuppliers.length === 0 && (
                 <tr>
                   <td colSpan={8} className="text-center py-16 text-slate-400">
@@ -417,12 +422,17 @@ export const Suppliers: React.FC = () => {
                     className="cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors"
                     onClick={() => setSelected(supplier)}
                   >
+<<<<<<< HEAD
                     <td data-label="Supplier">
+=======
+                    <td className="whitespace-nowrap px-4 py-3.5">
+>>>>>>> c038a6255de0cec8bcd111372000ba1cb3a2aa1f
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl bg-primary-50 dark:bg-primary-950/60 border border-primary-100 dark:border-primary-900/60 flex items-center justify-center text-base flex-shrink-0">
                           {connTypeIcon[supplier.connectionType]}
                         </div>
                         <div>
+<<<<<<< HEAD
                           <p className="font-bold text-slate-900 dark:text-slate-100 text-sm">{supplier.name}</p>
                           <p className="text-xs text-slate-400 dark:text-slate-400 font-medium">{supplier.code} · {supplier.country}</p>
                         </div>
@@ -432,6 +442,17 @@ export const Suppliers: React.FC = () => {
                       <Badge variant="info">{connectionTypeLabel(supplier.connectionType)}</Badge>
                     </td>
                     <td data-label="Status">
+=======
+                          <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm">{supplier.name}</p>
+                          <p className="text-xs text-slate-400">{supplier.code} · {supplier.country}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3.5">
+                      <Badge variant="info">{connectionTypeLabel(supplier.connectionType)}</Badge>
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3.5">
+>>>>>>> c038a6255de0cec8bcd111372000ba1cb3a2aa1f
                       <Badge variant={statusToVariant(supplier.status)} dot>
                         {supplier.status.charAt(0).toUpperCase() + supplier.status.slice(1)}
                       </Badge>
@@ -520,22 +541,22 @@ export const Suppliers: React.FC = () => {
         </div>
 
         {/* Working Pagination Footer */}
-        <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between">
-          <p className="text-xs text-slate-500 font-medium">
-            Showing <span className="font-semibold text-slate-800">{paginatedSuppliers.length}</span> of <span className="font-semibold text-slate-800">{filtered.length}</span> suppliers (Page {currentPage} of {totalPages})
+        <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-slate-500 font-medium text-center sm:text-left">
+            Showing <span className="font-semibold text-slate-800 dark:text-slate-200">{paginatedSuppliers.length}</span> of <span className="font-semibold text-slate-800 dark:text-slate-200">{filtered.length}</span> suppliers (Page {currentPage} of {totalPages})
           </p>
-          <div className="flex gap-1">
+          <div className="flex gap-1.5 w-full sm:w-auto justify-center">
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="btn-secondary btn-sm disabled:opacity-40"
+              className="btn-secondary btn-sm flex-1 sm:flex-initial disabled:opacity-40"
             >
               Previous
             </button>
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages || totalPages === 0}
-              className="btn-secondary btn-sm disabled:opacity-40"
+              className="btn-secondary btn-sm flex-1 sm:flex-initial disabled:opacity-40"
             >
               Next
             </button>

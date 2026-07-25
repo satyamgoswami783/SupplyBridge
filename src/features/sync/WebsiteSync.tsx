@@ -179,23 +179,23 @@ export const WebsiteSync: React.FC = () => {
       />
 
       {/* Summary Telemetry KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
         {[
           { label: 'TOTAL PUBLISHED PRODUCTS', value: '82,800 SKUs', color: 'text-slate-900 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800', sub: 'Live across Shift4Shop stores' },
           { label: 'CONNECTED STOREFRONTS',    value: '7 / 7 Stores', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50', sub: 'REST API v2 authenticated' },
           { label: 'ACTIVE PUBLISHING QUEUE',  value: '1,247 Items', color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200/80 dark:border-cyan-900/50', sub: 'Queued for API push' },
           { label: 'STOREFRONT API HEALTH',    value: '99.5%', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50/70 dark:bg-violet-950/30 border border-violet-200/80 dark:border-violet-900/50', sub: 'Gateway fully operational' },
         ].map((card, i) => (
-          <div key={i} className={`p-5 rounded-2xl shadow-xs min-h-[120px] flex flex-col justify-between transition-all duration-200 ${card.bg}`}>
-            <p className="text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">{card.label}</p>
-            <p className={`text-2xl lg:text-3xl font-black tracking-tight my-1 ${card.color}`}>{card.value}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">{card.sub}</p>
+          <div key={i} className={`p-4 sm:p-5 rounded-2xl shadow-xs min-h-[110px] sm:min-h-[120px] flex flex-col justify-between transition-all duration-200 ${card.bg}`}>
+            <p className="text-[10px] sm:text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">{card.label}</p>
+            <p className={`text-xl sm:text-2xl lg:text-3xl font-black tracking-tight my-1 ${card.color}`}>{card.value}</p>
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-semibold">{card.sub}</p>
           </div>
         ))}
       </div>
 
       {/* Phase 2 Architecture Specs Banner */}
-      <div className="p-4.5 rounded-2xl bg-gradient-aurora text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="p-4 sm:p-4.5 rounded-2xl bg-gradient-aurora text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-bold flex-shrink-0">
             <Zap size={20} />
@@ -212,12 +212,12 @@ export const WebsiteSync: React.FC = () => {
       </div>
 
       {/* Storefront Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
         {storesList.map(store => {
           const isSyncingThis = syncingStoreId === store.id || syncingAll || store.syncStatus === 'syncing'
 
           return (
-            <div key={store.id} className="card p-5 flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-all border border-slate-200/90 dark:border-slate-800">
+            <div key={store.id} className="card p-4 sm:p-5 flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-all border border-slate-200/90 dark:border-slate-800">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -231,7 +231,7 @@ export const WebsiteSync: React.FC = () => {
                           <ExternalLink size={12} />
                         </a>
                       </p>
-                      <p className="text-2xs text-slate-400 font-mono">{store.url}</p>
+                      <p className="text-2xs text-slate-400 font-mono truncate max-w-[180px] sm:max-w-none">{store.url}</p>
                     </div>
                   </div>
                   <Badge variant={statusToVariant(store.syncStatus)} dot>{store.syncStatus}</Badge>
@@ -282,7 +282,7 @@ export const WebsiteSync: React.FC = () => {
       </div>
 
       {/* Main Filter & Table Section — Detailed Shift4Shop Publishing Queue Table */}
-      <div className="card p-5 border border-slate-200/90 dark:border-slate-800">
+      <div className="card p-4 sm:p-5 border border-slate-200/90 dark:border-slate-800 w-full">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
             <Activity size={16} className="text-primary-600 dark:text-primary-400" /> Shift4Shop REST API Publishing Queue
@@ -307,7 +307,7 @@ export const WebsiteSync: React.FC = () => {
             <select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
-              className="select text-xs w-auto py-2"
+              className="select text-xs w-full sm:w-auto py-2"
             >
               <option value="all">All Queue Status</option>
               <option value="published">Published (HTTP 200/201 OK)</option>
@@ -317,41 +317,41 @@ export const WebsiteSync: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Publishing Queue Table */}
-        <div className="table-container">
-          <table className="table">
+        {/* Main Publishing Queue Table — Exact Image 1 UI with Responsive Horizontal Scroll */}
+        <div className="table-container w-full overflow-x-auto scrollbar-thin">
+          <table className="table min-w-[950px] w-full">
             <thead>
-              <tr>
-                <th className="whitespace-nowrap">Product Title</th>
-                <th className="whitespace-nowrap">Master SKU</th>
-                <th className="whitespace-nowrap">Target Storefront</th>
-                <th className="whitespace-nowrap">Publishing Action</th>
-                <th className="whitespace-nowrap">HTTP Response Code</th>
-                <th className="whitespace-nowrap">Status</th>
-                <th className="whitespace-nowrap">Last Sync</th>
-                <th className="text-right whitespace-nowrap">Action</th>
+              <tr className="bg-slate-100/90 dark:bg-slate-950/90 border-b-2 border-slate-200 dark:border-slate-800">
+                <th className="whitespace-nowrap px-4 py-3.5">PRODUCT TITLE</th>
+                <th className="whitespace-nowrap px-4 py-3.5">MASTER SKU</th>
+                <th className="whitespace-nowrap px-4 py-3.5">TARGET STOREFRONT</th>
+                <th className="whitespace-nowrap px-4 py-3.5">PUBLISHING ACTION</th>
+                <th className="whitespace-nowrap px-4 py-3.5">HTTP RESPONSE CODE</th>
+                <th className="whitespace-nowrap px-4 py-3.5">STATUS</th>
+                <th className="whitespace-nowrap px-4 py-3.5">LAST SYNC</th>
+                <th className="whitespace-nowrap px-4 py-3.5 text-right pr-4">ACTION</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filteredQueue.map(row => {
                 const isSyncingRow = syncingQueueId === row.id
 
                 return (
-                  <tr key={row.id}>
-                    <td>
-                      <p className="font-bold text-slate-800 dark:text-slate-100 text-xs leading-normal max-w-xs">{row.product}</p>
+                  <tr key={row.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                    <td className="whitespace-nowrap px-4 py-3.5">
+                      <p className="font-bold text-slate-800 dark:text-slate-100 text-xs leading-normal">{row.product}</p>
                     </td>
-                    <td>
+                    <td className="whitespace-nowrap px-4 py-3.5">
                       <code className="mono text-xs">{row.sku}</code>
                     </td>
-                    <td>
-                      <span className="text-xs text-slate-700 dark:text-slate-300 font-semibold whitespace-nowrap">{row.storeName}</span>
+                    <td className="whitespace-nowrap px-4 py-3.5">
+                      <span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{row.storeName}</span>
                     </td>
-                    <td>
-                      <span className="text-2xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-md font-bold whitespace-nowrap">{row.action}</span>
+                    <td className="whitespace-nowrap px-4 py-3.5">
+                      <span className="text-2xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-md font-bold">{row.action}</span>
                     </td>
-                    <td>
-                      <span className={`text-2xs font-mono font-bold whitespace-nowrap ${
+                    <td className="whitespace-nowrap px-4 py-3.5">
+                      <span className={`text-2xs font-mono font-bold ${
                         row.httpCode.includes('200') || row.httpCode.includes('201')
                           ? 'text-emerald-600 dark:text-emerald-400'
                           : row.httpCode.includes('429')
@@ -363,15 +363,15 @@ export const WebsiteSync: React.FC = () => {
                         {row.httpCode}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap">
+                    <td className="whitespace-nowrap px-4 py-3.5">
                       {row.status === 'published' && <Badge variant="success" dot>Published</Badge>}
                       {row.status === 'queued' && <Badge variant="warning" dot>Queued</Badge>}
                       {row.status === 'error' && <Badge variant="danger" dot>Publish Error</Badge>}
                     </td>
-                    <td className="whitespace-nowrap">
+                    <td className="whitespace-nowrap px-4 py-3.5">
                       <span className="text-2xs text-slate-500 dark:text-slate-400 font-mono">{row.lastSync}</span>
                     </td>
-                    <td className="text-right whitespace-nowrap">
+                    <td className="whitespace-nowrap px-4 py-3.5 text-right pr-4">
                       <button
                         onClick={() => handleRetryQueueItem(row.id, row.product)}
                         disabled={isSyncingRow}

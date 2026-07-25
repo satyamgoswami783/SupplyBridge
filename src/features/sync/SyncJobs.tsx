@@ -216,19 +216,20 @@ export const SyncJobs: React.FC = () => {
       />
 
       {/* KPI Summary Stats — High Resolution & Responsive Layout */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+      {/* KPI Summary Stats — High Resolution & Responsive Layout */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
         {[
           { label: 'RUNNING JOBS',   value: jobsList.filter(j => j.status === 'running').length,   color: 'text-cyan-600 dark:text-cyan-400',    bg: 'bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200/80 dark:border-cyan-900/50',    icon: <RefreshCw size={20} className="animate-spin text-cyan-600" /> },
           { label: 'QUEUED JOBS',    value: jobsList.filter(j => j.status === 'queued').length,    color: 'text-amber-600 dark:text-amber-400',   bg: 'bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50',   icon: <Clock size={20} className="text-amber-600" /> },
           { label: 'COMPLETED JOBS', value: jobsList.filter(j => j.status === 'completed').length, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50', icon: <CheckCircle2 size={20} className="text-emerald-600" /> },
           { label: 'FAILED JOBS',    value: jobsList.filter(j => j.status === 'failed').length,    color: 'text-rose-600 dark:text-rose-400',    bg: 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50',    icon: <XCircle size={20} className="text-rose-600" /> },
         ].map((s, i) => (
-          <div key={i} className={`p-5 rounded-2xl shadow-xs min-h-[115px] flex items-center justify-between border transition-all duration-200 ${s.bg}`}>
+          <div key={i} className={`p-4 sm:p-5 rounded-2xl shadow-xs min-h-[105px] sm:min-h-[115px] flex items-center justify-between border transition-all duration-200 ${s.bg}`}>
             <div>
-              <p className="text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-1">{s.label}</p>
-              <p className={`text-2xl lg:text-3xl font-black ${s.color}`}>{s.value}</p>
+              <p className="text-[10px] sm:text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-1">{s.label}</p>
+              <p className={`text-xl sm:text-2xl lg:text-3xl font-black ${s.color}`}>{s.value}</p>
             </div>
-            <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-xs border border-slate-100 dark:border-slate-700">
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-xs border border-slate-100 dark:border-slate-700 flex-shrink-0">
               {s.icon}
             </div>
           </div>
@@ -240,19 +241,20 @@ export const SyncJobs: React.FC = () => {
         <FilterBar search={search} onSearch={setSearch} placeholder="Search jobs by name, ID, or supplier..." />
       </div>
 
-      <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-card">
-        <div className="table-container">
-          <table className="table">
+      {/* Synchronization Jobs Table — Exact Image 1 UI with Responsive Horizontal Scroll */}
+      <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-card w-full">
+        <div className="table-container w-full overflow-x-auto scrollbar-thin">
+          <table className="table min-w-[950px] w-full">
             <thead>
-              <tr>
-                <th className="whitespace-nowrap">Job Name</th>
-                <th className="whitespace-nowrap">Type</th>
-                <th className="whitespace-nowrap">Status</th>
-                <th className="whitespace-nowrap">Progress</th>
-                <th className="whitespace-nowrap">Items Processed</th>
-                <th className="whitespace-nowrap">Started At</th>
-                <th className="whitespace-nowrap">Triggered By</th>
-                <th className="text-right whitespace-nowrap">Actions</th>
+              <tr className="bg-slate-100/90 dark:bg-slate-950/90 border-b-2 border-slate-200 dark:border-slate-800">
+                <th className="whitespace-nowrap px-4 py-3.5">JOB NAME</th>
+                <th className="whitespace-nowrap px-4 py-3.5">TYPE</th>
+                <th className="whitespace-nowrap px-4 py-3.5">STATUS</th>
+                <th className="whitespace-nowrap px-4 py-3.5">PROGRESS</th>
+                <th className="whitespace-nowrap px-4 py-3.5">ITEMS PROCESSED</th>
+                <th className="whitespace-nowrap px-4 py-3.5">STARTED AT</th>
+                <th className="whitespace-nowrap px-4 py-3.5">TRIGGERED BY</th>
+                <th className="whitespace-nowrap px-4 py-3.5 text-right pr-4">ACTIONS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -265,40 +267,40 @@ export const SyncJobs: React.FC = () => {
               )}
               {filtered.map(job => (
                 <tr key={job.id} className="cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors" onClick={() => setDetailJob(job)}>
-                  <td data-label="Job Name">
+                  <td data-label="Job Name" className="whitespace-nowrap px-4 py-3.5">
                     <p className="font-bold text-slate-900 dark:text-slate-100 text-xs leading-normal">{job.name}</p>
                     {job.supplierName && <p className="text-2xs text-slate-400 font-medium mt-0.5">{job.supplierName}</p>}
                     {job.storeName && <p className="text-2xs text-slate-400 font-medium mt-0.5">{job.storeName}</p>}
                   </td>
-                  <td data-label="Type" className="whitespace-nowrap">
+                  <td data-label="Type" className="whitespace-nowrap px-4 py-3.5">
                     <span className={`px-2.5 py-1 rounded-lg text-2xs font-bold uppercase tracking-wider border ${jobTypeColor[job.type] || 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}`}>
                       {job.type}
                     </span>
                   </td>
-                  <td data-label="Status" className="whitespace-nowrap">
+                  <td data-label="Status" className="whitespace-nowrap px-4 py-3.5">
                     <Badge variant={statusToVariant(job.status)} dot>{job.status}</Badge>
                   </td>
-                  <td data-label="Progress" className="w-36">
+                  <td data-label="Progress" className="whitespace-nowrap px-4 py-3.5 min-w-[140px]">
                     <ProgressBar
                       value={job.progress}
                       color={job.status === 'failed' ? 'rose' : job.status === 'completed' ? 'emerald' : 'primary'}
                       showLabel
                     />
                   </td>
-                  <td data-label="Items Processed" className="whitespace-nowrap">
+                  <td data-label="Items Processed" className="whitespace-nowrap px-4 py-3.5">
                     <div className="text-xs font-medium">
                       <span className="text-slate-900 dark:text-slate-100 font-bold">{job.processedItems.toLocaleString()}</span>
                       <span className="text-slate-400"> / {job.totalItems.toLocaleString()}</span>
                       {job.failedItems > 0 && <span className="text-rose-600 dark:text-rose-400 ml-1.5 font-bold">({job.failedItems} failed)</span>}
                     </div>
                   </td>
-                  <td data-label="Started At" className="whitespace-nowrap">
+                  <td data-label="Started At" className="whitespace-nowrap px-4 py-3.5">
                     <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                       {job.startedAt ? timeAgo(job.startedAt) : job.scheduledAt ? formatDateTime(job.scheduledAt) : '—'}
                     </span>
                   </td>
-                  <td data-label="Triggered By" className="whitespace-nowrap"><span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{job.triggeredBy}</span></td>
-                  <td className="text-right whitespace-nowrap">
+                  <td data-label="Triggered By" className="whitespace-nowrap px-4 py-3.5"><span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{job.triggeredBy}</span></td>
+                  <td className="whitespace-nowrap px-4 py-3.5 text-right pr-4">
                     <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
                       {role !== 'operations_staff' && job.status === 'running' && (
                         <button

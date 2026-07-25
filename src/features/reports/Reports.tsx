@@ -301,67 +301,33 @@ export const Reports: React.FC = () => {
         title="Operational Analytics & Reports"
         subtitle="Comprehensive operational reports across supplier feeds, PIM catalog health, inventory buffers, and Shift4Shop sync throughput"
         actions={
-          <div className="flex items-center gap-2">
-            {/* Custom Styled Dropdown */}
-            <div className="relative" ref={dropdownRef}>
-              <button
-                type="button"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors shadow-sm cursor-pointer select-none"
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5">
+              <Calendar size={14} className="text-slate-400" />
+              <select
+                value={dateRange}
+                onChange={e => {
+                  setDateRange(e.target.value)
+                  showNotification(`Date range changed to ${e.target.value}`)
+                }}
+                className="text-xs text-slate-700 dark:text-slate-200 bg-transparent outline-none cursor-pointer font-bold"
               >
-                <Calendar size={14} className="text-slate-400" />
-                <span>{dateRange}</span>
-                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {isDropdownOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 sm:left-0 mt-2 w-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden z-30"
-                  >
-                    <div className="p-1 space-y-0.5">
-                      {[
-                        'Last 7 days',
-                        'Last 30 days',
-                        'Last 90 days',
-                        'Year to Date'
-                      ].map((option) => (
-                        <button
-                          key={option}
-                          type="button"
-                          onClick={() => {
-                            setDateRange(option)
-                            setIsDropdownOpen(false)
-                            showNotification(`Date range changed to ${option}`)
-                          }}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                            dateRange === option
-                              ? 'bg-primary-600 text-white shadow-sm'
-                              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60'
-                          }`}
-                        >
-                          {option}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                <option value="Last 7 days">Last 7 days</option>
+                <option value="Last 30 days">Last 30 days</option>
+                <option value="Last 90 days">Last 90 days</option>
+                <option value="Year to Date">Year to Date</option>
+              </select>
             </div>
             <button
               onClick={handleExportPDF}
-              className="btn-secondary btn-sm flex items-center gap-1.5 shadow-sm"
+              className="btn-secondary btn-sm flex items-center gap-1.5 shadow-sm font-bold cursor-pointer"
               title="Download PDF Operational Report"
             >
               <FileText size={14} className="text-rose-600 dark:text-rose-400" /> Export PDF
             </button>
             <button
               onClick={handleExportCSV}
-              className="btn-secondary btn-sm flex items-center gap-1.5 shadow-sm"
+              className="btn-secondary btn-sm flex items-center gap-1.5 shadow-sm font-bold cursor-pointer"
               title="Download CSV Analytics File"
             >
               <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" /> Export CSV
@@ -374,68 +340,70 @@ export const Reports: React.FC = () => {
 
       {/* 1. SUPPLIER REPORTS TAB */}
       {tab === 'supplier' && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {[
               { label: 'Configured Suppliers', value: '27', delta: '+3 this month', up: true },
               { label: 'Active Connections', value: '23', delta: '+2 this month', up: true },
               { label: 'Total Catalog SKUs', value: '84,329', delta: '+1.2K this week', up: true },
               { label: 'Avg Feed Parse Duration', value: '27 min', delta: '-4 min improved', up: true },
             ].map(s => (
-              <div key={s.label} className="card p-4">
-                <p className="text-xs text-slate-400 font-medium mb-1">{s.label}</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{s.value}</p>
-                <p className={`text-xs mt-1 flex items-center gap-1 font-bold ${s.up ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}`}>
+              <div key={s.label} className="card p-3.5 sm:p-4">
+                <p className="text-[11px] sm:text-xs text-slate-400 font-medium mb-1 truncate">{s.label}</p>
+                <p className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">{s.value}</p>
+                <p className={`text-[10px] sm:text-xs mt-1 flex items-center gap-1 font-bold ${s.up ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}`}>
                   <TrendingUp size={10} /> {s.delta}
                 </p>
               </div>
             ))}
           </div>
 
-          <div className="card p-5">
+          <div className="card p-4 sm:p-5">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Supplier Products & Error Rate Breakdown</h3>
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={supplierData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }} />
-                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px' }} />
-                <Bar dataKey="synced" name="Synced SKUs" fill="#10b981" radius={[4,4,0,0]} stackId="a" />
-                <Bar dataKey="errors" name="Feed Errors" fill="#f43f5e" radius={[4,4,0,0]} stackId="a" />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="w-full overflow-x-auto">
+              <ResponsiveContainer width="100%" height={240} minWidth={300}>
+                <BarChart data={supplierData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px' }} />
+                  <Bar dataKey="synced" name="Synced SKUs" fill="#10b981" radius={[4,4,0,0]} stackId="a" />
+                  <Bar dataKey="errors" name="Feed Errors" fill="#f43f5e" radius={[4,4,0,0]} stackId="a" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
 
-          {/* Supplier Performance Table */}
-          <div className="card overflow-hidden">
+          {/* Supplier Performance Table — Exact Image 1 UI with Responsive Horizontal Scroll */}
+          <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-card w-full">
             <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Supplier Feed Performance Index</h3>
               <span className="text-2xs text-slate-400 font-semibold">{dateRange}</span>
             </div>
-            <div className="table-container">
-              <table className="table">
+            <div className="table-container w-full overflow-x-auto scrollbar-thin">
+              <table className="table min-w-[850px] w-full">
                 <thead>
-                  <tr>
-                    <th>Supplier Partner</th>
-                    <th>Protocol</th>
-                    <th>Total SKUs</th>
-                    <th>Synced SKUs</th>
-                    <th>Validation Pass %</th>
-                    <th>Connection Uptime</th>
-                    <th>Status</th>
+                  <tr className="bg-slate-100/90 dark:bg-slate-950/90 border-b-2 border-slate-200 dark:border-slate-800">
+                    <th className="whitespace-nowrap px-4 py-3.5">SUPPLIER PARTNER</th>
+                    <th className="whitespace-nowrap px-4 py-3.5">PROTOCOL</th>
+                    <th className="whitespace-nowrap px-4 py-3.5">TOTAL SKUS</th>
+                    <th className="whitespace-nowrap px-4 py-3.5">SYNCED SKUS</th>
+                    <th className="whitespace-nowrap px-4 py-3.5">VALIDATION PASS %</th>
+                    <th className="whitespace-nowrap px-4 py-3.5">CONNECTION UPTIME</th>
+                    <th className="whitespace-nowrap px-4 py-3.5">STATUS</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {supplierData.map(s => (
-                    <tr key={s.name}>
-                      <td className="font-bold text-slate-800 dark:text-slate-200">{s.name}</td>
-                      <td><span className="text-2xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">{s.type}</span></td>
-                      <td className="font-semibold">{s.products.toLocaleString()}</td>
-                      <td className="text-emerald-600 font-bold">{s.synced.toLocaleString()}</td>
-                      <td className="font-bold text-slate-700 dark:text-slate-300">{s.passRate}%</td>
-                      <td className="text-xs text-slate-500 font-medium">{s.uptime}</td>
-                      <td>
+                    <tr key={s.name} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                      <td className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-800 dark:text-slate-200">{s.name}</td>
+                      <td className="whitespace-nowrap px-4 py-3.5"><span className="text-2xs font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">{s.type}</span></td>
+                      <td className="whitespace-nowrap px-4 py-3.5 font-semibold">{s.products.toLocaleString()}</td>
+                      <td className="whitespace-nowrap px-4 py-3.5 text-emerald-600 font-bold">{s.synced.toLocaleString()}</td>
+                      <td className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-700 dark:text-slate-300">{s.passRate}%</td>
+                      <td className="whitespace-nowrap px-4 py-3.5 text-xs text-slate-500 font-mono">{s.uptime}</td>
+                      <td className="whitespace-nowrap px-4 py-3.5">
                         <Badge variant={s.errors === 0 ? 'success' : 'warning'}>
                           {s.errors === 0 ? 'Optimal' : `${s.errors} Errors`}
                         </Badge>
