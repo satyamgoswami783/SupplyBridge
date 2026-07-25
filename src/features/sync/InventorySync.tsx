@@ -184,17 +184,17 @@ export const InventorySync: React.FC = () => {
       />
 
       {/* Summary Telemetry KPI Cards — High Resolution & Responsive Layout */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
         {[
           { label: 'TOTAL IN-STOCK ITEMS', value: '78,450 SKUs', color: 'text-slate-900 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800', sub: 'Across 25 connected suppliers' },
           { label: 'PENDING SYNC QUEUE',    value: (items.filter(i => i.status === 'pending').length * 114 + 116).toString(), color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50', sub: 'Queued for storefront push' },
           { label: 'INVENTORY HEALTH',     value: '99.2%', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50', sub: 'Pipeline fully operational' },
           { label: 'LOW STOCK WARNINGS',   value: '142 SKUs', color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50', sub: 'Below safety buffer threshold' },
         ].map((card, i) => (
-          <div key={i} className={`p-5 rounded-2xl shadow-xs min-h-[120px] flex flex-col justify-between transition-all duration-200 ${card.bg}`}>
-            <p className="text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">{card.label}</p>
-            <p className={`text-2xl lg:text-3xl font-black tracking-tight my-1 ${card.color}`}>{card.value}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">{card.sub}</p>
+          <div key={i} className={`p-3.5 sm:p-4 rounded-2xl shadow-xs min-h-[90px] sm:min-h-[100px] flex flex-col justify-between transition-all duration-200 ${card.bg}`}>
+            <p className="text-[10px] sm:text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">{card.label}</p>
+            <p className={`text-lg sm:text-2xl font-black tracking-tight my-0.5 ${card.color}`}>{card.value}</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-semibold">{card.sub}</p>
           </div>
         ))}
       </div>

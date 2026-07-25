@@ -186,27 +186,32 @@ export const WebsiteSync: React.FC = () => {
           { label: 'ACTIVE PUBLISHING QUEUE',  value: '1,247 Items', color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200/80 dark:border-cyan-900/50', sub: 'Queued for API push' },
           { label: 'STOREFRONT API HEALTH',    value: '99.5%', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50/70 dark:bg-violet-950/30 border border-violet-200/80 dark:border-violet-900/50', sub: 'Gateway fully operational' },
         ].map((card, i) => (
-          <div key={i} className={`p-4 sm:p-5 rounded-2xl shadow-xs min-h-[110px] sm:min-h-[120px] flex flex-col justify-between transition-all duration-200 ${card.bg}`}>
+          <div key={i} className={`p-3.5 sm:p-4 rounded-2xl shadow-xs min-h-[90px] sm:min-h-[100px] flex flex-col justify-between transition-all duration-200 ${card.bg}`}>
             <p className="text-[10px] sm:text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">{card.label}</p>
-            <p className={`text-xl sm:text-2xl lg:text-3xl font-black tracking-tight my-1 ${card.color}`}>{card.value}</p>
-            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-semibold">{card.sub}</p>
+            <p className={`text-lg sm:text-2xl font-black tracking-tight my-0.5 ${card.color}`}>{card.value}</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-semibold">{card.sub}</p>
           </div>
         ))}
       </div>
 
       {/* Phase 2 Architecture Specs Banner */}
-      <div className="p-4 sm:p-4.5 rounded-2xl bg-gradient-aurora text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-bold flex-shrink-0">
-            <Zap size={20} />
+      <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-aurora text-white shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex items-start sm:items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-bold flex-shrink-0 mt-0.5 sm:mt-0">
+            <Zap size={18} />
           </div>
           <div>
-            <h3 className="font-extrabold text-sm tracking-tight text-white">Shift4Shop REST API v2 Publishing Gateway</h3>
-            <p className="text-2xs text-cyan-200 font-medium mt-0.5">Official API Endpoint: <code className="mono">apirest.3dcart.com/v2/Products</code> • Token Authorized</p>
+            <h3 className="font-extrabold text-xs sm:text-sm tracking-tight text-white">Shift4Shop REST API v2 Publishing Gateway</h3>
+            <p className="text-2xs text-cyan-100 font-medium mt-0.5 flex flex-wrap items-center gap-1.5">
+              <span>Official API Endpoint:</span>
+              <code className="mono px-1.5 py-0.5 rounded bg-black/20 text-cyan-200 font-mono text-[11px]">apirest.3dcart.com/v2/Products</code>
+              <span className="hidden sm:inline">•</span>
+              <span className="text-emerald-300 font-bold">Token Authorized</span>
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-xs font-bold flex-shrink-0">
-          <ShieldCheck size={14} className="text-cyan-300" />
+        <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/20 text-2xs sm:text-xs font-bold w-full sm:w-auto justify-center sm:justify-start">
+          <ShieldCheck size={13} className="text-cyan-300" />
           <span>Centralized Store Management Active</span>
         </div>
       </div>
