@@ -371,14 +371,13 @@ export const MasterCatalog: React.FC = () => {
         title="Master Catalog"
         subtitle="Single source of truth for all product data across suppliers and stores"
         actions={
-          <>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
             <button
               onClick={handleExportCatalogCSV}
-              className="btn-secondary btn-sm flex items-center justify-center gap-1.5 cursor-pointer"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1.5 cursor-pointer flex-1 sm:flex-initial"
               title="Download Catalog CSV File"
             >
-              <Download size={14} className="text-emerald-600" /> Export
+              <Download size={14} className="text-emerald-600 dark:text-emerald-400" /> Export
             </button>
             <button
               onClick={() => {
@@ -387,36 +386,35 @@ export const MasterCatalog: React.FC = () => {
                 setSupplierFilter('all')
                 showNotification('Filters reset.')
               }}
-              className="btn-secondary btn-sm flex items-center justify-center gap-1.5"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1.5 flex-1 sm:flex-initial"
             >
               <Filter size={14} /> Reset
             </button>
             {canManageCatalog && (
               <button
                 onClick={() => setAddModalOpen(true)}
-                className="btn-primary btn-sm flex items-center justify-center gap-1.5"
+                className="btn-primary btn-sm flex items-center justify-center gap-1.5 flex-1 sm:flex-initial"
               >
                 <Plus size={14} /> Add Product
               </button>
             )}
-            </div>
-          </>
+          </div>
         }
       />
 
       {/* Summary KPI Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
         {[
-          { label: 'Total Products', value: productsList.length.toLocaleString(), color: 'text-slate-800' },
-          { label: 'Published', value: productsList.filter(p => p.status === 'published').length.toLocaleString(), color: 'text-emerald-600' },
-          { label: 'Needs Validation', value: productsList.filter(p => p.validationStatus === 'failed').length.toLocaleString(), color: 'text-amber-600' },
-          { label: 'Failed Sync', value: productsList.filter(p => p.status === 'failed').length.toLocaleString(), color: 'text-rose-600' },
-          { label: 'Suppliers', value: '27', color: 'text-primary-600' },
-          { label: 'Connected Stores', value: '7', color: 'text-violet-600' },
+          { label: 'Total Products',  value: productsList.length.toLocaleString(), color: 'text-slate-800 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800' },
+          { label: 'Published',       value: productsList.filter(p => p.status === 'published').length.toLocaleString(), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/50' },
+          { label: 'Needs Validation',value: productsList.filter(p => p.validationStatus === 'failed').length.toLocaleString(), color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/50' },
+          { label: 'Failed Sync',     value: productsList.filter(p => p.status === 'failed').length.toLocaleString(), color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/50' },
+          { label: 'Suppliers',       value: '27', color: 'text-primary-600 dark:text-primary-400', bg: 'bg-primary-50/70 dark:bg-primary-950/40 border border-primary-200/80 dark:border-primary-900/50' },
+          { label: 'Connected Stores',value: '7', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50/70 dark:bg-violet-950/40 border border-violet-200/80 dark:border-violet-900/50' },
         ].map(s => (
-          <div key={s.label} className="card p-3.5 text-center">
-            <p className={`text-xl font-black ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-400 font-semibold mt-0.5">{s.label}</p>
+          <div key={s.label} className={`card p-3 sm:p-4 text-center rounded-2xl ${s.bg}`}>
+            <p className={`text-xl sm:text-2xl font-black ${s.color}`}>{s.value}</p>
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-semibold mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
@@ -424,7 +422,7 @@ export const MasterCatalog: React.FC = () => {
       <Tabs tabs={tabs} active={tab} onChange={setTab} />
 
       <FilterBar search={search} onSearch={v => { setSearch(v); setCurrentPage(1); }} placeholder="Search by product name, SKU, or brand...">
-        <div className="flex w-full gap-3 sm:w-auto">
+        <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto">
           <Select
             className="w-full"
             value={supplierFilter}
@@ -456,7 +454,7 @@ export const MasterCatalog: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex flex-wrap items-center gap-2 p-3 bg-primary-50/80 border border-primary-200 rounded-xl shadow-sm overflow-hidden"
+            className="flex flex-wrap items-center gap-2 p-3 bg-primary-50/80 dark:bg-primary-950/60 border border-primary-200 dark:border-primary-800 rounded-xl shadow-sm overflow-hidden"
           >
             <input
               type="checkbox"
@@ -467,34 +465,35 @@ export const MasterCatalog: React.FC = () => {
               }
               onChange={e => handleSelectAll(e.target.checked)}
             />
-            <span className="text-xs font-bold text-primary-900">
-              {selectedIds.length} item{selectedIds.length > 1 ? 's' : ''} selected
+            <span className="text-xs font-bold text-primary-900 dark:text-primary-200">
+              {selectedIds.length} items selected
             </span>
-            <div className="h-4 w-px bg-primary-200 mx-1" />
-            <button
-              onClick={handleBulkPublish}
-              className="btn-secondary btn-sm bg-white text-emerald-700 hover:bg-emerald-50 border-emerald-200 font-semibold"
-            >
-              Bulk Publish
-            </button>
-            <button
-              onClick={handleBulkValidate}
-              className="btn-secondary btn-sm bg-white text-amber-700 hover:bg-amber-50 border-amber-200 font-semibold"
-            >
-              Bulk Validate
-            </button>
-            <button
-              onClick={handleBulkDelete}
-              className="btn-secondary btn-sm bg-white text-rose-700 hover:bg-rose-50 border-rose-200 font-semibold"
-            >
-              Bulk Delete
-            </button>
+            <div className="flex items-center gap-1.5 ml-auto flex-wrap">
+              <button
+                onClick={handleBulkPublish}
+                className="btn-primary btn-sm"
+              >
+                Bulk Publish
+              </button>
+              <button
+                onClick={handleBulkValidate}
+                className="btn-secondary btn-sm bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/60 border-amber-200 dark:border-amber-900/60 font-semibold"
+              >
+                Bulk Validate
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                className="btn-secondary btn-sm bg-white dark:bg-slate-800 text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 border-rose-200 dark:border-rose-900/60 font-semibold"
+              >
+                Bulk Delete
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Product Table */}
-      <div className="card overflow-hidden border border-slate-200 shadow-card">
+      <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card">
         <div className="table-container">
           <table className="table">
             <thead>

@@ -164,21 +164,21 @@ interface TabsProps {
 }
 
 export const Tabs: React.FC<TabsProps> = ({ tabs, active, onChange }) => (
-  <div className="flex gap-1 border-b border-slate-200 mb-6 overflow-x-auto scrollbar-hide">
+  <div className="flex gap-1 border-b border-slate-200 dark:border-slate-800 mb-6 overflow-x-auto scrollbar-hide">
     {tabs.map(tab => (
       <button
         key={tab.id}
         onClick={() => onChange(tab.id)}
         className={cn(
-          'px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-all duration-200',
+          'px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition-all duration-200',
           active === tab.id
-            ? 'border-primary-600 text-primary-700'
-            : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+            ? 'border-primary-600 text-primary-700 dark:text-primary-400 font-bold'
+            : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-700'
         )}
       >
         {tab.label}
         {tab.count !== undefined && (
-          <span className={cn('ml-2 px-1.5 py-0.5 rounded-full text-xs', active === tab.id ? 'bg-primary-100 text-primary-700' : 'bg-slate-100 text-slate-500')}>
+          <span className={cn('ml-2 px-1.5 py-0.5 rounded-full text-xs font-bold', active === tab.id ? 'bg-primary-100 dark:bg-primary-950/80 text-primary-700 dark:text-primary-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400')}>
             {tab.count}
           </span>
         )}
