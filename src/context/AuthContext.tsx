@@ -148,32 +148,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-2.5 sm:p-6 lg:p-8 bg-gradient-mesh relative overflow-y-auto">
         {/* Ambient background glow accents */}
-        <div className="absolute top-10 left-10 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-10 left-10 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-violet-500/15 rounded-full blur-3xl" />
 
         {/* 2-Column Responsive Card */}
         <div className="max-w-4xl w-full bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 relative z-10 my-auto">
           
-          {/* Left Column: FULL DISPLAY HERO IMAGE COVER */}
+          {/* Left Column: FULL DISPLAY GOLDEN HERO IMAGE COVER */}
           <div className="hidden lg:flex lg:col-span-5 relative min-h-0 flex-col justify-between p-6 lg:p-8 text-white overflow-hidden">
             {/* Full Display Background Cover Image */}
             <img
-              src="/login_hero.png"
+              src="/login_hero_golden.png"
               alt="SupplyBridge Middleware Architecture"
               className="absolute inset-0 w-full h-full object-cover z-0 scale-105"
             />
-            {/* Dark Gradient Overlay for high text contrast */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/70 to-indigo-950/80 z-10" />
+            {/* Dark Golden Gradient Overlay for high text contrast */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-amber-950/40 z-10" />
 
             {/* Top Brand Logo */}
             <div className="relative z-20">
               <div className="flex items-center gap-2.5 mb-6">
-                <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-black shadow-lg border border-white/20">
-                  <Zap size={20} />
+                <div className="w-9 h-9 rounded-xl bg-amber-500/30 backdrop-blur-md flex items-center justify-center text-white font-black shadow-lg border border-amber-400/40">
+                  <Zap size={20} className="text-amber-400 fill-amber-400/20 animate-pulse" />
                 </div>
                 <div>
                   <h1 className="font-extrabold text-white text-base tracking-tight">SupplyBridge</h1>
-                  <p className="text-[10px] text-cyan-300 font-bold uppercase tracking-wider">Enterprise Middleware & PIM</p>
+                  <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Enterprise Middleware & PIM</p>
                 </div>
               </div>
 
@@ -191,8 +191,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   { icon: <RefreshCw size={13} />, text: 'Real-time Inventory & Pricing Pipeline' },
                   { icon: <Globe size={13} />, text: 'Multi-Storefront Validation & Sync' },
                 ].map((f, i) => (
-                  <div key={i} className="flex items-center gap-2 text-2xs text-white font-bold bg-slate-900/60 backdrop-blur-md px-3 py-2 rounded-lg border border-white/20">
-                    <span className="text-cyan-400">{f.icon}</span>
+                  <div key={i} className="flex items-center gap-2 text-2xs text-white font-bold bg-slate-950/70 backdrop-blur-md px-3 py-2 rounded-lg border border-amber-500/30">
+                    <span className="text-amber-400">{f.icon}</span>
                     <span>{f.text}</span>
                   </div>
                 ))}
@@ -229,7 +229,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="name@supplybridge.io"
-                    className="input py-1.5 px-3 text-xs focus:ring-2 focus:ring-primary-500/20"
+                    className="input py-1.5 px-3 text-xs focus:ring-2 focus:ring-amber-500/20"
                   />
                 </div>
 
@@ -243,7 +243,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="input py-1.5 px-3 text-xs focus:ring-2 focus:ring-primary-500/20"
+                    className="input py-1.5 px-3 text-xs focus:ring-2 focus:ring-amber-500/20"
                   />
                 </div>
 
@@ -251,7 +251,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 <button
                   type="submit"
                   disabled={isLoggingIn}
-                  className="btn-primary w-full py-2.5 text-xs sm:text-sm font-bold shadow-md shadow-indigo-500/20 mt-1"
+                  className="btn-primary w-full py-2.5 text-xs sm:text-sm font-bold shadow-md shadow-amber-500/25 mt-1"
                 >
                   {isLoggingIn ? (
                     <>
@@ -285,8 +285,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                       onClick={() => handleRoleSelect(preset)}
                       className={`w-full p-1.5 px-2.5 rounded-lg border text-left transition-all duration-150 flex items-center justify-between gap-2 group ${
                         isSelected
-                          ? 'bg-primary-50/90 dark:bg-primary-950/80 border-primary-500 dark:border-primary-500 ring-1 ring-primary-500/20'
-                          : 'bg-slate-50/70 dark:bg-slate-800/80 border-slate-200/90 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'
+                          ? 'bg-amber-50/90 dark:bg-amber-950/80 border-amber-500 dark:border-amber-500 ring-1 ring-amber-500/20'
+                          : 'bg-slate-50/70 dark:bg-slate-800/80 border-slate-200/90 dark:border-slate-700/80 hover:bg-amber-50/50 dark:hover:bg-slate-800 hover:border-amber-300 dark:hover:border-slate-600'
                       }`}
                     >
                       <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -295,16 +295,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
-                            <p className="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors truncate">
+                            <p className="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
                               {preset.label}
                             </p>
-                            {isSelected && <span className="text-[9px] bg-primary-600 text-white font-bold px-1.5 py-0.2 rounded-full flex-shrink-0">Selected</span>}
+                            {isSelected && <span className="text-[9px] bg-amber-500 text-white font-bold px-1.5 py-0.2 rounded-full flex-shrink-0">Selected</span>}
                           </div>
                           <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{preset.email}</p>
                         </div>
                       </div>
 
-                      <span className="text-[11px] text-primary-600 dark:text-primary-400 font-bold opacity-80 group-hover:opacity-100 transition-all flex-shrink-0">
+                      <span className="text-[11px] text-amber-600 dark:text-amber-400 font-bold opacity-80 group-hover:opacity-100 transition-all flex-shrink-0">
                         Fill →
                       </span>
                     </button>
