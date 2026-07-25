@@ -211,28 +211,28 @@ export const Logs: React.FC = () => {
       />
 
       {/* KPI Cards for System Issues */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
         {[
-          { id: 'all', label: 'Total Logged Events', value: logs.length, sub: 'Last 24 hours', icon: <FileText size={16} className="text-primary-600" />, bg: 'bg-primary-50', activeClass: 'border-primary-500 ring-2 ring-primary-500/10 bg-primary-25/50', activeNumberClass: 'text-primary-600' },
-          { id: 'error', label: 'Errors Logged', value: logs.filter(l => l.level === 'error').length, sub: 'Requires attention', icon: <ShieldAlert size={16} className="text-rose-600" />, bg: 'bg-rose-50', activeClass: 'border-rose-500 ring-2 ring-rose-500/10 bg-rose-25/50', activeNumberClass: 'text-rose-600' },
-          { id: 'warning', label: 'Warnings', value: logs.filter(l => l.level === 'warning').length, sub: 'System warnings', icon: <AlertTriangle size={16} className="text-amber-600" />, bg: 'bg-amber-50', activeClass: 'border-amber-500 ring-2 ring-amber-500/10 bg-amber-25/50', activeNumberClass: 'text-amber-600' },
-          { id: 'info', label: 'Sync & Import Success', value: '98.4%', sub: 'Avg success rate', icon: <CheckCircle2 size={16} className="text-emerald-600" />, bg: 'bg-emerald-50', activeClass: 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-25/50', activeNumberClass: 'text-emerald-600' },
+          { id: 'all', label: 'Total Logged Events', value: logs.length, sub: 'Last 24 hours', icon: <FileText size={16} className="text-primary-600 dark:text-primary-400" />, bg: 'bg-primary-50', activeClass: 'border-primary-500 ring-2 ring-primary-500/10 bg-primary-25/50', activeNumberClass: 'text-primary-600 dark:text-primary-400' },
+          { id: 'error', label: 'Errors Logged', value: logs.filter(l => l.level === 'error').length, sub: 'Requires attention', icon: <ShieldAlert size={16} className="text-rose-600 dark:text-rose-400" />, bg: 'bg-rose-50', activeClass: 'border-rose-500 ring-2 ring-rose-500/10 bg-rose-25/50', activeNumberClass: 'text-rose-600 dark:text-rose-400' },
+          { id: 'warning', label: 'Warnings', value: logs.filter(l => l.level === 'warning').length, sub: 'System warnings', icon: <AlertTriangle size={16} className="text-amber-600 dark:text-amber-400" />, bg: 'bg-amber-50', activeClass: 'border-amber-500 ring-2 ring-amber-500/10 bg-amber-25/50', activeNumberClass: 'text-amber-600 dark:text-amber-400' },
+          { id: 'info', label: 'Sync & Import Success', value: '98.4%', sub: 'Avg success rate', icon: <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400" />, bg: 'bg-emerald-50', activeClass: 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-25/50', activeNumberClass: 'text-emerald-600 dark:text-emerald-400' },
         ].map((card) => {
           const isSelected = activeTab === card.id;
           return (
             <div
               key={card.label}
               onClick={() => setActiveTab(card.id)}
-              className={`card p-5 flex items-start justify-between transition-all duration-200 cursor-pointer hover:shadow-card-md hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 ${
+              className={`card p-3.5 sm:p-4 flex items-start justify-between transition-all duration-200 cursor-pointer hover:shadow-card-md hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 ${
                 isSelected ? card.activeClass : 'border-surface-border'
               }`}
             >
               <div>
-                <p className={`text-2xl font-bold transition-colors duration-200 ${isSelected ? card.activeNumberClass : 'text-slate-900 dark:text-slate-100'}`}>{card.value}</p>
-                <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-1">{card.label}</p>
+                <p className={`text-xl sm:text-2xl font-bold transition-colors duration-200 ${isSelected ? card.activeNumberClass : 'text-slate-900 dark:text-slate-100'}`}>{card.value}</p>
+                <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5 truncate">{card.label}</p>
                 <p className="text-xxs text-slate-400 dark:text-slate-400 mt-0.5">{card.sub}</p>
               </div>
-              <div className={`w-9 h-9 rounded-xl ${card.bg} dark:bg-slate-800/80 flex items-center justify-center flex-shrink-0`}>
+              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl ${card.bg} dark:bg-slate-800/80 flex items-center justify-center flex-shrink-0 ml-1`}>
                 {card.icon}
               </div>
             </div>
@@ -245,10 +245,10 @@ export const Logs: React.FC = () => {
 
       {/* Filter Bar with Dropdowns */}
       <FilterBar search={search} onSearch={setSearch} placeholder="Search log message, details, job ID...">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto">
           {/* Level Filter Dropdown */}
           <select
-            className="input py-1 px-3 text-xs w-36"
+            className="input py-1.5 px-3 text-xs flex-1 sm:w-36 min-w-[120px]"
             value={levelFilter}
             onChange={e => setLevelFilter(e.target.value)}
           >
@@ -262,7 +262,7 @@ export const Logs: React.FC = () => {
 
           {/* Type Filter Dropdown */}
           <select
-            className="input py-1 px-3 text-xs w-36"
+            className="input py-1.5 px-3 text-xs flex-1 sm:w-36 min-w-[120px]"
             value={typeFilter}
             onChange={e => setTypeFilter(e.target.value)}
           >
@@ -296,11 +296,18 @@ export const Logs: React.FC = () => {
             <tbody>
               {filteredLogs.length > 0 ? (
                 filteredLogs.map(log => (
-                  <tr key={log.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                  <tr
+                    key={log.id}
+                    onClick={() => setSelectedLog(log)}
+                    className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+                  >
                     <td data-label="Level" className="py-3.5 px-4 text-center">
-                      <div className="flex justify-center">{getLevelIcon(log.level)}</div>
+                      <div className="flex items-center justify-end sm:justify-center gap-1.5">
+                        {getLevelIcon(log.level)}
+                        <span className="font-bold capitalize text-xs sm:hidden text-slate-700 dark:text-slate-200">{log.level}</span>
+                      </div>
                     </td>
-                    <td data-label="Timestamp" className="py-3.5 px-4 text-slate-500 dark:text-slate-400 font-mono">
+                    <td data-label="Timestamp" className="py-3.5 px-4 text-slate-500 dark:text-slate-400 font-mono text-xs">
                       {format(new Date(log.timestamp), 'yyyy-MM-dd HH:mm:ss')}
                     </td>
                     <td data-label="Type" className="py-3.5 px-4">
@@ -324,9 +331,12 @@ export const Logs: React.FC = () => {
                         <span className="text-slate-400 dark:text-slate-400 italic">System Scope</span>
                       )}
                     </td>
-                    <td data-label="Action" className="py-3.5 px-4 text-center">
+                    <td data-label="Action" className="mobile-hidden py-3.5 px-4 text-center">
                       <button
-                        onClick={() => setSelectedLog(log)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSelectedLog(log)
+                        }}
                         className="btn-icon hover:bg-primary-600 hover:text-white transition-all duration-200"
                         title="View Details"
                       >
