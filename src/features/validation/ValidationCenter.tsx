@@ -319,12 +319,7 @@ export const ValidationCenter: React.FC = () => {
                     </div>
                   </div>
                 </div>
-<<<<<<< HEAD
                 <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full md:w-auto justify-end pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800" onClick={e => e.stopPropagation()}>
-=======
-                <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-start items-center pt-3 sm:pt-0 pl-7 sm:pl-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/60" onClick={e => e.stopPropagation()}>
-                  <Badge variant={statusToVariant(item.status)} className="hidden md:inline-flex self-center mr-1">{item.status}</Badge>
->>>>>>> 70f5f610af14f62a03d1b7d0beeb462a90b16aee
                   {role !== 'operations_staff' && (
                     <>
                       <button
