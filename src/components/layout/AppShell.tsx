@@ -74,7 +74,7 @@ export const AppShell: React.FC = () => {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="p-3 sm:p-5 pb-20 sm:pb-12 mb-16 sm:mb-0 w-full max-w-full min-h-full"
+            className="p-3 sm:p-5 lg:p-6 pb-6 sm:pb-8 w-full max-w-full min-h-full"
           >
             <Outlet />
           </motion.div>
