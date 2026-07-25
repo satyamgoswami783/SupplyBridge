@@ -146,10 +146,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   if (isLoggedOut) {
     return (
-      <div className="min-h-screen w-full bg-slate-950 flex flex-col lg:flex-row overflow-x-hidden font-sans">
+      <div className="min-h-screen lg:h-screen w-full bg-slate-950 flex flex-col lg:flex-row overflow-x-hidden lg:overflow-hidden font-sans">
         
         {/* LEFT COLUMN: FULL SCREEN HERO BANNER & PROJECT BRANDING */}
-        <div className="lg:w-7/12 relative min-h-[500px] lg:min-h-screen flex flex-col justify-between p-6 sm:p-10 lg:p-14 text-white overflow-hidden bg-slate-950">
+        <div className="lg:w-7/12 relative min-h-[420px] lg:h-screen flex flex-col justify-between p-6 sm:p-8 lg:p-10 text-white overflow-hidden bg-slate-950 flex-shrink-0">
           {/* Full Screen Background Cover Image */}
           <img
             src="/login_hero_golden.png"
@@ -162,44 +162,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           {/* Top Brand Header */}
           <div className="relative z-20">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-11 h-11 rounded-2xl bg-amber-500/30 backdrop-blur-md flex items-center justify-center text-white font-black shadow-glow-primary border border-amber-400/40">
-                <Zap size={24} className="text-amber-400 fill-amber-400/20 animate-pulse" />
+            <div className="flex items-center gap-2.5 mb-5">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/30 backdrop-blur-md flex items-center justify-center text-white font-black shadow-glow-primary border border-amber-400/40">
+                <Zap size={22} className="text-amber-400 fill-amber-400/20 animate-pulse" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="font-black text-white text-xl tracking-tight bg-gradient-to-r from-white via-slate-100 to-amber-200 bg-clip-text text-transparent">
+                  <h1 className="font-black text-white text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-amber-200 bg-clip-text text-transparent">
                     SupplyBridge
                   </h1>
-                  <span className="text-[10px] font-black bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs border border-amber-400/40">
+                  <span className="text-[9px] font-black bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs border border-amber-400/40">
                     PRO v2.4
                   </span>
                 </div>
-                <p className="text-xs text-amber-400 font-bold uppercase tracking-wider">Enterprise Middleware & PIM Platform</p>
+                <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Enterprise Middleware & PIM Platform</p>
               </div>
             </div>
 
             <div className="max-w-xl">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white mb-4 leading-tight drop-shadow-md">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white mb-2 leading-tight drop-shadow-md">
                 Centralized Product & Multi-Supplier Hub
               </h2>
-              <p className="text-sm sm:text-base text-slate-200 leading-relaxed mb-8 font-medium drop-shadow-sm">
+              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed mb-4 font-medium drop-shadow-sm">
                 Automated multi-supplier data normalization, real-time inventory & pricing pipelines, pre-publication validation, and Shift4Shop storefront publishing engine.
               </p>
 
               {/* 4 Feature Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
                 {[
-                  { icon: <Database size={16} />, title: 'Master Catalog PIM', desc: 'Single Source of Truth SKU taxonomy & parent/child maps' },
-                  { icon: <RefreshCw size={16} />, title: 'Real-Time Sync Engine', desc: 'Automated API, FTP & file feed inventory/price updates' },
-                  { icon: <Globe size={16} />, title: 'Multi-Store Publishing', desc: 'Shift4Shop API gateway v2 & store-specific allocation' },
-                  { icon: <ShieldCheck size={16} />, title: 'Validation Center', desc: 'Pre-publish error queue & 5-role RBAC permission control' },
+                  { icon: <Database size={15} />, title: 'Master Catalog PIM', desc: 'Single Source of Truth SKU taxonomy & parent/child maps' },
+                  { icon: <RefreshCw size={15} />, title: 'Real-Time Sync Engine', desc: 'Automated API, FTP & file feed inventory/price updates' },
+                  { icon: <Globe size={15} />, title: 'Multi-Store Publishing', desc: 'Shift4Shop API gateway v2 & store-specific allocation' },
+                  { icon: <ShieldCheck size={15} />, title: 'Validation Center', desc: 'Pre-publish error queue & 5-role RBAC permission control' },
                 ].map((f, i) => (
-                  <div key={i} className="flex items-start gap-3 text-xs text-white font-bold bg-slate-950/70 backdrop-blur-md p-3.5 rounded-xl border border-amber-500/30 hover:border-amber-400/60 transition-colors">
-                    <span className="text-amber-400 p-2 rounded-lg bg-amber-500/20 border border-amber-500/30 flex-shrink-0">{f.icon}</span>
+                  <div key={i} className="flex items-start gap-2.5 text-xs text-white font-bold bg-slate-950/70 backdrop-blur-md p-2.5 rounded-xl border border-amber-500/30 hover:border-amber-400/60 transition-colors">
+                    <span className="text-amber-400 p-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30 flex-shrink-0">{f.icon}</span>
                     <div>
                       <p className="font-extrabold text-amber-200 text-xs mb-0.5">{f.title}</p>
-                      <p className="text-2xs text-slate-300 font-normal leading-normal">{f.desc}</p>
+                      <p className="text-[10px] text-slate-300 font-normal leading-tight">{f.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -208,13 +208,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           </div>
 
           {/* Bottom Live System Telemetry Banner */}
-          <div className="relative z-20 flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-white/20 mt-6">
-            <div className="flex items-center gap-3">
-              <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse shadow-glow-emerald" />
+          <div className="relative z-20 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-white/20 mt-4">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-glow-emerald" />
               <span className="text-xs font-bold text-white">Live Data Middleware Active</span>
-              <span className="text-2xs text-slate-400 font-mono">· 25 Active Suppliers</span>
+              <span className="text-[10px] text-slate-400 font-mono">· 25 Active Suppliers</span>
             </div>
-            <div className="flex items-center gap-4 text-2xs text-slate-300 font-semibold">
+            <div className="flex items-center gap-3 text-[10px] text-slate-300 font-semibold">
               <span>Shift4Shop REST API v2</span>
               <span>·</span>
               <span>ISO 27001 Certified</span>
@@ -223,24 +223,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         </div>
 
         {/* RIGHT COLUMN: FULL SCREEN LOGIN FORM & ROLE SELECTOR */}
-        <div className="lg:w-5/12 bg-white dark:bg-slate-900 p-6 sm:p-10 lg:p-12 flex flex-col justify-center border-l border-slate-200 dark:border-slate-800 relative z-20 min-h-screen">
-          <div className="max-w-md mx-auto w-full my-auto py-6">
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-2 lg:hidden">
-                <div className="w-8 h-8 rounded-xl bg-amber-500/30 backdrop-blur-md flex items-center justify-center text-white font-black border border-amber-400/40">
-                  <Zap size={16} className="text-amber-400" />
+        <div className="lg:w-5/12 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 flex flex-col justify-center border-l border-slate-200 dark:border-slate-800 relative z-20 lg:h-screen lg:max-h-screen overflow-y-auto">
+          <div className="max-w-md mx-auto w-full my-auto py-2">
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-1.5 lg:hidden">
+                <div className="w-7 h-7 rounded-xl bg-amber-500/30 backdrop-blur-md flex items-center justify-center text-white font-black border border-amber-400/40">
+                  <Zap size={15} className="text-amber-400" />
                 </div>
-                <span className="font-black text-slate-900 dark:text-white text-base">SupplyBridge</span>
+                <span className="font-black text-slate-900 dark:text-white text-sm">SupplyBridge</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Sign In to Platform</h2>
-              <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Enter your account credentials or choose a quick demo role to autofill.</p>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Sign In to Platform</h2>
+              <p className="text-2xs sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">Enter your account credentials or choose a quick demo role to autofill.</p>
             </div>
 
             {/* Login Form */}
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
+            <form onSubmit={handleLoginSubmit} className="space-y-2">
               <div>
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5 flex items-center gap-1.5">
-                  <Mail size={14} className="text-slate-400" /> Email Address
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1 flex items-center gap-1">
+                  <Mail size={12} className="text-slate-400" /> Email Address
                 </label>
                 <input
                   type="email"
@@ -248,13 +248,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="name@supplybridge.io"
-                  className="input py-2.5 px-3.5 text-xs sm:text-sm focus:ring-2 focus:ring-amber-500/20"
+                  className="input py-1.5 px-3 text-xs focus:ring-2 focus:ring-amber-500/20"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5 flex items-center gap-1.5">
-                  <Lock size={14} className="text-slate-400" /> Password
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1 flex items-center gap-1">
+                  <Lock size={12} className="text-slate-400" /> Password
                 </label>
                 <input
                   type="password"
@@ -262,7 +262,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="input py-2.5 px-3.5 text-xs sm:text-sm focus:ring-2 focus:ring-amber-500/20"
+                  className="input py-1.5 px-3 text-xs focus:ring-2 focus:ring-amber-500/20"
                 />
               </div>
 
@@ -270,31 +270,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               <button
                 type="submit"
                 disabled={isLoggingIn}
-                className="btn-primary w-full py-3 text-sm font-bold shadow-md shadow-amber-500/25 mt-2"
+                className="btn-primary w-full py-2.5 text-xs sm:text-sm font-bold shadow-md shadow-amber-500/25 mt-1"
               >
                 {isLoggingIn ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Authenticating...
                   </>
                 ) : (
                   <>
-                    Sign In to Dashboard <ArrowRight size={16} />
+                    Sign In to Dashboard <ArrowRight size={15} />
                   </>
                 )}
               </button>
             </form>
 
             {/* Divider */}
-            <div className="relative my-6 text-center">
+            <div className="relative my-2.5 text-center">
               <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200 dark:border-slate-800" /></div>
-              <span className="relative px-3 bg-white dark:bg-slate-900 text-2xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">
+              <span className="relative px-2 bg-white dark:bg-slate-900 text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">
                 Or Auto-fill Quick Role Preset
               </span>
             </div>
 
             {/* 5 Role Preset Buttons */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {ROLE_PRESETS.map(preset => {
                 const isSelected = selectedRole === preset.role && email === preset.email
                 return (
@@ -302,14 +302,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     key={preset.role}
                     type="button"
                     onClick={() => handleRoleSelect(preset)}
-                    className={`w-full p-2.5 sm:p-3 rounded-xl border text-left transition-all duration-150 flex items-center justify-between gap-3 group ${
+                    className={`w-full p-1.5 px-2.5 rounded-lg border text-left transition-all duration-150 flex items-center justify-between gap-2 group ${
                       isSelected
                         ? 'bg-amber-50/90 dark:bg-amber-950/80 border-amber-500 dark:border-amber-500 ring-1 ring-amber-500/20'
                         : 'bg-slate-50/70 dark:bg-slate-800/80 border-slate-200/90 dark:border-slate-700/80 hover:bg-amber-50/50 dark:hover:bg-slate-800 hover:border-amber-300 dark:hover:border-slate-600'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${preset.color} flex items-center justify-center text-white text-xs font-bold shadow-2xs flex-shrink-0`}>
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${preset.color} flex items-center justify-center text-white text-[10px] font-bold shadow-2xs flex-shrink-0`}>
                         {preset.label.charAt(0)}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -319,11 +319,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                           </p>
                           {isSelected && <span className="text-[9px] bg-amber-500 text-white font-bold px-1.5 py-0.2 rounded-full flex-shrink-0">Selected</span>}
                         </div>
-                        <p className="text-2xs text-slate-500 dark:text-slate-400 truncate">{preset.email}</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{preset.email}</p>
                       </div>
                     </div>
 
-                    <span className="text-xs text-amber-600 dark:text-amber-400 font-bold opacity-80 group-hover:opacity-100 transition-all flex-shrink-0">
+                    <span className="text-[11px] text-amber-600 dark:text-amber-400 font-bold opacity-80 group-hover:opacity-100 transition-all flex-shrink-0">
                       Fill →
                     </span>
                   </button>
