@@ -283,12 +283,14 @@ export const ImportQueue: React.FC = () => {
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-slate-800 dark:text-slate-100 text-sm sm:text-base">{item.supplierName}</span>
-                    <Badge variant="info">{connectionTypeLabel(item.connectionType)}</Badge>
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-slate-800 dark:text-slate-100 text-sm sm:text-base">{item.supplierName}</span>
+                      <Badge variant="info">{connectionTypeLabel(item.connectionType)}</Badge>
+                    </div>
                   </div>
-                  <Badge variant={statusToVariant(item.status)} dot>{item.status}</Badge>
+                  <Badge variant={statusToVariant(item.status)} dot className="flex-shrink-0">{item.status}</Badge>
                 </div>
 
                 {item.fileName && (
@@ -303,23 +305,30 @@ export const ImportQueue: React.FC = () => {
                   </p>
                 )}
 
-                <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
-                  {item.processedRecords > 0 && (
-                    <span className="inline-flex items-center gap-1">
+                {/* Structured 2x2 Telemetry Grid for Mobile & Desktop */}
+                <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 text-xs mb-3">
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Processed</span>
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-0.5">
                       <CheckCircle2 size={12} className="text-emerald-500 flex-shrink-0" />
-                      <strong className="text-slate-800 dark:text-slate-100">{item.processedRecords.toLocaleString()}</strong> processed
+                      {item.processedRecords > 0 ? item.processedRecords.toLocaleString() : '0'}
                     </span>
-                  )}
-                  {item.failedRecords > 0 && (
-                    <span className="text-rose-600 dark:text-rose-400 font-bold inline-flex items-center gap-1">
-                      <XCircle size={12} className="text-rose-500 flex-shrink-0" />
-                      {item.failedRecords.toLocaleString()} failed
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Failed</span>
+                    <span className={`font-bold flex items-center gap-1 mt-0.5 ${item.failedRecords > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                      <XCircle size={12} className={item.failedRecords > 0 ? 'text-rose-500' : 'text-slate-400'} />
+                      {item.failedRecords > 0 ? item.failedRecords.toLocaleString() : '0'}
                     </span>
-                  )}
-                </div>
-
-                <div className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-                  Total: <strong className="text-slate-800 dark:text-slate-100">{item.totalRecords.toLocaleString()}</strong> SKUs <span className="font-mono">• {timeAgo(item.createdAt)}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Size</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 mt-0.5 block">{item.totalRecords.toLocaleString()} SKUs</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Ingested</span>
+                    <span className="font-mono text-slate-500 dark:text-slate-400 mt-0.5 block text-2xs">{timeAgo(item.createdAt)}</span>
+                  </div>
                 </div>
 
                 {item.status === 'processing' && (
@@ -334,7 +343,7 @@ export const ImportQueue: React.FC = () => {
                 )}
 
                 {/* Card Bottom Actions Bar */}
-                <div className="flex items-center justify-between sm:justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80 mt-2">
+                <div className="flex items-center justify-between sm:justify-end gap-2 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 mt-2">
                   <button
                     onClick={() => setPreviewItem(item)}
                     className="btn-ghost btn-sm font-bold flex items-center justify-center gap-1.5 text-primary-600 dark:text-primary-400 cursor-pointer"
