@@ -618,7 +618,7 @@ export const MasterCatalog: React.FC = () => {
                     </td>
                     <td data-label="" className="text-center mobile-full">
                       <div
-                        className="flex items-center justify-center gap-1 w-full md:w-auto"
+                        className="flex items-center justify-end md:justify-center gap-1.5 w-full md:w-auto"
                         onClick={e => e.stopPropagation()}
                       >
                         <button
