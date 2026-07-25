@@ -353,12 +353,7 @@
 
   /* ─── Modal overlay ──────────────────────────────────── */
   .modal-overlay {
-    @apply fixed inset-0 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 transition-all duration-300;
-    background: radial-gradient(circle at center, rgba(245, 158, 11, 0.32) 0%, rgba(217, 119, 6, 0.22) 45%, rgba(15, 23, 42, 0.72) 100%);
-  }
-
-  .dark .modal-overlay {
-    background: radial-gradient(circle at center, rgba(245, 158, 11, 0.25) 0%, rgba(99, 102, 241, 0.18) 50%, rgba(9, 13, 22, 0.85) 100%) !important;
+    @apply fixed inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 transition-all duration-200;
   }
 
   .modal-panel {
