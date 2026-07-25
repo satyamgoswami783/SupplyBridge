@@ -303,9 +303,9 @@ export const ImageSync: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Image Asset Audit Table — Exact Image 1 UI with Responsive Horizontal Scroll */}
+        {/* Main Image Asset Audit Table */}
         <div className="table-container w-full overflow-x-auto scrollbar-thin">
-          <table className="table min-w-[950px] w-full">
+          <table className="table min-w-0 sm:min-w-[950px] w-full">
             <thead>
               <tr className="bg-slate-100/90 dark:bg-slate-950/90 border-b-2 border-slate-200 dark:border-slate-800">
                 <th className="whitespace-nowrap px-4 py-3.5">PRODUCT TITLE</th>
