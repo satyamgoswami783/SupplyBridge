@@ -210,17 +210,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           </div>
 
           {/* Right Column: Interactive Login Form & Role Selector */}
-          <div className="lg:col-span-7 p-5 sm:p-8 lg:p-10 bg-white flex flex-col justify-center">
+          <div className="lg:col-span-7 p-5 sm:p-8 lg:p-10 bg-white dark:bg-slate-900 flex flex-col justify-center">
             <div className="max-w-md mx-auto w-full">
               <div className="mb-6">
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Sign In</h2>
-                <p className="text-xs font-medium text-slate-500 mt-1">Enter your credentials or choose a quick demo role to autofill.</p>
+                <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Sign In</h2>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Enter your credentials or choose a quick demo role to autofill.</p>
               </div>
 
               {/* Login Form */}
               <form onSubmit={handleLoginSubmit} className="space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center gap-1.5">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5 flex items-center gap-1.5">
                     <Mail size={13} className="text-slate-400" /> Email Address
                   </label>
                   <input
@@ -234,7 +234,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center gap-1.5">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5 flex items-center gap-1.5">
                     <Lock size={13} className="text-slate-400" /> Password
                   </label>
                   <input
@@ -268,8 +268,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
               {/* Divider */}
               <div className="relative my-6 text-center">
-                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
-                <span className="relative px-3 bg-white text-2xs uppercase tracking-wider text-slate-400 font-bold">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200 dark:border-slate-800" /></div>
+                <span className="relative px-3 bg-white dark:bg-slate-900 text-2xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">
                   Or Auto-fill Quick Role Preset
                 </span>
               </div>
@@ -285,8 +285,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                       onClick={() => handleRoleSelect(preset)}
                       className={`w-full p-2.5 sm:p-3 rounded-xl border text-left transition-all duration-200 flex items-center justify-between gap-3 group ${
                         isSelected
-                          ? 'bg-primary-50/90 border-primary-500 ring-2 ring-primary-500/20'
-                          : 'bg-slate-50/70 border-slate-200/90 hover:bg-slate-100 hover:border-slate-300'
+                          ? 'bg-primary-50/90 dark:bg-primary-950/80 border-primary-500 dark:border-primary-500 ring-2 ring-primary-500/20'
+                          : 'bg-slate-50/70 dark:bg-slate-800/80 border-slate-200/90 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -295,16 +295,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-1.5">
-                            <p className="text-xs font-bold text-slate-800 group-hover:text-primary-700 transition-colors truncate">
+                            <p className="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors truncate">
                               {preset.label}
                             </p>
                             {isSelected && <span className="text-2xs bg-primary-600 text-white font-bold px-1.5 py-0.5 rounded-full flex-shrink-0">Selected</span>}
                           </div>
-                          <p className="text-2xs text-slate-500 truncate">{preset.email}</p>
+                          <p className="text-2xs text-slate-500 dark:text-slate-400 truncate">{preset.email}</p>
                         </div>
                       </div>
 
-                      <span className="text-xs text-primary-600 font-bold opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all flex-shrink-0 ml-1">
+                      <span className="text-xs text-primary-600 dark:text-primary-400 font-bold opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all flex-shrink-0 ml-1">
                         Fill →
                       </span>
                     </button>
