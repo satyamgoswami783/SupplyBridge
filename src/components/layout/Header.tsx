@@ -49,11 +49,27 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
   ]
 
   return (
-    <header className="sticky top-0 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 h-14 flex items-center px-4 gap-4 transition-colors duration-200">
-      {/* Mobile menu */}
-      <button onClick={onMenuClick} className="lg:hidden btn-icon dark:text-slate-300 dark:hover:bg-slate-800">
-        <Menu size={20} />
-      </button>
+    <header className="sticky top-0 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 h-14 flex items-center px-3 sm:px-4 gap-3 sm:gap-4 transition-colors duration-200">
+      {/* Mobile menu & Glowing Brand Badge */}
+      <div className="flex items-center gap-2 lg:hidden">
+        <button onClick={onMenuClick} className="btn-icon text-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
+          <Menu size={20} />
+        </button>
+        <div className="flex items-center gap-2">
+          <div className="relative w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-violet-600 to-cyan-400 p-[1.5px] shadow-sm flex items-center justify-center">
+            <div className="w-full h-full bg-slate-950 rounded-[9px] flex items-center justify-center text-white">
+              <Zap size={15} className="text-amber-400 fill-amber-400/20 animate-pulse" />
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center gap-1">
+              <span className="font-black text-slate-900 dark:text-white text-sm tracking-tight">SupplyBridge</span>
+              <span className="text-[8px] font-black bg-amber-500 text-white px-1 py-0.2 rounded-full uppercase">PRO</span>
+            </div>
+            <span className="text-[9px] font-black text-amber-600 dark:text-cyan-400 uppercase tracking-wider block leading-none">Enterprise PIM</span>
+          </div>
+        </div>
+      </div>
 
       {/* Search */}
       <div className="relative flex-1 max-w-md hidden sm:block">

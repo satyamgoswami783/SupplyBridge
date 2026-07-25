@@ -162,19 +162,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
           open ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         )}
       >
-        {/* Logo */}
-        <div className="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between flex-shrink-0">
+        {/* Premium Brand Logo */}
+        <div className="px-4 py-4 border-b border-slate-800/80 flex items-center justify-between flex-shrink-0 bg-slate-950/60 backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-aurora flex items-center justify-center shadow-glow-primary text-white font-black flex-shrink-0">
-              <Zap size={18} />
+            {/* Glowing 3D Brand Icon Badge with Pulse Ring */}
+            <div className="relative group cursor-pointer">
+              <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-violet-600 to-cyan-400 p-[2px] shadow-glow-primary transition-all duration-300 group-hover:scale-105">
+                <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-white">
+                  <Zap size={20} className="text-amber-400 fill-amber-400/20 drop-shadow-md animate-pulse" />
+                </div>
+              </div>
+              <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-slate-950 animate-pulse shadow-glow-emerald" />
             </div>
+
             <div>
-              <span className="font-extrabold text-white text-sm tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-                SupplyBridge
+              <div className="flex items-center gap-1.5">
+                <span className="font-black text-white text-base tracking-tight bg-gradient-to-r from-white via-slate-100 to-amber-200 bg-clip-text text-transparent drop-shadow-xs">
+                  SupplyBridge
+                </span>
+                <span className="text-[9px] font-black bg-gradient-to-r from-amber-500 to-amber-600 text-white px-1.5 py-0.2 rounded-full uppercase tracking-wider shadow-xs border border-amber-400/40">
+                  PRO
+                </span>
+              </div>
+              <span className="block text-[10px] text-amber-400 dark:text-cyan-400 font-extrabold tracking-widest uppercase">
+                Enterprise PIM Middleware
               </span>
-              <span className="block text-2xs text-cyan-400 font-semibold tracking-wider uppercase">Enterprise PIM</span>
             </div>
           </div>
+
           <button onClick={onClose} className="lg:hidden btn-icon text-slate-400 hover:text-white hover:bg-slate-800">
             <X size={18} />
           </button>
