@@ -146,16 +146,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   if (isLoggedOut) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-3 sm:p-6 lg:p-8 pb-24 sm:pb-12 bg-gradient-mesh relative overflow-y-auto">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-2.5 sm:p-6 lg:p-8 bg-gradient-mesh relative overflow-y-auto">
         {/* Ambient background glow accents */}
         <div className="absolute top-10 left-10 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
 
         {/* 2-Column Responsive Card */}
-        <div className="max-w-5xl w-full bg-white rounded-3xl border border-slate-200/90 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 relative z-10 my-auto mb-16 sm:mb-8">
+        <div className="max-w-4xl w-full bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 relative z-10 my-auto">
           
           {/* Left Column: FULL DISPLAY HERO IMAGE COVER */}
-          <div className="lg:col-span-5 relative min-h-[450px] lg:min-h-full flex flex-col justify-between p-8 lg:p-10 text-white overflow-hidden">
+          <div className="hidden lg:flex lg:col-span-5 relative min-h-0 flex-col justify-between p-6 lg:p-8 text-white overflow-hidden">
             {/* Full Display Background Cover Image */}
             <img
               src="/login_hero.png"
@@ -167,31 +167,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             {/* Top Brand Logo */}
             <div className="relative z-20">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-black shadow-lg border border-white/20">
-                  <Zap size={22} />
+              <div className="flex items-center gap-2.5 mb-6">
+                <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-black shadow-lg border border-white/20">
+                  <Zap size={20} />
                 </div>
                 <div>
-                  <h1 className="font-extrabold text-white text-lg tracking-tight">SupplyBridge</h1>
-                  <p className="text-2xs text-cyan-300 font-bold uppercase tracking-wider">Enterprise Middleware & PIM</p>
+                  <h1 className="font-extrabold text-white text-base tracking-tight">SupplyBridge</h1>
+                  <p className="text-[10px] text-cyan-300 font-bold uppercase tracking-wider">Enterprise Middleware & PIM</p>
                 </div>
               </div>
 
-              <h2 className="text-3xl font-black tracking-tight text-white mb-3 leading-tight drop-shadow-md">
+              <h2 className="text-2xl font-black tracking-tight text-white mb-2 leading-tight drop-shadow-md">
                 Centralized Product & Supplier Hub
               </h2>
-              <p className="text-xs text-slate-200 leading-relaxed mb-6 font-medium drop-shadow-sm">
+              <p className="text-xs text-slate-200 leading-relaxed mb-4 font-medium drop-shadow-sm">
                 Automated multi-supplier normalization, inventory sync & Shift4Shop publishing engine.
               </p>
 
               {/* Feature Points */}
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {[
-                  { icon: <Database size={14} />, text: 'Single Source of Truth Master Catalog' },
-                  { icon: <RefreshCw size={14} />, text: 'Real-time Inventory & Pricing Pipeline' },
-                  { icon: <Globe size={14} />, text: 'Multi-Storefront Validation & Sync' },
+                  { icon: <Database size={13} />, text: 'Single Source of Truth Master Catalog' },
+                  { icon: <RefreshCw size={13} />, text: 'Real-time Inventory & Pricing Pipeline' },
+                  { icon: <Globe size={13} />, text: 'Multi-Storefront Validation & Sync' },
                 ].map((f, i) => (
-                  <div key={i} className="flex items-center gap-2.5 text-xs text-white font-bold bg-slate-900/60 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-white/20">
+                  <div key={i} className="flex items-center gap-2 text-2xs text-white font-bold bg-slate-900/60 backdrop-blur-md px-3 py-2 rounded-lg border border-white/20">
                     <span className="text-cyan-400">{f.icon}</span>
                     <span>{f.text}</span>
                   </div>
@@ -200,28 +200,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             </div>
 
             {/* Bottom Status Indicator */}
-            <div className="relative z-20 flex items-center justify-between pt-6 border-t border-white/20 mt-8">
+            <div className="relative z-20 flex items-center justify-between pt-4 border-t border-white/20 mt-6">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-glow-emerald" />
-                <span className="text-xs font-bold text-white">Live Data Middleware Active</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-glow-emerald" />
+                <span className="text-2xs font-bold text-white">Live Data Middleware Active</span>
               </div>
-              <span className="text-2xs text-slate-300 font-semibold">ISO 27001</span>
+              <span className="text-[10px] text-slate-300 font-semibold">ISO 27001</span>
             </div>
           </div>
 
           {/* Right Column: Interactive Login Form & Role Selector */}
-          <div className="lg:col-span-7 p-5 sm:p-8 lg:p-10 bg-white dark:bg-slate-900 flex flex-col justify-center">
+          <div className="lg:col-span-7 p-3.5 sm:p-6 lg:p-8 bg-white dark:bg-slate-900 flex flex-col justify-center">
             <div className="max-w-md mx-auto w-full">
-              <div className="mb-6">
-                <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Sign In</h2>
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Enter your credentials or choose a quick demo role to autofill.</p>
+              <div className="mb-3">
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Sign In</h2>
+                <p className="text-2xs sm:text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">Enter your credentials or choose a quick demo role to autofill.</p>
               </div>
 
               {/* Login Form */}
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
+              <form onSubmit={handleLoginSubmit} className="space-y-2.5">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5 flex items-center gap-1.5">
-                    <Mail size={13} className="text-slate-400" /> Email Address
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1 flex items-center gap-1">
+                    <Mail size={12} className="text-slate-400" /> Email Address
                   </label>
                   <input
                     type="email"
@@ -229,13 +229,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="name@supplybridge.io"
-                    className="input focus:ring-2 focus:ring-primary-500/20"
+                    className="input py-1.5 px-3 text-xs focus:ring-2 focus:ring-primary-500/20"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5 flex items-center gap-1.5">
-                    <Lock size={13} className="text-slate-400" /> Password
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1 flex items-center gap-1">
+                    <Lock size={12} className="text-slate-400" /> Password
                   </label>
                   <input
                     type="password"
@@ -243,7 +243,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="input focus:ring-2 focus:ring-primary-500/20"
+                    className="input py-1.5 px-3 text-xs focus:ring-2 focus:ring-primary-500/20"
                   />
                 </div>
 
@@ -251,31 +251,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 <button
                   type="submit"
                   disabled={isLoggingIn}
-                  className="btn-primary w-full py-3 text-sm font-bold shadow-md shadow-indigo-500/20 mt-2"
+                  className="btn-primary w-full py-2.5 text-xs sm:text-sm font-bold shadow-md shadow-indigo-500/20 mt-1"
                 >
                   {isLoggingIn ? (
                     <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Authenticating...
                     </>
                   ) : (
                     <>
-                      Sign In to Dashboard <ArrowRight size={16} />
+                      Sign In to Dashboard <ArrowRight size={15} />
                     </>
                   )}
                 </button>
               </form>
 
               {/* Divider */}
-              <div className="relative my-6 text-center">
+              <div className="relative my-3 text-center">
                 <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200 dark:border-slate-800" /></div>
-                <span className="relative px-3 bg-white dark:bg-slate-900 text-2xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">
+                <span className="relative px-2 bg-white dark:bg-slate-900 text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">
                   Or Auto-fill Quick Role Preset
                 </span>
               </div>
 
               {/* 5 Role Preset Buttons */}
-              <div className="space-y-2 pb-2">
+              <div className="space-y-1.5">
                 {ROLE_PRESETS.map(preset => {
                   const isSelected = selectedRole === preset.role && email === preset.email
                   return (
@@ -283,28 +283,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                       key={preset.role}
                       type="button"
                       onClick={() => handleRoleSelect(preset)}
-                      className={`w-full p-2.5 sm:p-3 rounded-xl border text-left transition-all duration-200 flex items-center justify-between gap-3 group ${
+                      className={`w-full p-1.5 px-2.5 rounded-lg border text-left transition-all duration-150 flex items-center justify-between gap-2 group ${
                         isSelected
-                          ? 'bg-primary-50/90 dark:bg-primary-950/80 border-primary-500 dark:border-primary-500 ring-2 ring-primary-500/20'
+                          ? 'bg-primary-50/90 dark:bg-primary-950/80 border-primary-500 dark:border-primary-500 ring-1 ring-primary-500/20'
                           : 'bg-slate-50/70 dark:bg-slate-800/80 border-slate-200/90 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${preset.color} flex items-center justify-center text-white text-xs font-bold shadow-sm flex-shrink-0`}>
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${preset.color} flex items-center justify-center text-white text-[10px] font-bold shadow-2xs flex-shrink-0`}>
                           {preset.label.charAt(0)}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-1.5">
+                          <div className="flex items-center gap-1.5">
                             <p className="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors truncate">
                               {preset.label}
                             </p>
-                            {isSelected && <span className="text-2xs bg-primary-600 text-white font-bold px-1.5 py-0.5 rounded-full flex-shrink-0">Selected</span>}
+                            {isSelected && <span className="text-[9px] bg-primary-600 text-white font-bold px-1.5 py-0.2 rounded-full flex-shrink-0">Selected</span>}
                           </div>
-                          <p className="text-2xs text-slate-500 dark:text-slate-400 truncate">{preset.email}</p>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{preset.email}</p>
                         </div>
                       </div>
 
-                      <span className="text-xs text-primary-600 dark:text-primary-400 font-bold opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all flex-shrink-0 ml-1">
+                      <span className="text-[11px] text-primary-600 dark:text-primary-400 font-bold opacity-80 group-hover:opacity-100 transition-all flex-shrink-0">
                         Fill →
                       </span>
                     </button>

@@ -229,19 +229,19 @@ export const ImportQueue: React.FC = () => {
         />
 
         {/* KPI Summary Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
           {[
-            { label: 'TOTAL INGESTION SKUS', value: importsList.reduce((s, q) => s + q.totalRecords, 0).toLocaleString(), color: 'text-slate-900 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800', icon: <ArrowDownCircle size={20} className="text-slate-700 dark:text-slate-300" /> },
-            { label: 'CURRENTLY PROCESSING', value: importsList.filter(q => q.status === 'processing').length, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200/80 dark:border-cyan-900/50', icon: <RefreshCw size={20} className="animate-spin text-cyan-600" /> },
-            { label: 'PENDING QUEUE',         value: importsList.filter(q => q.status === 'pending').length,    color: 'text-amber-600 dark:text-amber-400',  bg: 'bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50',  icon: <Clock size={20} className="text-amber-600" /> },
-            { label: 'FAILED INGESTIONS',     value: importsList.filter(q => q.status === 'failed').length,     color: 'text-rose-600 dark:text-rose-400',   bg: 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50',   icon: <XCircle size={20} className="text-rose-600" /> },
+            { label: 'TOTAL INGESTION SKUS', value: importsList.reduce((s, q) => s + q.totalRecords, 0).toLocaleString(), color: 'text-slate-900 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800', icon: <ArrowDownCircle size={18} className="text-slate-700 dark:text-slate-300" /> },
+            { label: 'CURRENTLY PROCESSING', value: importsList.filter(q => q.status === 'processing').length, color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200/80 dark:border-cyan-900/50', icon: <RefreshCw size={18} className="animate-spin text-cyan-600" /> },
+            { label: 'PENDING QUEUE',         value: importsList.filter(q => q.status === 'pending').length,    color: 'text-amber-600 dark:text-amber-400',  bg: 'bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50',  icon: <Clock size={18} className="text-amber-600" /> },
+            { label: 'FAILED INGESTIONS',     value: importsList.filter(q => q.status === 'failed').length,     color: 'text-rose-600 dark:text-rose-400',   bg: 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50',   icon: <XCircle size={18} className="text-rose-600" /> },
           ].map((s, i) => (
-            <div key={i} className={`p-4 sm:p-5 rounded-2xl shadow-xs min-h-[105px] sm:min-h-[115px] flex items-center justify-between border transition-all duration-200 ${s.bg}`}>
+            <div key={i} className={`p-3 sm:p-3.5 rounded-xl shadow-2xs min-h-[72px] sm:min-h-[85px] flex items-center justify-between border transition-all duration-200 ${s.bg}`}>
               <div>
-                <p className="text-[10px] sm:text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-1">{s.label}</p>
-                <p className={`text-xl sm:text-2xl lg:text-3xl font-black ${s.color}`}>{s.value}</p>
+                <p className="text-[9px] sm:text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-0.5">{s.label}</p>
+                <p className={`text-base sm:text-xl lg:text-2xl font-black ${s.color}`}>{s.value}</p>
               </div>
-              <div className="p-2.5 sm:p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-xs border border-slate-100 dark:border-slate-700 flex-shrink-0">
+              <div className="p-2 sm:p-2.5 rounded-xl bg-white dark:bg-slate-800 shadow-2xs border border-slate-100 dark:border-slate-700 flex-shrink-0">
                 {s.icon}
               </div>
             </div>
@@ -249,13 +249,13 @@ export const ImportQueue: React.FC = () => {
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <Tabs tabs={tabs} active={tab} onChange={setTab} />
         <FilterBar search={search} onSearch={setSearch} placeholder="Search supplier feeds by name or format..." />
       </div>
 
       {/* Supplier Feed Cards List */}
-      <div className="space-y-4 sm:space-y-5 lg:space-y-6">
+      <div className="space-y-2.5 sm:space-y-3.5">
         {filtered.length === 0 && (
           <div className="card p-12 text-center text-slate-400 border border-slate-200/90 dark:border-slate-800">
             <EmptyState
@@ -266,10 +266,10 @@ export const ImportQueue: React.FC = () => {
           </div>
         )}
         {filtered.map(item => (
-          <div key={item.id} className="card p-4 sm:p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900">
-            <div className="flex items-start gap-3 sm:gap-3.5">
+          <div key={item.id} className="card p-3 sm:p-4 hover:border-slate-300 dark:hover:border-slate-700 transition-all border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <div className="flex items-start gap-2.5 sm:gap-3.5">
               <div
-                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-2xs mt-0.5 ${
+                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center flex-shrink-0 shadow-2xs mt-0.5 ${
                   item.status === 'completed'
                     ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
                     : item.status === 'failed'
@@ -279,14 +279,14 @@ export const ImportQueue: React.FC = () => {
                     : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
                 }`}
               >
-                <Download size={18} />
+                <Download size={16} />
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2 mb-2">
+                <div className="flex items-start justify-between gap-2 mb-1.5">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-slate-800 dark:text-slate-100 text-sm sm:text-base">{item.supplierName}</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-100 text-xs sm:text-sm">{item.supplierName}</span>
                       <Badge variant="info">{connectionTypeLabel(item.connectionType)}</Badge>
                     </div>
                   </div>
@@ -294,45 +294,45 @@ export const ImportQueue: React.FC = () => {
                 </div>
 
                 {item.fileName && (
-                  <p className="text-2xs sm:text-xs text-slate-500 dark:text-slate-400 mb-2 leading-relaxed">
-                    Source Feed File: <code className="mono text-2xs font-bold px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-700 dark:text-slate-300 break-all inline-block mt-0.5 sm:mt-0">{item.fileName}</code>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-1.5 leading-tight">
+                    Source Feed File: <code className="mono text-[10px] font-bold px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-700 dark:text-slate-300 break-all inline-block">{item.fileName}</code>
                   </p>
                 )}
 
                 {item.errorMessage && (
-                  <p className="text-xs text-rose-600 dark:text-rose-400 mb-2 flex items-center gap-1.5 font-semibold bg-rose-50 dark:bg-rose-950/40 px-3 py-1.5 rounded-lg border border-rose-200 dark:border-rose-800/60">
-                    <AlertCircle size={13} /> Error: {item.errorMessage}
+                  <p className="text-2xs text-rose-600 dark:text-rose-400 mb-1.5 flex items-center gap-1 font-semibold bg-rose-50 dark:bg-rose-950/40 px-2.5 py-1 rounded-lg border border-rose-200 dark:border-rose-800/60">
+                    <AlertCircle size={12} /> Error: {item.errorMessage}
                   </p>
                 )}
 
-                {/* Structured 2x2 Telemetry Grid for Mobile & Desktop */}
-                <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 text-xs mb-3">
+                {/* Structured 2x2 Telemetry Grid */}
+                <div className="grid grid-cols-2 gap-1.5 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 text-2xs mb-2">
                   <div>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Processed</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Processed</span>
                     <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-0.5">
-                      <CheckCircle2 size={12} className="text-emerald-500 flex-shrink-0" />
+                      <CheckCircle2 size={11} className="text-emerald-500 flex-shrink-0" />
                       {item.processedRecords > 0 ? item.processedRecords.toLocaleString() : '0'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Failed</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Failed</span>
                     <span className={`font-bold flex items-center gap-1 mt-0.5 ${item.failedRecords > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'}`}>
-                      <XCircle size={12} className={item.failedRecords > 0 ? 'text-rose-500' : 'text-slate-400'} />
+                      <XCircle size={11} className={item.failedRecords > 0 ? 'text-rose-500' : 'text-slate-400'} />
                       {item.failedRecords > 0 ? item.failedRecords.toLocaleString() : '0'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Size</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Total Size</span>
                     <span className="font-bold text-slate-800 dark:text-slate-200 mt-0.5 block">{item.totalRecords.toLocaleString()} SKUs</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Ingested</span>
-                    <span className="font-mono text-slate-500 dark:text-slate-400 mt-0.5 block text-2xs">{timeAgo(item.createdAt)}</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Ingested</span>
+                    <span className="font-mono text-slate-500 dark:text-slate-400 mt-0.5 block text-[10px]">{timeAgo(item.createdAt)}</span>
                   </div>
                 </div>
 
                 {item.status === 'processing' && (
-                  <div className="mb-3">
+                  <div className="mb-2">
                     <ProgressBar
                       value={item.processedRecords}
                       max={item.totalRecords}
@@ -343,37 +343,37 @@ export const ImportQueue: React.FC = () => {
                 )}
 
                 {/* Card Bottom Actions Bar */}
-                <div className="flex items-center justify-between sm:justify-end gap-2 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 mt-2">
+                <div className="flex items-center justify-between sm:justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 mt-1.5">
                   <button
                     onClick={() => setPreviewItem(item)}
-                    className="btn-ghost btn-sm font-bold flex items-center justify-center gap-1.5 text-primary-600 dark:text-primary-400 cursor-pointer"
+                    className="btn-ghost btn-sm text-2xs font-bold flex items-center justify-center gap-1 text-primary-600 dark:text-primary-400 cursor-pointer py-1"
                     title="Preview Imported Sample Records Data"
                   >
-                    <Eye size={14} /> Preview Data
+                    <Eye size={13} /> Preview Data
                   </button>
                   {item.status === 'pending' && (
                     <button
                       onClick={() => handleSetHighPriority(item.id, item.supplierName)}
-                      className="btn-secondary btn-sm flex items-center justify-center gap-1.5 font-bold cursor-pointer text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 hover:bg-amber-100 dark:hover:bg-amber-900/60"
+                      className="btn-secondary btn-sm text-2xs flex items-center justify-center gap-1 font-bold cursor-pointer text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 py-1"
                       title="Set High Priority Queue"
                     >
-                      <Zap size={13} /> High Priority
+                      <Zap size={12} /> High Priority
                     </button>
                   )}
                   {item.status === 'failed' && (
                     <button
                       onClick={() => handleRetry(item.id, item.supplierName)}
-                      className="btn-secondary btn-sm flex items-center justify-center gap-1.5 font-bold cursor-pointer"
+                      className="btn-secondary btn-sm text-2xs flex items-center justify-center gap-1 font-bold cursor-pointer py-1"
                     >
-                      <RotateCcw size={13} /> Retry Ingestion
+                      <RotateCcw size={12} /> Retry Ingestion
                     </button>
                   )}
                   {item.status === 'processing' && (
                     <button
                       onClick={() => handleCancel(item.id, item.supplierName)}
-                      className="btn-ghost btn-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center justify-center gap-1.5 font-bold cursor-pointer"
+                      className="btn-ghost btn-sm text-2xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center justify-center gap-1 font-bold cursor-pointer py-1"
                     >
-                      <XCircle size={13} /> Cancel
+                      <XCircle size={12} /> Cancel
                     </button>
                   )}
                 </div>
