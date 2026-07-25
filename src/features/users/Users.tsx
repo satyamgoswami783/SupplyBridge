@@ -136,7 +136,7 @@ export const Users: React.FC = () => {
         </select>
       </FilterBar>
 
-      <div className="card overflow-hidden">
+      <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <div className="table-container">
           <table className="table">
             <thead>

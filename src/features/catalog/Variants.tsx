@@ -210,29 +210,29 @@ export const Variants: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map(v => (
-            <div key={v.id} className="card p-5 hover:shadow-card-md transition-all flex flex-col justify-between border border-slate-200">
+            <div key={v.id} className="card p-5 hover:shadow-card-md transition-all flex flex-col justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
               <div>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center shadow-2xs">
-                      <Layers size={18} className="text-violet-600" />
+                    <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/60 border border-violet-100 dark:border-violet-900/60 flex items-center justify-center shadow-2xs">
+                      <Layers size={18} className="text-violet-600 dark:text-violet-400" />
                     </div>
                     <div>
-                      <p className="font-bold text-slate-900 text-sm">{v.name}</p>
+                      <p className="font-bold text-slate-900 dark:text-slate-100 text-sm">{v.name}</p>
                       <p className="text-xs text-slate-400 font-medium mt-0.5">{v.productCount.toLocaleString()} products using</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => handleOpenEdit(v)}
-                      className="btn-icon text-slate-400 hover:text-slate-700"
+                      className="btn-icon text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                       title="Edit Variant Type"
                     >
                       <Edit2 size={13} />
                     </button>
                     <button
                       onClick={() => { setDeletingVariant(v); setDeleteOpen(true); }}
-                      className="btn-icon text-rose-400 hover:text-rose-600 hover:bg-rose-50"
+                      className="btn-icon text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
                       title="Delete Variant Type"
                     >
                       <Trash2 size={13} />
@@ -242,17 +242,17 @@ export const Variants: React.FC = () => {
 
                 {/* Option Chips Container */}
                 <div className="space-y-2">
-                  <p className="text-2xs font-bold uppercase tracking-wider text-slate-400">Available Dimension Values ({v.values.length})</p>
-                  <div className="flex flex-wrap gap-1.5 items-center bg-slate-50/80 p-3 rounded-xl border border-slate-100 min-h-[60px]">
+                  <p className="text-2xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">Available Dimension Values ({v.values.length})</p>
+                  <div className="flex flex-wrap gap-1.5 items-center bg-slate-50/80 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-700/60 min-h-[60px]">
                     {v.values.map(val => (
                       <span
                         key={val}
-                        className="px-2.5 py-1 bg-white border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 shadow-2xs group/chip hover:border-slate-300 transition-colors"
+                        className="px-2.5 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 shadow-2xs group/chip hover:border-slate-300 dark:hover:border-slate-600 transition-colors"
                       >
                         {val}
                         <button
                           onClick={() => handleRemoveChipValue(v.id, val)}
-                          className="text-slate-400 hover:text-rose-600 rounded-md p-0.5 transition-colors"
+                          className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-md p-0.5 transition-colors"
                           title="Remove option value"
                         >
                           <X size={11} />

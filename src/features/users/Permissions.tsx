@@ -157,7 +157,7 @@ export const Permissions: React.FC = () => {
           const grantedCount = isSuper ? MODULE_LIST.length : perms.length
 
           return (
-            <div key={r.role} className="card p-4 flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+            <div key={r.role} className="card p-4 flex flex-col justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <Badge variant={r.badgeVariant}>{r.name}</Badge>
@@ -210,7 +210,7 @@ export const Permissions: React.FC = () => {
       </FilterBar>
 
       {/* Interactive Permission Matrix Table */}
-      <div className="card overflow-hidden">
+      <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <div className="table-container">
           <table className="table">
             <thead>

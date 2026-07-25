@@ -156,7 +156,7 @@ export const Brands: React.FC = () => {
 
       <FilterBar search={search} onSearch={setSearch} placeholder="Search brands by name or slug..." />
 
-      <div className="card overflow-hidden">
+      <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <div className="table-container">
           <table className="table">
             <thead>
@@ -181,30 +181,30 @@ export const Brands: React.FC = () => {
                 </tr>
               )}
               {filtered.map(brand => (
-                <tr key={brand.id} className="hover:bg-slate-50/80 transition-colors">
-                  <td>
+                <tr key={brand.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                  <td data-label="Brand">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0">
-                        <Award size={14} className="text-amber-600" />
+                      <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-100 dark:border-amber-900/60 flex items-center justify-center flex-shrink-0">
+                        <Award size={14} className="text-amber-600 dark:text-amber-400" />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-800 text-sm">{brand.name}</p>
-                        <code className="text-2xs text-slate-400 font-mono">{brand.slug}</code>
+                        <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm">{brand.name}</p>
+                        <code className="text-2xs text-slate-400 dark:text-slate-400 font-mono">{brand.slug}</code>
                       </div>
                     </div>
                   </td>
-                  <td>
-                    <span className="font-semibold text-slate-700">{brand.productCount.toLocaleString()}</span>
+                  <td data-label="Products">
+                    <span className="font-semibold text-slate-700 dark:text-slate-200">{brand.productCount.toLocaleString()}</span>
                   </td>
-                  <td>
+                  <td data-label="Status">
                     <Badge variant={brand.status === 'active' ? 'success' : 'neutral'} dot>
                       {brand.status}
                     </Badge>
                   </td>
-                  <td>
-                    <span className="text-xs text-slate-400">{brand.createdAt.split('T')[0]}</span>
+                  <td data-label="Created">
+                    <span className="text-xs text-slate-500 dark:text-slate-300 font-medium">{brand.createdAt.split('T')[0]}</span>
                   </td>
-                  <td className="text-right">
+                  <td data-label="Actions" className="text-right sm:text-right">
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => handleOpenEdit(brand)}
@@ -215,7 +215,7 @@ export const Brands: React.FC = () => {
                       </button>
                       <button
                         onClick={() => { setDeletingBrand(brand); setDeleteOpen(true); }}
-                        className="btn-icon text-rose-500 hover:bg-rose-50"
+                        className="btn-icon text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40"
                         title="Delete Brand"
                       >
                         <Trash2 size={14} />

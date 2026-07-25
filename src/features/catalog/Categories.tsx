@@ -157,13 +157,13 @@ export const Categories: React.FC = () => {
 
       <FilterBar search={search} onSearch={setSearch} placeholder="Search category by name or slug..." />
 
-      <div className="card overflow-hidden">
+      <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <div className="table-container">
           <table className="table">
             <thead>
               <tr>
                 <th>Category</th>
-                <th>Parent</th>
+                <th>Parent Category</th>
                 <th>Products</th>
                 <th>Status</th>
                 <th>Created</th>
@@ -186,42 +186,42 @@ export const Categories: React.FC = () => {
                 const parentCat = categoriesList.find(c => c.id === cat.parentId)
 
                 return (
-                  <tr key={cat.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td>
+                  <tr key={cat.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                    <td data-label="Category">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0">
-                          <Tag size={14} className="text-primary-600" />
+                        <div className="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-950/60 border border-primary-100 dark:border-primary-900/60 flex items-center justify-center flex-shrink-0">
+                          <Tag size={14} className="text-primary-600 dark:text-primary-400" />
                         </div>
                         <div>
-                          <p className="font-semibold text-slate-800 text-sm">{cat.name}</p>
-                          <code className="text-2xs text-slate-400 font-mono">{cat.slug}</code>
+                          <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm">{cat.name}</p>
+                          <code className="text-2xs text-slate-400 dark:text-slate-400 font-mono">{cat.slug}</code>
                         </div>
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Parent Category">
                       {parentCat ? (
-                        <div className="flex items-center gap-1 text-xs text-slate-600 font-medium">
+                        <div className="flex items-center gap-1 text-xs text-slate-600 dark:text-slate-300 font-medium">
                           <ChevronRight size={12} className="text-slate-400" />
                           {parentCat.name}
                         </div>
                       ) : (
-                        <span className="text-2xs font-semibold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                        <span className="text-2xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
                           Root
                         </span>
                       )}
                     </td>
-                    <td>
-                      <span className="font-semibold text-slate-700">{cat.productCount.toLocaleString()}</span>
+                    <td data-label="Products">
+                      <span className="font-semibold text-slate-700 dark:text-slate-200">{cat.productCount.toLocaleString()}</span>
                     </td>
-                    <td>
+                    <td data-label="Status">
                       <Badge variant={cat.status === 'active' ? 'success' : 'neutral'} dot>
                         {cat.status}
                       </Badge>
                     </td>
-                    <td>
-                      <span className="text-xs text-slate-400">{cat.createdAt.split('T')[0]}</span>
+                    <td data-label="Created">
+                      <span className="text-xs text-slate-500 dark:text-slate-300 font-medium">{cat.createdAt.split('T')[0]}</span>
                     </td>
-                    <td className="text-right">
+                    <td data-label="Actions" className="text-right sm:text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => handleOpenEdit(cat)}
@@ -232,7 +232,7 @@ export const Categories: React.FC = () => {
                         </button>
                         <button
                           onClick={() => { setDeletingCategory(cat); setDeleteOpen(true); }}
-                          className="btn-icon text-rose-500 hover:bg-rose-50"
+                          className="btn-icon text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40"
                           title="Delete Category"
                         >
                           <Trash2 size={14} />
