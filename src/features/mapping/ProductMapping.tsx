@@ -317,18 +317,18 @@ export const ProductMapping: React.FC = () => {
         title={pageTitles[activeMapping]?.title || 'Product Mapping'}
         subtitle={pageTitles[activeMapping]?.subtitle || 'Manage schema mapping rules'}
         actions={
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
             <button
               onClick={handleAutoMap}
               disabled={isAutoMapping}
-              className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1.5 font-bold cursor-pointer flex-1 sm:flex-initial"
             >
               <RefreshCw size={14} className={isAutoMapping ? 'animate-spin text-primary-600' : ''} />
-              {isAutoMapping ? 'Auto-Mapping...' : <><span className="hidden sm:inline">Auto-Map High Confidence</span><span className="sm:hidden">Auto-Map</span></>}
+              {isAutoMapping ? 'Auto-Mapping...' : 'Auto-Map'}
             </button>
             <button
               onClick={() => { setFormData({ field1: '', field2: '', supplierName: 'TechParts Int.', dataType: 'String' }); setAddModalOpen(true); }}
-              className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer"
+              className="btn-primary btn-sm flex items-center justify-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer flex-1 sm:flex-initial whitespace-nowrap"
             >
               <Plus size={14} /> Add Mapping Rule
             </button>
@@ -339,14 +339,14 @@ export const ProductMapping: React.FC = () => {
       {/* Stats Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
         {[
-          { label: 'Product Rules',  value: productMappings.length, color: 'text-slate-800 dark:text-slate-100' },
-          { label: 'Category Rules', value: categoryMappings.length, color: 'text-primary-600 dark:text-primary-400' },
-          { label: 'Variant Rules',  value: variantMappings.length, color: 'text-violet-600 dark:text-violet-400' },
-          { label: 'Attribute Rules',value: attributeMappings.length, color: 'text-emerald-600 dark:text-emerald-400' },
+          { label: 'Product Rules',  value: productMappings.length, color: 'text-slate-800 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800' },
+          { label: 'Category Rules', value: categoryMappings.length, color: 'text-primary-600 dark:text-primary-400', bg: 'bg-primary-50/70 dark:bg-primary-950/40 border border-primary-200/80 dark:border-primary-900/50' },
+          { label: 'Variant Rules',  value: variantMappings.length, color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50/70 dark:bg-violet-950/40 border border-violet-200/80 dark:border-violet-900/50' },
+          { label: 'Attribute Rules',value: attributeMappings.length, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/50' },
         ].map(s => (
-          <div key={s.label} className="card px-3 py-2.5 sm:px-4 sm:py-3 text-center">
-            <p className={`text-xl sm:text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-2xs sm:text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
+          <div key={s.label} className={`card px-3 py-2.5 sm:px-4 sm:py-3 text-center rounded-2xl ${s.bg}`}>
+            <p className={`text-xl sm:text-2xl font-black ${s.color}`}>{s.value}</p>
+            <p className="text-2xs sm:text-xs text-slate-500 dark:text-slate-400 font-semibold mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
@@ -355,7 +355,7 @@ export const ProductMapping: React.FC = () => {
 
       <FilterBar search={search} onSearch={setSearch} placeholder={`Search ${activeMapping} mappings...`}>
         <select
-          className="select input-sm w-auto min-w-[140px]"
+          className="select input-sm w-full sm:w-auto min-w-[140px]"
           value={supplierFilter}
           onChange={e => setSupplierFilter(e.target.value)}
         >
@@ -368,7 +368,7 @@ export const ProductMapping: React.FC = () => {
 
       {/* --- TAB 1: PRODUCT SKU MAPPING --- */}
       {activeMapping === 'products' && (
-        <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800">
+        <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <div className="table-container">
             <table className="table">
               <thead>
@@ -426,7 +426,7 @@ export const ProductMapping: React.FC = () => {
 
       {/* --- TAB 2: CATEGORY MAPPING --- */}
       {activeMapping === 'categories' && (
-        <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800">
+        <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <div className="table-container">
             <table className="table">
               <thead>
@@ -441,7 +441,7 @@ export const ProductMapping: React.FC = () => {
               </thead>
               <tbody>
                 {categoryMappings.map(m => (
-                  <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                     <td data-label="Category"><span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{m.supplierCategory}</span></td>
                     <td data-label="Supplier">{m.supplierName}</td>
                     <td className="text-center mobile-hidden"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
@@ -468,7 +468,7 @@ export const ProductMapping: React.FC = () => {
 
       {/* --- TAB 3: VARIANT MAPPING --- */}
       {activeMapping === 'variants' && (
-        <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800">
+        <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <div className="table-container">
             <table className="table">
               <thead>
@@ -484,12 +484,12 @@ export const ProductMapping: React.FC = () => {
               </thead>
               <tbody>
                 {variantMappings.map(m => (
-                  <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                     <td data-label="Variant Key"><code className="mono font-semibold text-slate-800 dark:text-slate-200">{m.supplierVariantKey}</code></td>
                     <td data-label="Supplier">{m.supplierName}</td>
                     <td className="text-center mobile-hidden"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
                     <td data-label="Dimension"><span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{m.masterVariantDimension}</span></td>
-                    <td data-label="Mapped Values"><span className="text-xs text-slate-600 font-mono">{m.mappedValues || '—'}</span></td>
+                    <td data-label="Mapped Values"><span className="text-xs text-slate-600 dark:text-slate-400 font-mono">{m.mappedValues || '—'}</span></td>
                     <td data-label="Status"><Badge variant={m.status === 'mapped' ? 'success' : 'danger'}>{m.status}</Badge></td>
                     <td data-label="" className="text-right mobile-full">
                       <button
@@ -512,7 +512,7 @@ export const ProductMapping: React.FC = () => {
 
       {/* --- TAB 4: ATTRIBUTE MAPPING --- */}
       {activeMapping === 'attributes' && (
-        <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800">
+        <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <div className="table-container">
             <table className="table">
               <thead>
@@ -528,7 +528,7 @@ export const ProductMapping: React.FC = () => {
               </thead>
               <tbody>
                 {attributeMappings.map(m => (
-                  <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                     <td data-label="Attribute"><code className="mono font-bold text-slate-800 dark:text-slate-200">{m.supplierAttribute}</code></td>
                     <td data-label="Supplier">{m.supplierName}</td>
                     <td className="text-center mobile-hidden"><ArrowLeftRight size={14} className="text-slate-400 mx-auto" /></td>
@@ -553,7 +553,7 @@ export const ProductMapping: React.FC = () => {
 
       {/* --- TAB 5: SUPPLIER FEED MAPPING --- */}
       {activeMapping === 'suppliers' && (
-        <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800">
+        <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <div className="table-container">
             <table className="table">
               <thead>
