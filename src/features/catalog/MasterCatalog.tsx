@@ -371,7 +371,7 @@ export const MasterCatalog: React.FC = () => {
         title="Master Catalog"
         subtitle="Single source of truth for all product data across suppliers and stores"
         actions={
-          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+          <div className={`grid ${canManageCatalog ? 'grid-cols-3' : 'grid-cols-2'} gap-1.5 w-full sm:flex sm:w-auto sm:items-center sm:gap-2`}>
             <button
               onClick={handleExportCatalogCSV}
               className="btn-secondary btn-sm flex items-center justify-center gap-1.5 cursor-pointer flex-1 sm:flex-initial"
