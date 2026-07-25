@@ -240,9 +240,9 @@ export const ImageSync: React.FC = () => {
           <span className="text-xs text-slate-400 font-medium">Visual Media Cache</span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="flex sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 overflow-x-auto scrollbar-thin pb-2 sm:pb-0">
           {GALLERY_SAMPLES.map(img => (
-            <div key={img.id} className="group relative cursor-pointer" onClick={() => setPreviewItem(img)}>
+            <div key={img.id} className="group relative cursor-pointer min-w-[130px] sm:min-w-0" onClick={() => setPreviewItem(img)}>
               <div className={`aspect-square rounded-xl overflow-hidden border-2 relative ${
                 img.status === 'synced' ? 'border-emerald-300 dark:border-emerald-900 bg-white' :
                 img.status === 'broken' ? 'border-rose-300 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40' :
@@ -274,7 +274,7 @@ export const ImageSync: React.FC = () => {
       </div>
 
       {/* Main Filter & Table Section — Detailed Image Asset Audit Table */}
-      <div className="card p-5 border border-slate-200/90 dark:border-slate-800">
+      <div className="card p-5 border border-slate-200/90 dark:border-slate-800 w-full">
         {/* Search & Status Filters */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="relative flex-1 max-w-md">
@@ -292,7 +292,7 @@ export const ImageSync: React.FC = () => {
             <select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
-              className="select text-xs w-auto py-2"
+              className="select text-xs w-full sm:w-auto py-2"
             >
               <option value="all">All Image Status</option>
               <option value="synced">Synced (WebP CDN Published)</option>
@@ -303,69 +303,69 @@ export const ImageSync: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Image Asset Audit Table */}
-        <div className="table-container">
-          <table className="table">
+        {/* Main Image Asset Audit Table — Exact Image 1 UI with Responsive Horizontal Scroll */}
+        <div className="table-container w-full overflow-x-auto scrollbar-thin">
+          <table className="table min-w-[950px] w-full">
             <thead>
-              <tr>
-                <th className="whitespace-nowrap">Product Title</th>
-                <th className="whitespace-nowrap">Master SKU</th>
-                <th className="whitespace-nowrap">Supplier Source</th>
-                <th className="whitespace-nowrap">Supplier Raw Image URL</th>
-                <th className="whitespace-nowrap">Shift4Shop CDN URL</th>
-                <th className="whitespace-nowrap">Resolution / Size</th>
-                <th className="whitespace-nowrap">Status</th>
-                <th className="whitespace-nowrap">Last Sync</th>
-                <th className="text-right whitespace-nowrap">Action</th>
+              <tr className="bg-slate-100/90 dark:bg-slate-950/90 border-b-2 border-slate-200 dark:border-slate-800">
+                <th className="whitespace-nowrap px-4 py-3.5">PRODUCT TITLE</th>
+                <th className="whitespace-nowrap px-4 py-3.5">MASTER SKU</th>
+                <th className="whitespace-nowrap px-4 py-3.5">SUPPLIER SOURCE</th>
+                <th className="whitespace-nowrap px-4 py-3.5">SUPPLIER RAW IMAGE URL</th>
+                <th className="whitespace-nowrap px-4 py-3.5">SHIFT4SHOP CDN URL</th>
+                <th className="whitespace-nowrap px-4 py-3.5">RESOLUTION / SIZE</th>
+                <th className="whitespace-nowrap px-4 py-3.5">STATUS</th>
+                <th className="whitespace-nowrap px-4 py-3.5">LAST SYNC</th>
+                <th className="whitespace-nowrap px-4 py-3.5 text-right pr-4">ACTION</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filteredItems.map(row => {
                 const title = row.product || (row as any).name || ''
                 const isSyncingRow = syncingId === row.id
 
                 return (
-                  <tr key={row.id}>
-                    <td>
-                      <p className="font-bold text-slate-800 dark:text-slate-100 text-xs leading-normal max-w-xs">{title}</p>
+                  <tr key={row.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                    <td className="whitespace-nowrap px-4 py-3.5">
+                      <p className="font-bold text-slate-800 dark:text-slate-100 text-xs leading-normal">{title}</p>
                     </td>
-                    <td>
+                    <td className="whitespace-nowrap px-4 py-3.5">
                       <code className="mono text-xs">{row.sku}</code>
                     </td>
-                    <td>
-                      <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold whitespace-nowrap">{row.supplier}</span>
+                    <td className="whitespace-nowrap px-4 py-3.5">
+                      <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold">{row.supplier}</span>
                     </td>
-                    <td>
+                    <td className="whitespace-nowrap px-4 py-3.5">
                       {row.rawUrl ? (
-                        <span className="text-2xs text-indigo-600 dark:text-indigo-400 font-mono truncate block max-w-[180px]" title={row.rawUrl}>
+                        <span className="text-2xs text-indigo-600 dark:text-indigo-400 font-mono" title={row.rawUrl}>
                           {row.rawUrl}
                         </span>
                       ) : (
                         <span className="text-2xs text-slate-400 italic">No supplier URL</span>
                       )}
                     </td>
-                    <td>
+                    <td className="whitespace-nowrap px-4 py-3.5">
                       {row.cdnUrl && row.cdnUrl.startsWith('http') ? (
-                        <span className="text-2xs text-emerald-600 dark:text-emerald-400 font-mono truncate block max-w-[180px]" title={row.cdnUrl}>
+                        <span className="text-2xs text-emerald-600 dark:text-emerald-400 font-mono" title={row.cdnUrl}>
                           {row.cdnUrl}
                         </span>
                       ) : (
                         <span className="text-2xs text-rose-600 dark:text-rose-400 font-mono">{row.cdnUrl || 'Not cached'}</span>
                       )}
                     </td>
-                    <td>
-                      <span className="text-xs text-slate-600 dark:text-slate-400 font-mono whitespace-nowrap">{row.dimensions} ({row.size})</span>
+                    <td className="whitespace-nowrap px-4 py-3.5">
+                      <span className="text-xs text-slate-600 dark:text-slate-400 font-mono">{row.dimensions} ({row.size})</span>
                     </td>
-                    <td className="whitespace-nowrap">
+                    <td className="whitespace-nowrap px-4 py-3.5">
                       {row.status === 'synced' && <Badge variant="success" dot>Synced</Badge>}
                       {row.status === 'pending' && <Badge variant="warning" dot>Pending Push</Badge>}
                       {row.status === 'broken' && <Badge variant="danger" dot>Broken 404</Badge>}
                       {row.status === 'missing' && <Badge variant="neutral">Missing Media</Badge>}
                     </td>
-                    <td className="whitespace-nowrap">
+                    <td className="whitespace-nowrap px-4 py-3.5">
                       <span className="text-2xs text-slate-500 dark:text-slate-400 font-mono">{row.lastSync}</span>
                     </td>
-                    <td className="text-right whitespace-nowrap">
+                    <td className="whitespace-nowrap px-4 py-3.5 text-right pr-4">
                       <button
                         onClick={() => handleRetrySingle(row.id, title)}
                         disabled={isSyncingRow}
