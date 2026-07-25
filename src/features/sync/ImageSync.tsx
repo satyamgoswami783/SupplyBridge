@@ -326,16 +326,16 @@ export const ImageSync: React.FC = () => {
 
                 return (
                   <tr key={row.id}>
-                    <td>
+                    <td data-label="Product Title">
                       <p className="font-bold text-slate-800 dark:text-slate-100 text-xs leading-normal max-w-xs">{title}</p>
                     </td>
-                    <td>
+                    <td data-label="Master SKU">
                       <code className="mono text-xs">{row.sku}</code>
                     </td>
-                    <td>
-                      <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold whitespace-nowrap">{row.supplier}</span>
+                    <td data-label="Supplier Source">
+                      <span className="text-xs text-slate-600 dark:text-slate-300 font-semibold whitespace-nowrap">{row.supplier}</span>
                     </td>
-                    <td>
+                    <td data-label="Raw URL">
                       {row.rawUrl ? (
                         <span className="text-2xs text-indigo-600 dark:text-indigo-400 font-mono truncate block max-w-[180px]" title={row.rawUrl}>
                           {row.rawUrl}
@@ -344,7 +344,7 @@ export const ImageSync: React.FC = () => {
                         <span className="text-2xs text-slate-400 italic">No supplier URL</span>
                       )}
                     </td>
-                    <td>
+                    <td data-label="CDN URL">
                       {row.cdnUrl && row.cdnUrl.startsWith('http') ? (
                         <span className="text-2xs text-emerald-600 dark:text-emerald-400 font-mono truncate block max-w-[180px]" title={row.cdnUrl}>
                           {row.cdnUrl}
@@ -353,16 +353,16 @@ export const ImageSync: React.FC = () => {
                         <span className="text-2xs text-rose-600 dark:text-rose-400 font-mono">{row.cdnUrl || 'Not cached'}</span>
                       )}
                     </td>
-                    <td>
-                      <span className="text-xs text-slate-600 dark:text-slate-400 font-mono whitespace-nowrap">{row.dimensions} ({row.size})</span>
+                    <td data-label="Resolution">
+                      <span className="text-xs text-slate-600 dark:text-slate-300 font-mono whitespace-nowrap">{row.dimensions} ({row.size})</span>
                     </td>
-                    <td className="whitespace-nowrap">
+                    <td data-label="Status" className="whitespace-nowrap">
                       {row.status === 'synced' && <Badge variant="success" dot>Synced</Badge>}
                       {row.status === 'pending' && <Badge variant="warning" dot>Pending Push</Badge>}
                       {row.status === 'broken' && <Badge variant="danger" dot>Broken 404</Badge>}
                       {row.status === 'missing' && <Badge variant="neutral">Missing Media</Badge>}
                     </td>
-                    <td className="whitespace-nowrap">
+                    <td data-label="Last Sync" className="whitespace-nowrap">
                       <span className="text-2xs text-slate-500 dark:text-slate-400 font-mono">{row.lastSync}</span>
                     </td>
                     <td className="text-right whitespace-nowrap">

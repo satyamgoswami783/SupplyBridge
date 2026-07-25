@@ -62,12 +62,12 @@ export const Dashboard: React.FC = () => {
   const [activeCard, setActiveCard] = useState<string | null>(null)
 
   const cards = [
-    { id: 'connected', label: 'Connected Suppliers', value: m.connectedSuppliers, icon: <Truck size={13} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+2 this week', changeType: 'positive' as const, activeClass: 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-25/50', activeNumberClass: 'text-emerald-600' },
-    { id: 'disconnected', label: 'Disconnected', value: m.disconnectedSuppliers, icon: <Wifi size={13} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '-1 resolved', changeType: 'positive' as const, activeClass: 'border-rose-500 ring-2 ring-rose-500/10 bg-rose-25/50', activeNumberClass: 'text-rose-600' },
-    { id: 'total-products', label: 'Total Products', value: formatNumber(m.totalProducts), icon: <Package size={13} className="text-primary-600" />, iconBg: 'bg-primary-50', change: '+1.2K today', changeType: 'positive' as const, activeClass: 'border-primary-500 ring-2 ring-primary-500/10 bg-primary-25/50', activeNumberClass: 'text-primary-600' },
-    { id: 'pending-validation', label: 'Pending Validation', value: m.pendingProducts, icon: <AlertTriangle size={13} className="text-amber-600" />, iconBg: 'bg-amber-50', change: '-84 resolved', changeType: 'positive' as const, activeClass: 'border-amber-500 ring-2 ring-amber-500/10 bg-amber-25/50', activeNumberClass: 'text-amber-600' },
-    { id: 'published-products', label: 'Published Products', value: formatNumber(m.publishedProducts), icon: <CheckCircle2 size={13} className="text-emerald-600" />, iconBg: 'bg-emerald-50', change: '+982 today', changeType: 'positive' as const, activeClass: 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-25/50', activeNumberClass: 'text-emerald-600' },
-    { id: 'failed-products', label: 'Failed Products', value: m.failedProducts, icon: <XCircle size={13} className="text-rose-600" />, iconBg: 'bg-rose-50', change: '+12 today', changeType: 'negative' as const, activeClass: 'border-rose-500 ring-2 ring-rose-500/10 bg-rose-25/50', activeNumberClass: 'text-rose-600' },
+    { id: 'connected', label: 'Connected Suppliers', value: m.connectedSuppliers, icon: <Truck size={13} className="text-emerald-600 dark:text-emerald-400" />, iconBg: 'bg-emerald-50 dark:bg-emerald-950/60', change: '+2 this week', changeType: 'positive' as const, activeClass: 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-25/50 dark:bg-emerald-950/40', activeNumberClass: 'text-emerald-600 dark:text-emerald-400' },
+    { id: 'disconnected', label: 'Disconnected', value: m.disconnectedSuppliers, icon: <Wifi size={13} className="text-rose-600 dark:text-rose-400" />, iconBg: 'bg-rose-50 dark:bg-rose-950/60', change: '-1 resolved', changeType: 'positive' as const, activeClass: 'border-rose-500 ring-2 ring-rose-500/10 bg-rose-25/50 dark:bg-rose-950/40', activeNumberClass: 'text-rose-600 dark:text-rose-400' },
+    { id: 'total-products', label: 'Total Products', value: formatNumber(m.totalProducts), icon: <Package size={13} className="text-primary-600 dark:text-primary-400" />, iconBg: 'bg-primary-50 dark:bg-primary-950/60', change: '+1.2K today', changeType: 'positive' as const, activeClass: 'border-primary-500 ring-2 ring-primary-500/10 bg-primary-25/50 dark:bg-primary-950/40', activeNumberClass: 'text-primary-600 dark:text-primary-400' },
+    { id: 'pending-validation', label: 'Pending Validation', value: m.pendingProducts, icon: <AlertTriangle size={13} className="text-amber-600 dark:text-amber-400" />, iconBg: 'bg-amber-50 dark:bg-amber-950/60', change: '-84 resolved', changeType: 'positive' as const, activeClass: 'border-amber-500 ring-2 ring-amber-500/10 bg-amber-25/50 dark:bg-amber-950/40', activeNumberClass: 'text-amber-600 dark:text-amber-400' },
+    { id: 'published-products', label: 'Published Products', value: formatNumber(m.publishedProducts), icon: <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />, iconBg: 'bg-emerald-50 dark:bg-emerald-950/60', change: '+982 today', changeType: 'positive' as const, activeClass: 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-25/50 dark:bg-emerald-950/40', activeNumberClass: 'text-emerald-600 dark:text-emerald-400' },
+    { id: 'failed-products', label: 'Failed Products', value: m.failedProducts, icon: <XCircle size={13} className="text-rose-600 dark:text-rose-400" />, iconBg: 'bg-rose-50 dark:bg-rose-950/60', change: '+12 today', changeType: 'negative' as const, activeClass: 'border-rose-500 ring-2 ring-rose-500/10 bg-rose-25/50 dark:bg-rose-950/40', activeNumberClass: 'text-rose-600 dark:text-rose-400' },
   ]
 
   const { role, currentUser } = useAuth()
@@ -221,7 +221,7 @@ export const Dashboard: React.FC = () => {
                   {card.icon}
                 </div>
                 {card.change && (
-                  <span className={`text-2xs font-semibold px-1.5 py-0.5 rounded-full ${card.changeType === 'positive' ? 'text-emerald-700 bg-emerald-50' : 'text-rose-700 bg-rose-50'
+                  <span className={`text-2xs font-semibold px-1.5 py-0.5 rounded-full ${card.changeType === 'positive' ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800' : 'text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800'
                     }`}>
                     {card.change}
                   </span>
@@ -229,7 +229,7 @@ export const Dashboard: React.FC = () => {
               </div>
               <div>
                 <p className="kpi-label">{card.label}</p>
-                <p className={`kpi-value mt-0.5 transition-colors duration-200 ${isSelected ? card.activeNumberClass : 'text-slate-900'
+                <p className={`kpi-value mt-0.5 transition-colors duration-200 ${isSelected ? card.activeNumberClass : 'text-slate-900 dark:text-slate-100'
                   }`}>
                   {typeof card.value === 'number' ? card.value.toLocaleString() : card.value}
                 </p>
@@ -335,7 +335,7 @@ export const Dashboard: React.FC = () => {
       {/* Charts Row */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
         {/* Sync Jobs Area Chart */}
-        <div className="xl:col-span-2 card p-5 border border-slate-200 dark:border-slate-800">
+        <div className="xl:col-span-2 card p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Synchronization Activity Trend</p>
@@ -359,10 +359,10 @@ export const Dashboard: React.FC = () => {
                   <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: '1px solid #1e293b', color: '#f8fafc', fontSize: '12px', boxShadow: '0 8px 16px rgba(0,0,0,0.3)' }} />
               <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
               <Area type="monotone" dataKey="inventory" name="Inventory Sync" stroke="#4f46e5" strokeWidth={2} fill="url(#colInv)" dot={false} />
               <Area type="monotone" dataKey="pricing" name="Pricing Sync" stroke="#10b981" strokeWidth={2} fill="url(#colPri)" dot={false} />
@@ -372,18 +372,18 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Products by Supplier Bar Chart */}
-        <div className="card p-5 border border-slate-200 dark:border-slate-800">
+        <div className="card p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div className="mb-4">
             <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Products by Supplier</p>
             <p className="text-xs text-slate-400 font-medium">Top supplier distribution by catalog count</p>
           </div>
           <ResponsiveContainer width="100%" height={230}>
-            <BarChart data={mockProductsBySupplier} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+            <BarChart data={[...mockProductsBySupplier].reverse()} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} horizontal={false} />
               <XAxis type="number" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} width={90} />
-              <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }} />
-              <Bar dataKey="products" name="Products" fill="#4f46e5" radius={[0, 6, 6, 0]} />
+              <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} width={95} />
+              <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: '1px solid #1e293b', color: '#f8fafc', fontSize: '12px', boxShadow: '0 8px 16px rgba(0,0,0,0.3)' }} />
+              <Bar dataKey="products" name="Products" fill="#6366f1" radius={[0, 6, 6, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

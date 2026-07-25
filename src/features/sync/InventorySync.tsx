@@ -321,42 +321,42 @@ export const InventorySync: React.FC = () => {
 
                 return (
                   <tr key={row.id}>
-                    <td>
+                    <td data-label="Product">
                       <p className="font-bold text-slate-800 dark:text-slate-100 text-xs leading-normal max-w-xs">{row.name}</p>
                     </td>
-                    <td>
+                    <td data-label="Master SKU">
                       <code className="mono text-xs">{row.sku}</code>
                     </td>
-                    <td>
-                      <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold whitespace-nowrap">{row.supplier}</span>
+                    <td data-label="Supplier">
+                      <span className="text-xs text-slate-600 dark:text-slate-300 font-semibold whitespace-nowrap">{row.supplier}</span>
                     </td>
-                    <td>
+                    <td data-label="Supplier Stock">
                       <span className="font-bold text-slate-700 dark:text-slate-300">{row.supplierStock.toLocaleString()}</span>
                     </td>
-                    <td>
+                    <td data-label="Safety Buffer">
                       <span className="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md font-bold">-{row.buffer}</span>
                     </td>
-                    <td>
+                    <td data-label="Available Stock">
                       <span className="font-bold text-slate-900 dark:text-slate-100">{row.availableStock.toLocaleString()}</span>
                     </td>
-                    <td>
+                    <td data-label="Store Live">
                       <span className={`font-bold ${row.websiteStock === row.availableStock ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'}`}>
                         {row.websiteStock.toLocaleString()}
                       </span>
                     </td>
-                    <td>
-                      <span className={`flex items-center gap-1 text-xs font-bold whitespace-nowrap ${row.variance > 0 ? 'text-amber-600 dark:text-amber-400' : row.variance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'}`}>
+                    <td data-label="Variance">
+                      <span className={`flex items-center gap-1 text-xs font-bold whitespace-nowrap ${row.variance > 0 ? 'text-amber-600 dark:text-amber-400' : row.variance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-slate-400'}`}>
                         {row.variance > 0 ? <TrendingUp size={13} /> : row.variance < 0 ? <TrendingDown size={13} /> : null}
                         {row.variance > 0 ? `+${row.variance}` : row.variance === 0 ? '0 (Synced)' : row.variance}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap">
+                    <td data-label="Sync Status" className="whitespace-nowrap">
                       {row.status === 'synced' && <Badge variant="success" dot>Synced</Badge>}
                       {row.status === 'pending' && <Badge variant="warning" dot>Pending Push</Badge>}
                       {row.status === 'error' && <Badge variant="danger" dot>Sync Error</Badge>}
                       {row.status === 'out_of_stock' && <Badge variant="neutral">Out of Stock</Badge>}
                     </td>
-                    <td className="whitespace-nowrap">
+                    <td data-label="Last Sync" className="whitespace-nowrap">
                       <span className="text-2xs text-slate-500 dark:text-slate-400 font-mono">{row.lastSync}</span>
                     </td>
                     <td className="text-right whitespace-nowrap">

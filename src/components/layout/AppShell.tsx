@@ -7,7 +7,13 @@ import { UserProfileModal } from '../ui/UserProfileModal'
 
 export const AppShell: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('supplybridge_theme')
+    if (saved !== null) {
+      return saved === 'dark'
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+  })
   const location = useLocation()
 
   // Close sidebar on route change (mobile)
@@ -15,16 +21,21 @@ export const AppShell: React.FC = () => {
     setSidebarOpen(false)
   }, [location.pathname])
 
-  const toggleDark = () => {
-    const nextDark = !darkMode
-    setDarkMode(nextDark)
-    if (nextDark) {
+  // Sync dark mode class on html & body elements on state change and initial mount
+  useEffect(() => {
+    if (darkMode) {
       document.documentElement.classList.add('dark')
       document.body.classList.add('dark')
+      localStorage.setItem('supplybridge_theme', 'dark')
     } else {
       document.documentElement.classList.remove('dark')
       document.body.classList.remove('dark')
+      localStorage.setItem('supplybridge_theme', 'light')
     }
+  }, [darkMode])
+
+  const toggleDark = () => {
+    setDarkMode(prev => !prev)
   }
 
   return (

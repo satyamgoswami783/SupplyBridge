@@ -7,10 +7,22 @@
     <meta name="description" content="SupplyBridge — Enterprise Middleware, PIM & Supplier Integration Platform. Centralized product management, synchronization, and supplier connectivity." />
     <meta name="robots" content="noindex" />
     <title>SupplyBridge — Enterprise PIM & Supplier Integration Platform</title>
-    <script type="module" crossorigin src="/assets/index-CZMrB29d.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-NESC_fDk.css">
+    <script>
+      (function() {
+        var theme = localStorage.getItem('supplybridge_theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+          if (document.body) document.body.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          if (document.body) document.body.classList.remove('dark');
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-CrJDkQ6s.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Cuk9NoRj.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"></div>
   </body>
 </html>

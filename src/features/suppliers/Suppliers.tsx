@@ -371,7 +371,7 @@ export const Suppliers: React.FC = () => {
       </FilterBar>
 
       {/* Table */}
-      <div className="card overflow-hidden">
+      <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <div className="table-container">
           <table className="table">
             <thead>
@@ -410,45 +410,45 @@ export const Suppliers: React.FC = () => {
                 return (
                   <tr
                     key={supplier.id}
-                    className="cursor-pointer hover:bg-slate-50/80 transition-colors"
+                    className="cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors"
                     onClick={() => setSelected(supplier)}
                   >
-                    <td>
+                    <td data-label="Supplier">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-primary-50 border border-primary-100 flex items-center justify-center text-base flex-shrink-0">
+                        <div className="w-9 h-9 rounded-xl bg-primary-50 dark:bg-primary-950/60 border border-primary-100 dark:border-primary-900/60 flex items-center justify-center text-base flex-shrink-0">
                           {connTypeIcon[supplier.connectionType]}
                         </div>
                         <div>
-                          <p className="font-semibold text-slate-800 text-sm">{supplier.name}</p>
-                          <p className="text-xs text-slate-400">{supplier.code} · {supplier.country}</p>
+                          <p className="font-bold text-slate-900 dark:text-slate-100 text-sm">{supplier.name}</p>
+                          <p className="text-xs text-slate-400 dark:text-slate-400 font-medium">{supplier.code} · {supplier.country}</p>
                         </div>
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Connection">
                       <Badge variant="info">{connectionTypeLabel(supplier.connectionType)}</Badge>
                     </td>
-                    <td>
+                    <td data-label="Status">
                       <Badge variant={statusToVariant(supplier.status)} dot>
                         {supplier.status.charAt(0).toUpperCase() + supplier.status.slice(1)}
                       </Badge>
                     </td>
-                    <td>
-                      <span className="font-semibold text-slate-700">{supplier.productCount.toLocaleString()}</span>
+                    <td data-label="Products">
+                      <span className="font-bold text-slate-800 dark:text-slate-200">{supplier.productCount.toLocaleString()}</span>
                     </td>
-                    <td>
-                      <span className="text-slate-500 text-xs">{supplier.lastSync ? timeAgo(supplier.lastSync) : '—'}</span>
+                    <td data-label="Last Sync">
+                      <span className="text-slate-600 dark:text-slate-300 text-xs font-medium">{supplier.lastSync ? timeAgo(supplier.lastSync) : '—'}</span>
                     </td>
-                    <td>
-                      <span className="text-slate-500 text-xs">{supplier.nextSync ? formatDateTime(supplier.nextSync) : '—'}</span>
+                    <td data-label="Next Sync">
+                      <span className="text-slate-600 dark:text-slate-300 text-xs font-medium">{supplier.nextSync ? formatDateTime(supplier.nextSync) : '—'}</span>
                     </td>
-                    <td>
+                    <td data-label="Errors">
                       {supplier.errorCount > 0 ? (
                         <Badge variant="danger">{supplier.errorCount} errors</Badge>
                       ) : (
                         <Badge variant="success">Clean</Badge>
                       )}
                     </td>
-                    <td className="text-right">
+                    <td data-label="Actions" className="text-right sm:text-right">
                       <div className="flex items-center justify-end gap-1 relative" onClick={e => e.stopPropagation()}>
                         <button
                           onClick={() => handleSyncSingle(supplier.id, supplier.name)}
@@ -456,7 +456,7 @@ export const Suppliers: React.FC = () => {
                           className="btn-icon"
                           title="Manual Sync"
                         >
-                          <RefreshCw size={14} className={isSyncingThis ? 'animate-spin text-primary-600' : ''} />
+                          <RefreshCw size={14} className={isSyncingThis ? 'animate-spin text-primary-600 dark:text-primary-400' : ''} />
                         </button>
 
                         <div className="relative">
@@ -470,33 +470,33 @@ export const Suppliers: React.FC = () => {
 
                           {/* Popover Action Menu */}
                           {isMenuOpen && (
-                            <div className="absolute right-0 top-8 w-44 card shadow-card-lg z-50 p-1 text-left text-xs space-y-0.5">
+                            <div className="absolute right-0 top-8 w-44 card shadow-card-lg z-50 p-1 text-left text-xs space-y-0.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                               <button
                                 onClick={() => { setSelected(supplier); setOpenMenuId(null); }}
-                                className="w-full px-3 py-1.5 rounded hover:bg-slate-100 flex items-center gap-2 text-slate-700"
+                                className="w-full px-3 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-700 dark:text-slate-200"
                               >
                                 <ExternalLink size={13} /> View Details
                               </button>
                               <button
                                 onClick={() => { handleSyncSingle(supplier.id, supplier.name); setOpenMenuId(null); }}
-                                className="w-full px-3 py-1.5 rounded hover:bg-slate-100 flex items-center gap-2 text-slate-700"
+                                className="w-full px-3 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-700 dark:text-slate-200"
                               >
                                 <RefreshCw size={13} /> Trigger Sync
                               </button>
                               <button
                                 onClick={() => { handleToggleStatus(supplier.id); setOpenMenuId(null); }}
-                                className="w-full px-3 py-1.5 rounded hover:bg-slate-100 flex items-center gap-2 text-slate-700"
+                                className="w-full px-3 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-700 dark:text-slate-200"
                               >
                                 {supplier.status === 'connected' ? <WifiOff size={13} className="text-amber-500" /> : <Wifi size={13} className="text-emerald-500" />}
                                 {supplier.status === 'connected' ? 'Disconnect' : 'Connect'}
                               </button>
                               <button
                                 onClick={() => handleOpenEdit(supplier)}
-                                className="w-full px-3 py-1.5 rounded hover:bg-slate-100 flex items-center gap-2 text-slate-700"
+                                className="w-full px-3 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-700 dark:text-slate-200"
                               >
                                 <Edit2 size={13} /> Edit Details
                               </button>
-                              <div className="my-1 border-t border-slate-100" />
+                              <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
                               <button
                                 onClick={() => { setDeletingSupplier(supplier); setDeleteOpen(true); setOpenMenuId(null); }}
                                 className="w-full px-3 py-1.5 rounded hover:bg-rose-50 text-rose-600 flex items-center gap-2 font-medium"
@@ -791,15 +791,15 @@ const SupplierDetail: React.FC<{
       onClose={onClose}
       size="xl"
     >
-      <div className="flex gap-1 border-b border-slate-100 mb-5 overflow-x-auto scrollbar-hide -mx-6 px-6">
+      <div className="flex gap-1 border-b border-slate-100 dark:border-slate-800 mb-5 overflow-x-auto scrollbar-hide -mx-6 px-6">
         {tabs.map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`px-3 py-2 text-sm font-medium capitalize whitespace-nowrap border-b-2 transition-colors ${
               tab === t
-                ? 'border-primary-600 text-primary-700'
-                : 'border-transparent text-slate-400 hover:text-slate-600'
+                ? 'border-primary-600 text-primary-700 dark:text-primary-400 font-bold'
+                : 'border-transparent text-slate-400 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
             }`}
           >
             {t}
@@ -819,9 +819,9 @@ const SupplierDetail: React.FC<{
             { label: 'Last Sync', value: supplier.lastSync ? formatDateTime(supplier.lastSync) : '—' },
             { label: 'Next Sync', value: supplier.nextSync ? formatDateTime(supplier.nextSync) : '—' },
           ].map(item => (
-            <div key={item.label} className="bg-slate-50 rounded-xl p-3">
-              <p className="text-xs text-slate-400 mb-1 font-medium">{item.label}</p>
-              <div className="text-sm font-semibold text-slate-800">{item.value}</div>
+            <div key={item.label} className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-3 border border-slate-100 dark:border-slate-700/60">
+              <p className="text-xs text-slate-400 dark:text-slate-400 mb-1 font-medium">{item.label}</p>
+              <div className="text-sm font-semibold text-slate-800 dark:text-slate-100">{item.value}</div>
             </div>
           ))}
           <div className="col-span-2 flex gap-2 pt-2">
@@ -836,7 +836,7 @@ const SupplierDetail: React.FC<{
               disabled={isTesting}
               className="btn-secondary btn-sm flex-1 flex items-center justify-center gap-1.5"
             >
-              <Plug size={13} className={isTesting ? 'animate-spin text-primary-600' : ''} />
+              <Plug size={13} className={isTesting ? 'animate-spin text-primary-600 dark:text-primary-400' : ''} />
               {isTesting ? 'Testing...' : 'Test Connection'}
             </button>
           </div>
@@ -845,25 +845,25 @@ const SupplierDetail: React.FC<{
 
       {tab === 'connection' && (
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
-            <CheckCircle2 size={18} className="text-emerald-600" />
+          <div className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-950/60 rounded-xl border border-emerald-200 dark:border-emerald-800">
+            <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400" />
             <div>
-              <p className="text-sm font-semibold text-emerald-800">Connection Active</p>
-              <p className="text-xs text-emerald-600">Last verified {supplier.lastSync ? timeAgo(supplier.lastSync) : 'N/A'}</p>
+              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Connection Active</p>
+              <p className="text-xs text-emerald-600 dark:text-emerald-400">Last verified {supplier.lastSync ? timeAgo(supplier.lastSync) : 'N/A'}</p>
             </div>
           </div>
 
           {testResult && (
-            <div className="p-3 bg-sky-50 text-sky-800 border border-sky-200 rounded-xl text-xs font-semibold flex items-center gap-2">
-              <CheckCircle2 size={14} className="text-sky-600" /> {testResult}
+            <div className="p-3 bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800 rounded-xl text-xs font-semibold flex items-center gap-2">
+              <CheckCircle2 size={14} className="text-sky-600 dark:text-sky-400" /> {testResult}
             </div>
           )}
 
           <div className="space-y-3">
             {supplier.credentials?.apiUrl && (
-              <div className="bg-slate-50 rounded-xl p-3">
+              <div className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-3 border border-slate-100 dark:border-slate-700/60">
                 <p className="text-2xs text-slate-400 font-medium uppercase tracking-wider mb-1">API Endpoint</p>
-                <code className="text-xs text-slate-700 font-mono">{supplier.credentials.apiUrl}</code>
+                <code className="text-xs text-slate-700 dark:text-slate-200 font-mono">{supplier.credentials.apiUrl}</code>
               </div>
             )}
           </div>
@@ -879,12 +879,12 @@ const SupplierDetail: React.FC<{
       )}
 
       {tab === 'credentials' && (
-        <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
-          <p className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
-            <Key size={14} className="text-primary-600" /> Credentials & Endpoint Details
+        <div className="space-y-3 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+          <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+            <Key size={14} className="text-primary-600 dark:text-primary-400" /> Credentials & Endpoint Details
           </p>
           <div>
-            <label className="text-xs text-slate-500 font-medium block mb-1">Endpoint / Server Host</label>
+            <label className="text-xs text-slate-500 dark:text-slate-400 font-medium block mb-1">Endpoint / Server Host</label>
             <input
               className="input text-xs"
               readOnly
@@ -892,7 +892,7 @@ const SupplierDetail: React.FC<{
             />
           </div>
           <div>
-            <label className="text-xs text-slate-500 font-medium block mb-1">API Key / Token</label>
+            <label className="text-xs text-slate-500 dark:text-slate-400 font-medium block mb-1">API Key / Token</label>
             <input
               className="input text-xs font-mono"
               type="password"
@@ -911,10 +911,10 @@ const SupplierDetail: React.FC<{
             { date: 'Jul 23, 17:30', products: 18380, status: 'warning', duration: '34m' },
             { date: 'Jul 23, 11:30', products: 18350, status: 'success', duration: '27m' },
           ].map((h, i) => (
-            <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl text-sm">
-              <span className="text-slate-600 text-xs">{h.date}</span>
-              <span className="text-slate-800 font-medium text-xs">{h.products.toLocaleString()} products</span>
-              <span className="text-slate-400 text-xs">{h.duration}</span>
+            <div key={i} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl text-sm border border-slate-100 dark:border-slate-700/60">
+              <span className="text-slate-600 dark:text-slate-400 text-xs">{h.date}</span>
+              <span className="text-slate-800 dark:text-slate-100 font-medium text-xs">{h.products.toLocaleString()} products</span>
+              <span className="text-slate-400 dark:text-slate-400 text-xs">{h.duration}</span>
               <Badge variant={statusToVariant(h.status)}>{h.status}</Badge>
             </div>
           ))}

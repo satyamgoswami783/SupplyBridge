@@ -195,7 +195,7 @@ export const StoreManagement: React.FC = () => {
           return (
             <div
               key={store.id}
-              className="card p-5 hover:shadow-card-md transition-all flex flex-col justify-between border border-slate-200"
+              className="card p-5 hover:shadow-card-md transition-all flex flex-col justify-between border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
             >
               <div>
                 <div className="flex items-start justify-between mb-4">
@@ -206,28 +206,28 @@ export const StoreManagement: React.FC = () => {
                     <div
                       className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
                         store.status === 'active'
-                          ? 'bg-emerald-50 border-emerald-200'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-900/60'
                           : store.status === 'error'
-                          ? 'bg-rose-50 border-rose-200'
-                          : 'bg-slate-100 border-slate-200'
+                          ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-900/60'
+                          : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
                       }`}
                     >
                       <Globe
                         size={18}
                         className={
                           store.status === 'active'
-                            ? 'text-emerald-600'
+                            ? 'text-emerald-600 dark:text-emerald-400'
                             : store.status === 'error'
-                            ? 'text-rose-600'
-                            : 'text-slate-400'
+                            ? 'text-rose-600 dark:text-rose-400'
+                            : 'text-slate-400 dark:text-slate-500'
                         }
                       />
                     </div>
                     <div>
-                      <p className="font-bold text-slate-900 text-sm hover:text-primary-600 transition-colors">
+                      <p className="font-bold text-slate-900 dark:text-slate-100 text-sm hover:text-primary-600 transition-colors">
                         {store.name}
                       </p>
-                      <p className="text-xs text-slate-400 font-medium">{store.platform}</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-400 font-medium">{store.platform}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -236,14 +236,14 @@ export const StoreManagement: React.FC = () => {
                     </Badge>
                     <button
                       onClick={e => handleOpenEdit(store, e)}
-                      className="btn-icon text-slate-400 hover:text-slate-700"
+                      className="btn-icon text-slate-400 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                       title="Edit Store Settings"
                     >
                       <Edit2 size={13} />
                     </button>
                     <button
                       onClick={e => handleOpenDelete(store, e)}
-                      className="btn-icon text-rose-400 hover:text-rose-600 hover:bg-rose-50"
+                      className="btn-icon text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
                       title="Remove Store Connection"
                     >
                       <Trash2 size={13} />
@@ -252,22 +252,22 @@ export const StoreManagement: React.FC = () => {
                 </div>
 
                 <div
-                  className="space-y-2 text-sm bg-slate-50/80 p-3 rounded-xl border border-slate-100 cursor-pointer"
+                  className="space-y-2 text-sm bg-slate-50/80 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-700/60 cursor-pointer"
                   onClick={() => setSelectedStore(store)}
                 >
-                  <div className="flex justify-between text-slate-600 text-xs">
+                  <div className="flex justify-between text-slate-600 dark:text-slate-300 text-xs">
                     <span>Assigned Products</span>
-                    <span className="font-bold text-slate-900">
+                    <span className="font-bold text-slate-900 dark:text-slate-100">
                       {store.productCount.toLocaleString()} SKUs
                     </span>
                   </div>
-                  <div className="flex justify-between text-slate-600 text-xs">
+                  <div className="flex justify-between text-slate-600 dark:text-slate-300 text-xs">
                     <span>Store Region</span>
-                    <span className="text-slate-700 font-semibold">{store.region || '—'}</span>
+                    <span className="text-slate-700 dark:text-slate-200 font-semibold">{store.region || '—'}</span>
                   </div>
-                  <div className="flex justify-between text-slate-600 text-xs">
+                  <div className="flex justify-between text-slate-600 dark:text-slate-300 text-xs">
                     <span>Last Sync Date</span>
-                    <span className="text-slate-500 font-mono">
+                    <span className="text-slate-500 dark:text-slate-400 font-mono">
                       {store.lastSync ? timeAgo(store.lastSync) : 'Never'}
                     </span>
                   </div>
@@ -275,7 +275,7 @@ export const StoreManagement: React.FC = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2 mt-4 pt-4 border-t border-slate-100">
+              <div className="flex gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <button
                   disabled={isSyncingThis}
                   className="btn-primary btn-sm flex-1 flex items-center justify-center gap-1.5 cursor-pointer font-bold"

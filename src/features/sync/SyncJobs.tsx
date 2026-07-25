@@ -265,39 +265,39 @@ export const SyncJobs: React.FC = () => {
               )}
               {filtered.map(job => (
                 <tr key={job.id} className="cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors" onClick={() => setDetailJob(job)}>
-                  <td>
+                  <td data-label="Job Name">
                     <p className="font-bold text-slate-900 dark:text-slate-100 text-xs leading-normal">{job.name}</p>
                     {job.supplierName && <p className="text-2xs text-slate-400 font-medium mt-0.5">{job.supplierName}</p>}
                     {job.storeName && <p className="text-2xs text-slate-400 font-medium mt-0.5">{job.storeName}</p>}
                   </td>
-                  <td className="whitespace-nowrap">
-                    <span className={`px-2.5 py-1 rounded-lg text-2xs font-bold uppercase tracking-wider border ${jobTypeColor[job.type] || 'bg-slate-100 text-slate-700 border-slate-200'}`}>
+                  <td data-label="Type" className="whitespace-nowrap">
+                    <span className={`px-2.5 py-1 rounded-lg text-2xs font-bold uppercase tracking-wider border ${jobTypeColor[job.type] || 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}`}>
                       {job.type}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap">
+                  <td data-label="Status" className="whitespace-nowrap">
                     <Badge variant={statusToVariant(job.status)} dot>{job.status}</Badge>
                   </td>
-                  <td className="w-36">
+                  <td data-label="Progress" className="w-36">
                     <ProgressBar
                       value={job.progress}
                       color={job.status === 'failed' ? 'rose' : job.status === 'completed' ? 'emerald' : 'primary'}
                       showLabel
                     />
                   </td>
-                  <td className="whitespace-nowrap">
+                  <td data-label="Items Processed" className="whitespace-nowrap">
                     <div className="text-xs font-medium">
                       <span className="text-slate-900 dark:text-slate-100 font-bold">{job.processedItems.toLocaleString()}</span>
                       <span className="text-slate-400"> / {job.totalItems.toLocaleString()}</span>
                       {job.failedItems > 0 && <span className="text-rose-600 dark:text-rose-400 ml-1.5 font-bold">({job.failedItems} failed)</span>}
                     </div>
                   </td>
-                  <td className="whitespace-nowrap">
+                  <td data-label="Started At" className="whitespace-nowrap">
                     <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                       {job.startedAt ? timeAgo(job.startedAt) : job.scheduledAt ? formatDateTime(job.scheduledAt) : '—'}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap"><span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{job.triggeredBy}</span></td>
+                  <td data-label="Triggered By" className="whitespace-nowrap"><span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{job.triggeredBy}</span></td>
                   <td className="text-right whitespace-nowrap">
                     <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
                       {role !== 'operations_staff' && job.status === 'running' && (

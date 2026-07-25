@@ -40,8 +40,8 @@ export const Modal: React.FC<ModalProps> = ({ open, onClose, title, subtitle, ch
         >
           <div className="modal-header">
             <div>
-              <h3 className="text-base font-semibold text-slate-900">{title}</h3>
-              {subtitle && <p className="text-sm text-slate-500 mt-0.5">{subtitle}</p>}
+              <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
+              {subtitle && <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{subtitle}</p>}
             </div>
             <button onClick={onClose} className="btn-icon ml-4 flex-shrink-0">
               <X size={16} />

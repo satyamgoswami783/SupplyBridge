@@ -309,25 +309,25 @@ export const PricingSync: React.FC = () => {
               {auditLogRows.map((row, i) => {
                 const change = row.new - row.old
                 return (
-                  <tr key={i} className="hover:bg-slate-50/80 transition-colors">
-                    <td><span className="font-bold text-slate-900 text-sm leading-snug">{row.name}</span></td>
-                    <td>
-                      <span className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 font-mono text-xs font-semibold inline-block whitespace-nowrap">
+                  <tr key={i} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                    <td data-label="Product Name"><span className="font-bold text-slate-900 dark:text-slate-100 text-sm leading-snug">{row.name}</span></td>
+                    <td data-label="SKU">
+                      <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-mono text-xs font-semibold inline-block whitespace-nowrap">
                         {row.sku}
                       </span>
                     </td>
-                    <td><span className="text-xs text-slate-600 font-semibold whitespace-nowrap">{row.supplier}</span></td>
-                    <td><span className="text-xs text-slate-500 font-mono font-medium whitespace-nowrap">${row.old.toFixed(2)}</span></td>
-                    <td><span className="text-xs font-bold text-slate-900 font-mono whitespace-nowrap">${row.new.toFixed(2)}</span></td>
-                    <td>
-                      <span className={`inline-flex items-center gap-1 text-xs font-bold whitespace-nowrap ${change > 0 ? 'text-emerald-600' : change < 0 ? 'text-rose-600' : 'text-slate-400'}`}>
+                    <td data-label="Supplier"><span className="text-xs text-slate-600 dark:text-slate-300 font-semibold whitespace-nowrap">{row.supplier}</span></td>
+                    <td data-label="Old Price"><span className="text-xs text-slate-500 dark:text-slate-400 font-mono font-medium whitespace-nowrap">${row.old.toFixed(2)}</span></td>
+                    <td data-label="New Price"><span className="text-xs font-bold text-slate-900 dark:text-slate-100 font-mono whitespace-nowrap">${row.new.toFixed(2)}</span></td>
+                    <td data-label="Change">
+                      <span className={`inline-flex items-center gap-1 text-xs font-bold whitespace-nowrap ${change > 0 ? 'text-emerald-600 dark:text-emerald-400' : change < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'}`}>
                         {change > 0 ? <TrendingUp size={12} /> : change < 0 ? <TrendingDown size={12} /> : '='}
                         {change > 0 ? '+' : ''}${change.toFixed(2)}
                       </span>
                     </td>
-                    <td><span className="text-xs text-emerald-600 font-bold whitespace-nowrap">{row.margin}%</span></td>
-                    <td><Badge variant={row.ok ? 'success' : 'warning'} dot>{row.ok ? 'Synced' : 'Pending'}</Badge></td>
-                    <td><span className="text-xs text-slate-500 font-mono whitespace-nowrap">{row.time}</span></td>
+                    <td data-label="Margin"><span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">{row.margin}%</span></td>
+                    <td data-label="Status"><Badge variant={row.ok ? 'success' : 'warning'} dot>{row.ok ? 'Synced' : 'Pending'}</Badge></td>
+                    <td data-label="Time"><span className="text-xs text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap">{row.time}</span></td>
                   </tr>
                 )
               })}

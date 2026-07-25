@@ -153,29 +153,29 @@ export const Users: React.FC = () => {
             <tbody>
               {filtered.map(user => (
                 <tr key={user.id} className="cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-850/50 transition-colors" onClick={() => setViewProfileUser(user)}>
-                  <td>
+                  <td data-label="User">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl bg-gradient-aurora flex items-center justify-center text-white text-xs font-black flex-shrink-0 shadow-glow-primary">
                         {getInitials(user.name)}
                       </div>
                       <div>
                         <p className="font-bold text-slate-800 dark:text-slate-100 text-sm hover:text-primary-600 transition-colors">{user.name}</p>
-                        <p className="text-2xs text-slate-400">{user.email}</p>
+                        <p className="text-2xs text-slate-400 dark:text-slate-400">{user.email}</p>
                       </div>
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Role">
                     <Badge variant={(ROLE_COLORS[user.role] as any) || 'neutral'}>{ROLE_LABELS[user.role]}</Badge>
                   </td>
-                  <td><span className="text-xs font-medium text-slate-600 dark:text-slate-300">{user.department || '—'}</span></td>
-                  <td>
+                  <td data-label="Department"><span className="text-xs font-medium text-slate-600 dark:text-slate-300">{user.department || '—'}</span></td>
+                  <td data-label="Status">
                     <Badge variant={statusToVariant(user.status)} dot>
                       {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                     </Badge>
                   </td>
-                  <td><span className="text-xs text-slate-400">{user.lastLogin ? timeAgo(user.lastLogin) : '—'}</span></td>
-                  <td><span className="text-xs text-slate-400">{formatDate(user.createdAt)}</span></td>
-                  <td className="text-right" onClick={e => e.stopPropagation()}>
+                  <td data-label="Last Login"><span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{user.lastLogin ? timeAgo(user.lastLogin) : '—'}</span></td>
+                  <td data-label="Joined"><span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{formatDate(user.createdAt)}</span></td>
+                  <td data-label="Actions" className="text-right" onClick={e => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-1">
                       <button className="btn-icon" onClick={() => setViewProfileUser(user)} title="View User Profile"><Eye size={14} /></button>
                       {user.status === 'active' ? (

@@ -83,12 +83,12 @@ export const Monitoring: React.FC = () => {
       {/* System Health Gauges */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'CPU Load',      value: 52, color: 'primary', icon: <Cpu size={16} className="text-primary-600" />, bg: 'bg-primary-50 dark:bg-slate-800' },
-          { label: 'Memory Usage',  value: 66, color: 'cyan',    icon: <Server size={16} className="text-cyan-600" />,  bg: 'bg-cyan-50 dark:bg-slate-800' },
-          { label: 'Disk Storage',  value: 43, color: 'emerald', icon: <HardDrive size={16} className="text-emerald-600" />, bg: 'bg-emerald-50 dark:bg-slate-800' },
-          { label: 'Queue Load',    value: 48, color: 'amber',   icon: <Database size={16} className="text-amber-600" />, bg: 'bg-amber-50 dark:bg-slate-800' },
+          { label: 'CPU Load',      value: 52, color: 'primary', icon: <Cpu size={16} className="text-primary-600 dark:text-primary-400" />, bg: 'bg-primary-50 dark:bg-slate-800/80' },
+          { label: 'Memory Usage',  value: 66, color: 'cyan',    icon: <Server size={16} className="text-cyan-600 dark:text-cyan-400" />,  bg: 'bg-cyan-50 dark:bg-slate-800/80' },
+          { label: 'Disk Storage',  value: 43, color: 'emerald', icon: <HardDrive size={16} className="text-emerald-600 dark:text-emerald-400" />, bg: 'bg-emerald-50 dark:bg-slate-800/80' },
+          { label: 'Queue Load',    value: 48, color: 'amber',   icon: <Database size={16} className="text-amber-600 dark:text-amber-400" />, bg: 'bg-amber-50 dark:bg-slate-800/80' },
         ].map(s => (
-          <div key={s.label} className="card p-5">
+          <div key={s.label} className="card p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
             <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-3`}>{s.icon}</div>
             <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{s.value}%</p>
             <p className="text-xs text-slate-400 font-medium mt-0.5 mb-2">{s.label}</p>
@@ -98,7 +98,7 @@ export const Monitoring: React.FC = () => {
       </div>
 
       {/* Performance Chart */}
-      <div className="card p-5">
+      <div className="card p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Telemetry Performance — Last 24 Hours</h3>
@@ -119,10 +119,10 @@ export const Monitoring: React.FC = () => {
                 <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
             <XAxis dataKey="time" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-            <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }} />
+            <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: '1px solid #1e293b', color: '#f8fafc', fontSize: '12px' }} />
             <Area type="monotone" dataKey="cpu" name="CPU %" stroke="#4f46e5" strokeWidth={2} fill="url(#cpuGrad)" dot={false} />
             <Area type="monotone" dataKey="memory" name="Memory %" stroke="#06b6d4" strokeWidth={2} fill="url(#memGrad)" dot={false} />
           </AreaChart>
@@ -131,9 +131,9 @@ export const Monitoring: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* API Health */}
-        <div className="card p-5">
+        <div className="card p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-            <Wifi size={15} className="text-primary-600" /> API Gateway Endpoint Latency
+            <Wifi size={15} className="text-primary-600 dark:text-primary-400" /> API Gateway Endpoint Latency
           </h3>
           <div className="space-y-3">
             {[
@@ -144,11 +144,11 @@ export const Monitoring: React.FC = () => {
               { endpoint: '/api/v1/suppliers',   latency: '55ms', status: 'operational', calls: '980/hr' },
               { endpoint: '/v2/shift4shop/catalog', latency: '78ms', status: 'operational', calls: '15,600/hr' },
             ].map(ep => (
-              <div key={ep.endpoint} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-850">
+              <div key={ep.endpoint} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
                 <code className="text-xs font-mono text-slate-700 dark:text-slate-300">{ep.endpoint}</code>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-slate-400">{ep.calls}</span>
-                  <span className={`text-xs font-semibold ${ep.latency.includes('12') ? 'text-amber-600' : 'text-emerald-600'}`}>{ep.latency}</span>
+                  <span className="text-xs text-slate-400 font-medium">{ep.calls}</span>
+                  <span className={`text-xs font-semibold ${ep.latency.includes('12') ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>{ep.latency}</span>
                   <HealthIndicator status={ep.status as any} label={ep.status === 'operational' ? 'OK' : 'Slow'} />
                 </div>
               </div>
@@ -157,10 +157,10 @@ export const Monitoring: React.FC = () => {
         </div>
 
         {/* Supplier Status Telemetry */}
-        <div className="card p-5">
+        <div className="card p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-              <Truck size={15} className="text-primary-600" /> Supplier Connection Telemetry
+              <Truck size={15} className="text-primary-600 dark:text-primary-400" /> Supplier Connection Telemetry
             </h3>
             <span className="text-2xs text-slate-400 font-semibold">{mockSuppliers.length} Total Partners</span>
           </div>
@@ -170,7 +170,7 @@ export const Monitoring: React.FC = () => {
               const isTesting = testingSupplierId === s.id
               const isUp = s.status === 'connected' || s.status === 'syncing'
               return (
-                <div key={s.id} className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-850/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <div key={s.id} className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isUp ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                     <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{s.name}</span>
@@ -194,9 +194,9 @@ export const Monitoring: React.FC = () => {
         </div>
 
         {/* Queue Health */}
-        <div className="card p-5">
+        <div className="card p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-            <Database size={15} className="text-primary-600" /> Message & Job Queue Throughput
+            <Database size={15} className="text-primary-600 dark:text-primary-400" /> Message & Job Queue Throughput
           </h3>
           <div className="space-y-3">
             {[
@@ -209,7 +209,7 @@ export const Monitoring: React.FC = () => {
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm text-slate-700 dark:text-slate-300">{q.label}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500 font-semibold">{q.current}/{q.max} items</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">{q.current}/{q.max} items</span>
                     <HealthIndicator status={q.status} label={q.status === 'healthy' ? 'OK' : 'High'} />
                   </div>
                 </div>
@@ -220,9 +220,9 @@ export const Monitoring: React.FC = () => {
         </div>
 
         {/* Shift4Shop Storefront Availability */}
-        <div className="card p-5">
+        <div className="card p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-            <Globe size={15} className="text-primary-600" /> Shift4Shop Storefront Availability
+            <Globe size={15} className="text-primary-600 dark:text-primary-400" /> Shift4Shop Storefront Availability
           </h3>
           <div className="space-y-2">
             {[
@@ -232,7 +232,7 @@ export const Monitoring: React.FC = () => {
               { name: 'IndusStore UK Storefront',   uptime: '99.95%', ok: true },
               { name: 'QuickBuy CA Storefront',    uptime: '98.50%', ok: false },
             ].map(s => (
-              <div key={s.name} className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-850">
+              <div key={s.name} className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
                 <div className="flex items-center gap-2">
                   <div className={`w-1.5 h-1.5 rounded-full ${s.ok ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                   <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{s.name}</span>

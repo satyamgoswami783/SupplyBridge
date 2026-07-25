@@ -227,10 +227,10 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ open, onClose, onC
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-panel max-w-sm" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h3 className="text-base font-semibold text-slate-900">{title}</h3>
+          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
         </div>
         <div className="modal-body">
-          <p className="text-sm text-slate-600">{message}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300">{message}</p>
         </div>
         <div className="modal-footer">
           <button onClick={onClose} className="btn-secondary btn-sm">Cancel</button>

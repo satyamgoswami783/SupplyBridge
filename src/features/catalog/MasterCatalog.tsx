@@ -351,7 +351,7 @@ export const MasterCatalog: React.FC = () => {
   ]
 
   return (
-    <div className="relative space-y-6">
+    <div className="relative space-y-4 md:space-y-6">
       {/* Toast Notification Banner */}
       <AnimatePresence>
         {toastMessage && (
@@ -372,12 +372,13 @@ export const MasterCatalog: React.FC = () => {
         subtitle="Single source of truth for all product data across suppliers and stores"
         actions={
           <>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <button
               onClick={handleExportCatalogCSV}
-              className="btn-secondary btn-sm flex items-center gap-1.5 cursor-pointer"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1.5 cursor-pointer"
               title="Download Catalog CSV File"
             >
-              <Download size={14} className="text-emerald-600" /> Export CSV
+              <Download size={14} className="text-emerald-600" /> Export
             </button>
             <button
               onClick={() => {
@@ -386,18 +387,19 @@ export const MasterCatalog: React.FC = () => {
                 setSupplierFilter('all')
                 showNotification('Filters reset.')
               }}
-              className="btn-secondary btn-sm flex items-center gap-1.5"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1.5"
             >
-              <Filter size={14} /> Reset Filters
+              <Filter size={14} /> Reset
             </button>
             {canManageCatalog && (
               <button
                 onClick={() => setAddModalOpen(true)}
-                className="btn-primary btn-sm flex items-center gap-1.5"
+                className="btn-primary btn-sm flex items-center justify-center gap-1.5"
               >
                 <Plus size={14} /> Add Product
               </button>
             )}
+            </div>
           </>
         }
       />
@@ -452,7 +454,7 @@ export const MasterCatalog: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center gap-2 p-3 bg-primary-50/80 border border-primary-200 rounded-xl shadow-sm overflow-hidden"
+            className="flex flex-wrap items-center gap-2 p-3 bg-primary-50/80 border border-primary-200 rounded-xl shadow-sm overflow-hidden"
           >
             <input
               type="checkbox"
@@ -537,7 +539,7 @@ export const MasterCatalog: React.FC = () => {
                       }`}
                     onClick={() => setViewProduct(product)}
                   >
-                    <td className="text-center" onClick={e => e.stopPropagation()}>
+                    <td className="text-center mobile-hidden" onClick={e => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
@@ -545,7 +547,7 @@ export const MasterCatalog: React.FC = () => {
                         onChange={() => handleSelectOne(product.id)}
                       />
                     </td>
-                    <td>
+                    <td data-label="Product">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0 border border-slate-200 overflow-hidden shadow-2xs">
                           {product.images.length > 0 ? (
@@ -559,63 +561,63 @@ export const MasterCatalog: React.FC = () => {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-bold text-slate-900 text-sm max-w-[220px] truncate leading-snug">
+                          <p className="font-bold text-slate-900 dark:text-slate-100 text-sm max-w-[220px] truncate leading-snug">
                             {product.name}
                           </p>
-                          <p className="text-xs text-slate-400 font-medium mt-0.5">
+                          <p className="text-xs text-slate-400 dark:text-slate-400 font-medium mt-0.5">
                             {product.brand || '—'}
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td>
-                      <code className="mono text-xs font-semibold px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-lg text-slate-800 whitespace-nowrap inline-block tracking-tight">
+                    <td data-label="SKU">
+                      <code className="mono text-xs font-semibold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 whitespace-nowrap inline-block tracking-tight">
                         {product.sku}
                       </code>
                     </td>
-                    <td>
-                      <span className="text-xs text-slate-700 font-medium whitespace-nowrap">
+                    <td data-label="Supplier">
+                      <span className="text-xs text-slate-700 dark:text-slate-200 font-medium whitespace-nowrap">
                         {product.supplierName}
                       </span>
                     </td>
-                    <td>
-                      <span className="text-xs text-slate-600 font-medium whitespace-nowrap">
+                    <td data-label="Category" className="mobile-hidden">
+                      <span className="text-xs text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
                         {product.categoryName || '—'}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="Price">
                       <div className="whitespace-nowrap">
-                        <span className="font-bold text-slate-900 text-sm">
+                        <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">
                           ${product.pricing.retailPrice.toFixed(2)}
                         </span>
-                        <span className="text-2xs text-emerald-600 ml-1.5 font-bold">
+                        <span className="text-2xs text-emerald-600 dark:text-emerald-400 ml-1.5 font-bold">
                           +{product.pricing.margin.toFixed(1)}%
                         </span>
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Stock">
                       <Badge variant={statusToVariant(product.inventory.status)}>
                         {product.inventory.availableStock.toLocaleString()}
                       </Badge>
                     </td>
-                    <td>
+                    <td data-label="Status">
                       <Badge variant={statusToVariant(product.status)}>
                         {product.status.replace(/_/g, ' ')}
                       </Badge>
                     </td>
-                    <td>
+                    <td data-label="Validation" className="mobile-hidden">
                       <Badge variant={statusToVariant(product.validationStatus)}>
                         {product.validationStatus}
                       </Badge>
                     </td>
-                    <td>
-                      <span className="text-xs text-slate-400 font-mono whitespace-nowrap">
+                    <td data-label="Updated" className="mobile-hidden">
+                      <span className="text-xs text-slate-400 dark:text-slate-400 font-mono whitespace-nowrap">
                         {timeAgo(product.updatedAt)}
                       </span>
                     </td>
-                    <td className="text-center">
+                    <td data-label="" className="text-center mobile-full">
                       <div
-                        className="flex items-center justify-center gap-1"
+                        className="flex items-center justify-center gap-1 w-full md:w-auto"
                         onClick={e => e.stopPropagation()}
                       >
                         <button
