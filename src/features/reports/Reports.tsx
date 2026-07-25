@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BarChart3, Download, Calendar, TrendingUp, CheckCircle2, FileSpreadsheet, FileText, Package, RefreshCw, AlertTriangle, ShieldCheck, Truck, Database } from 'lucide-react'
+import { BarChart3, Download, Calendar, TrendingUp, CheckCircle2, FileSpreadsheet, FileText, Package, RefreshCw, AlertTriangle, ShieldCheck, Truck, Database, ChevronDown } from 'lucide-react'
 import { SectionHeader, Tabs } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts'
@@ -43,6 +43,20 @@ export const Reports: React.FC = () => {
   const [tab, setTab] = useState('supplier')
   const [dateRange, setDateRange] = useState('Last 30 days')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const showNotification = (msg: string) => {
     setToastMessage(msg)

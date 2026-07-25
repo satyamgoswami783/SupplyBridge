@@ -295,7 +295,7 @@ export const ValidationCenter: React.FC = () => {
                           SKU: <code className="mono">{item.supplierSku}</code> · {item.supplierName} · {timeAgo(item.createdAt)}
                         </p>
                       </div>
-                      <Badge variant={statusToVariant(item.status)} className="self-start md:self-center">{item.status}</Badge>
+                      <Badge variant={statusToVariant(item.status)} className="self-start md:self-center md:hidden">{item.status}</Badge>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-3">
                       {item.errors.map((err, i) => (
@@ -312,7 +312,8 @@ export const ValidationCenter: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end sm:justify-start pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/60" onClick={e => e.stopPropagation()}>
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-start items-center pt-3 sm:pt-0 pl-7 sm:pl-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/60" onClick={e => e.stopPropagation()}>
+                  <Badge variant={statusToVariant(item.status)} className="hidden md:inline-flex self-center mr-1">{item.status}</Badge>
                   {role !== 'operations_staff' && (
                     <>
                       <button
