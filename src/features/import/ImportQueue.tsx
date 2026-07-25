@@ -266,54 +266,53 @@ export const ImportQueue: React.FC = () => {
           </div>
         )}
         {filtered.map(item => (
-          <div key={item.id} className="card p-4 sm:p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all border border-slate-200/90 dark:border-slate-800">
-            <div className="flex items-start gap-3.5">
+          <div key={item.id} className="card p-4 sm:p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <div className="flex items-start gap-3 sm:gap-3.5">
               <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-2xs mt-0.5 ${
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-2xs mt-0.5 ${
                   item.status === 'completed'
-                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
                     : item.status === 'failed'
-                    ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600'
+                    ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
                     : item.status === 'processing'
-                    ? 'bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600'
-                    : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600'
+                    ? 'bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400'
+                    : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
                 }`}
               >
                 <Download size={18} />
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">{item.supplierName}</span>
-                  <Badge variant="info">{connectionTypeLabel(item.connectionType)}</Badge>
-                </div>
-
-                <div className="mb-2">
+                <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-slate-800 dark:text-slate-100 text-sm sm:text-base">{item.supplierName}</span>
+                    <Badge variant="info">{connectionTypeLabel(item.connectionType)}</Badge>
+                  </div>
                   <Badge variant={statusToVariant(item.status)} dot>{item.status}</Badge>
                 </div>
 
                 {item.fileName && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
-                    Source Feed File: <code className="mono text-2xs font-bold px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-700 dark:text-slate-300 break-all">{item.fileName}</code>
+                  <p className="text-2xs sm:text-xs text-slate-500 dark:text-slate-400 mb-2 leading-relaxed">
+                    Source Feed File: <code className="mono text-2xs font-bold px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-700 dark:text-slate-300 break-all inline-block mt-0.5 sm:mt-0">{item.fileName}</code>
                   </p>
                 )}
 
                 {item.errorMessage && (
-                  <p className="text-xs text-rose-600 dark:text-rose-400 mb-2 flex items-center gap-1.5 font-semibold bg-rose-50 dark:bg-rose-950/40 px-3 py-1.5 rounded-lg border border-rose-200 dark:border-rose-800">
+                  <p className="text-xs text-rose-600 dark:text-rose-400 mb-2 flex items-center gap-1.5 font-semibold bg-rose-50 dark:bg-rose-950/40 px-3 py-1.5 rounded-lg border border-rose-200 dark:border-rose-800/60">
                     <AlertCircle size={13} /> Error: {item.errorMessage}
                   </p>
                 )}
 
                 <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
                   {item.processedRecords > 0 && (
-                    <span>
-                      <CheckCircle2 size={12} className="inline mr-1 text-emerald-500" />
+                    <span className="inline-flex items-center gap-1">
+                      <CheckCircle2 size={12} className="text-emerald-500 flex-shrink-0" />
                       <strong className="text-slate-800 dark:text-slate-100">{item.processedRecords.toLocaleString()}</strong> processed
                     </span>
                   )}
                   {item.failedRecords > 0 && (
-                    <span className="text-rose-600 font-bold">
-                      <XCircle size={12} className="inline mr-1 text-rose-500" />
+                    <span className="text-rose-600 dark:text-rose-400 font-bold inline-flex items-center gap-1">
+                      <XCircle size={12} className="text-rose-500 flex-shrink-0" />
                       {item.failedRecords.toLocaleString()} failed
                     </span>
                   )}
@@ -334,11 +333,11 @@ export const ImportQueue: React.FC = () => {
                   </div>
                 )}
 
-                {/* Card Bottom Actions Bar — Exact Image 1 Mobile Match */}
-                <div className="flex items-center justify-end gap-3 pt-2">
+                {/* Card Bottom Actions Bar */}
+                <div className="flex items-center justify-between sm:justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80 mt-2">
                   <button
                     onClick={() => setPreviewItem(item)}
-                    className="btn-ghost btn-sm font-bold flex items-center gap-1.5 text-primary-600 dark:text-primary-400 cursor-pointer"
+                    className="btn-ghost btn-sm font-bold flex items-center justify-center gap-1.5 text-primary-600 dark:text-primary-400 cursor-pointer"
                     title="Preview Imported Sample Records Data"
                   >
                     <Eye size={14} /> Preview Data
@@ -346,7 +345,7 @@ export const ImportQueue: React.FC = () => {
                   {item.status === 'pending' && (
                     <button
                       onClick={() => handleSetHighPriority(item.id, item.supplierName)}
-                      className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer text-amber-600 hover:bg-amber-50"
+                      className="btn-secondary btn-sm flex items-center justify-center gap-1.5 font-bold cursor-pointer text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 hover:bg-amber-100 dark:hover:bg-amber-900/60"
                       title="Set High Priority Queue"
                     >
                       <Zap size={13} /> High Priority
@@ -355,7 +354,7 @@ export const ImportQueue: React.FC = () => {
                   {item.status === 'failed' && (
                     <button
                       onClick={() => handleRetry(item.id, item.supplierName)}
-                      className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
+                      className="btn-secondary btn-sm flex items-center justify-center gap-1.5 font-bold cursor-pointer"
                     >
                       <RotateCcw size={13} /> Retry Ingestion
                     </button>
@@ -363,7 +362,7 @@ export const ImportQueue: React.FC = () => {
                   {item.status === 'processing' && (
                     <button
                       onClick={() => handleCancel(item.id, item.supplierName)}
-                      className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1.5 font-bold cursor-pointer"
+                      className="btn-ghost btn-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center justify-center gap-1.5 font-bold cursor-pointer"
                     >
                       <XCircle size={13} /> Cancel
                     </button>
