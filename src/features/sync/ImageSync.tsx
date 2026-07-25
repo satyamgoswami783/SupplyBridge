@@ -232,8 +232,8 @@ export const ImageSync: React.FC = () => {
       </div>
 
       {/* Visual Product Image Gallery Grid */}
-      <div className="card p-5 border border-slate-200/90 dark:border-slate-800">
-        <div className="flex items-center justify-between mb-4">
+      <div className="card p-4 sm:p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 mb-4">
           <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
             <Image size={16} className="text-primary-600 dark:text-primary-400" /> Master Catalog Product Image Gallery
           </h3>
@@ -244,7 +244,7 @@ export const ImageSync: React.FC = () => {
           {GALLERY_SAMPLES.map(img => (
             <div key={img.id} className="group relative cursor-pointer min-w-[130px] sm:min-w-0" onClick={() => setPreviewItem(img)}>
               <div className={`aspect-square rounded-xl overflow-hidden border-2 relative ${
-                img.status === 'synced' ? 'border-emerald-300 dark:border-emerald-900 bg-white' :
+                img.status === 'synced' ? 'border-emerald-300 dark:border-emerald-900 bg-white dark:bg-slate-800' :
                 img.status === 'broken' ? 'border-rose-300 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40' :
                 img.status === 'missing' ? 'border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900' : 'border-amber-300 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40'
               }`}>
@@ -274,7 +274,7 @@ export const ImageSync: React.FC = () => {
       </div>
 
       {/* Main Filter & Table Section — Detailed Image Asset Audit Table */}
-      <div className="card p-5 border border-slate-200/90 dark:border-slate-800 w-full">
+      <div className="card p-4 sm:p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full">
         {/* Search & Status Filters */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="relative flex-1 max-w-md">
