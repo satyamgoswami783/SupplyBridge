@@ -372,17 +372,10 @@ export const Suppliers: React.FC = () => {
         </div>
       </FilterBar>
 
-<<<<<<< HEAD
       {/* Table */}
       <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <div className="table-container">
           <table className="table">
-=======
-      {/* Exact Table UI from Image 1 with Responsive Horizontal Scroll */}
-      <div className="card overflow-hidden w-full">
-        <div className="table-container w-full overflow-x-auto scrollbar-thin">
-          <table className="table min-w-[850px] w-full">
->>>>>>> c038a6255de0cec8bcd111372000ba1cb3a2aa1f
             <thead>
               <tr className="bg-slate-100/90 dark:bg-slate-950/90 border-b-2 border-slate-200 dark:border-slate-800">
                 <th className="whitespace-nowrap px-4 py-3.5">SUPPLIER</th>
@@ -422,17 +415,12 @@ export const Suppliers: React.FC = () => {
                     className="cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors"
                     onClick={() => setSelected(supplier)}
                   >
-<<<<<<< HEAD
                     <td data-label="Supplier">
-=======
-                    <td className="whitespace-nowrap px-4 py-3.5">
->>>>>>> c038a6255de0cec8bcd111372000ba1cb3a2aa1f
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl bg-primary-50 dark:bg-primary-950/60 border border-primary-100 dark:border-primary-900/60 flex items-center justify-center text-base flex-shrink-0">
                           {connTypeIcon[supplier.connectionType]}
                         </div>
                         <div>
-<<<<<<< HEAD
                           <p className="font-bold text-slate-900 dark:text-slate-100 text-sm">{supplier.name}</p>
                           <p className="text-xs text-slate-400 dark:text-slate-400 font-medium">{supplier.code} · {supplier.country}</p>
                         </div>
@@ -442,17 +430,6 @@ export const Suppliers: React.FC = () => {
                       <Badge variant="info">{connectionTypeLabel(supplier.connectionType)}</Badge>
                     </td>
                     <td data-label="Status">
-=======
-                          <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm">{supplier.name}</p>
-                          <p className="text-xs text-slate-400">{supplier.code} · {supplier.country}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3.5">
-                      <Badge variant="info">{connectionTypeLabel(supplier.connectionType)}</Badge>
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3.5">
->>>>>>> c038a6255de0cec8bcd111372000ba1cb3a2aa1f
                       <Badge variant={statusToVariant(supplier.status)} dot>
                         {supplier.status.charAt(0).toUpperCase() + supplier.status.slice(1)}
                       </Badge>

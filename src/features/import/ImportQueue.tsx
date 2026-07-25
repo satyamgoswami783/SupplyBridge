@@ -370,45 +370,6 @@ export const ImportQueue: React.FC = () => {
                   )}
                 </div>
               </div>
-<<<<<<< HEAD
-=======
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-start sm:justify-end pt-3 sm:pt-0 pl-[54px] sm:pl-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/60" onClick={e => e.stopPropagation()}>
-                <button
-                  onClick={() => setPreviewItem(item)}
-                  className="btn-ghost btn-sm font-bold flex items-center gap-1 text-primary-600 dark:text-primary-400 cursor-pointer"
-                  title="Preview Imported Sample Records Data"
-                >
-                  <Eye size={14} /> Preview Data
-                </button>
-                {item.status === 'pending' && (
-                  <button
-                    onClick={() => handleSetHighPriority(item.id, item.supplierName)}
-                    className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer text-amber-600 hover:bg-amber-50"
-                    title="Set High Priority Queue"
-                  >
-                    <Zap size={13} /> High Priority
-                  </button>
-                )}
-                {item.status === 'failed' && (
-                  <button
-                    onClick={() => handleRetry(item.id, item.supplierName)}
-                    className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
-                  >
-                    <RotateCcw size={13} /> Retry Ingestion
-                  </button>
-                )}
-                {item.status === 'processing' && (
-                  <button
-                    onClick={() => handleCancel(item.id, item.supplierName)}
-                    className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1.5 font-bold cursor-pointer"
-                  >
-                    <XCircle size={13} /> Cancel
-                  </button>
-                )}
-              </div>
->>>>>>> 70f5f610af14f62a03d1b7d0beeb462a90b16aee
             </div>
           </div>
         ))}
