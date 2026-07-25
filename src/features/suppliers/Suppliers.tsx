@@ -23,7 +23,7 @@ import {
   Download
 } from 'lucide-react'
 import { Badge } from '../../components/ui/Badge'
-import { SectionHeader, FilterBar, EmptyState, ConfirmDialog } from '../../components/ui'
+import { SectionHeader, FilterBar, EmptyState, ConfirmDialog, Select } from '../../components/ui'
 import { Modal } from '../../components/ui/Modal'
 import { statusToVariant, connectionTypeLabel, formatDateTime, timeAgo } from '../../utils'
 import type { Supplier, ConnectionType, SupplierStatus } from '../../types'
@@ -349,25 +349,29 @@ export const Suppliers: React.FC = () => {
 
       {/* Filters */}
       <FilterBar search={search} onSearch={v => { setSearch(v); setCurrentPage(1); }} placeholder="Search by name, code, or email...">
-        <select
-          className="select w-auto min-w-[130px] input-sm"
-          value={statusFilter}
-          onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }}
-        >
-          <option value="all">All Status</option>
-          <option value="connected">Connected</option>
-          <option value="disconnected">Disconnected</option>
-          <option value="error">Error</option>
-          <option value="syncing">Syncing</option>
-        </select>
-        <select
-          className="select w-auto min-w-[130px] input-sm"
-          value={typeFilter}
-          onChange={e => { setTypeFilter(e.target.value); setCurrentPage(1); }}
-        >
-          <option value="all">All Types</option>
-          {CONNECTION_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-        </select>
+        <div className="flex w-full gap-3 sm:w-auto">
+          <Select
+            className="w-full"
+            value={statusFilter}
+            onChange={v => { setStatusFilter(v); setCurrentPage(1); }}
+            options={[
+              { label: 'All Status', value: 'all' },
+              { label: 'Connected', value: 'connected' },
+              { label: 'Disconnected', value: 'disconnected' },
+              { label: 'Error', value: 'error' },
+              { label: 'Syncing', value: 'syncing' }
+            ]}
+          />
+          <Select
+            className="w-full"
+            value={typeFilter}
+            onChange={v => { setTypeFilter(v); setCurrentPage(1); }}
+            options={[
+              { label: 'All Types', value: 'all' },
+              ...CONNECTION_TYPES
+            ]}
+          />
+        </div>
       </FilterBar>
 
       {/* Table */}
