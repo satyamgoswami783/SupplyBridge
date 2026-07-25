@@ -218,29 +218,31 @@ export const ValidationCenter: React.FC = () => {
       <Tabs tabs={tabs} active={tab} onChange={setTab} />
       
       <FilterBar search={search} onSearch={setSearch} placeholder="Search product name or SKU...">
-        <select
-          className="select input-sm w-auto min-w-[130px]"
-          value={selectedSupplier}
-          onChange={e => setSelectedSupplier(e.target.value)}
-        >
-          {suppliersList.map(sup => (
-            <option key={sup} value={sup}>{sup}</option>
-          ))}
-        </select>
-        <select
-          className="select input-sm w-auto"
-          value={selectedErrorType}
-          onChange={e => setSelectedErrorType(e.target.value)}
-        >
-          <option value="All Error Types">All Error Types</option>
-          <option value="Missing Image">Missing Image</option>
-          <option value="Duplicate SKU">Duplicate SKU</option>
-          <option value="Missing Price">Missing Price</option>
-          <option value="Invalid Category">Invalid Category</option>
-          <option value="Missing Description">Missing Description</option>
-          <option value="Invalid Attribute">Invalid Attribute</option>
-          <option value="Duplicate Product">Duplicate Product</option>
-        </select>
+        <div className="flex justify-center gap-3 w-full sm:justify-start sm:w-auto">
+          <select
+            className="select input-sm w-[130px] font-medium"
+            value={selectedSupplier}
+            onChange={e => setSelectedSupplier(e.target.value)}
+          >
+            {suppliersList.map(sup => (
+              <option key={sup} value={sup}>{sup}</option>
+            ))}
+          </select>
+          <select
+            className="select input-sm w-[130px] font-medium"
+            value={selectedErrorType}
+            onChange={e => setSelectedErrorType(e.target.value)}
+          >
+            <option value="All Error Types">All Error Types</option>
+            <option value="Missing Image">Missing Image</option>
+            <option value="Duplicate SKU">Duplicate SKU</option>
+            <option value="Missing Price">Missing Price</option>
+            <option value="Invalid Category">Invalid Category</option>
+            <option value="Missing Description">Missing Description</option>
+            <option value="Invalid Attribute">Invalid Attribute</option>
+            <option value="Duplicate Product">Duplicate Product</option>
+          </select>
+        </div>
       </FilterBar>
 
       {/* Bulk Select Bar */}
