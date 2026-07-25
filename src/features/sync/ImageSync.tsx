@@ -156,17 +156,17 @@ export const ImageSync: React.FC = () => {
         title="Image Synchronization"
         subtitle="Monitor and synchronize supplier media feeds, CDN hosting, WebP image compression, and 404 URL repairs"
         actions={
-          <div className="grid grid-cols-3 gap-1.5 w-full sm:flex sm:w-auto sm:items-center sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
             <button
               onClick={handleExportCSV}
-              className="btn-secondary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer px-2 sm:px-3 text-xs"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer px-2.5 sm:px-3 text-xs flex-shrink-0"
               title="Download Image Audit CSV Report"
             >
               <Download size={14} className="text-emerald-600 dark:text-emerald-400" /> Export <span className="hidden sm:inline">CSV</span>
             </button>
             <button
               onClick={handleRetryBroken}
-              className="btn-secondary btn-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 border-rose-200 dark:border-rose-900/60 flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer px-2 sm:px-3 text-xs whitespace-nowrap"
+              className="btn-secondary btn-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 border-rose-200 dark:border-rose-900/60 flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer px-2.5 sm:px-3 text-xs whitespace-nowrap flex-shrink-0"
               title="Re-fetch all broken 404 image URLs"
             >
               <RotateCcw size={14} /> Retry <span className="hidden sm:inline">Broken (1,532)</span><span className="sm:hidden">(1.5k)</span>
@@ -174,7 +174,7 @@ export const ImageSync: React.FC = () => {
             <button
               onClick={handleSyncImages}
               disabled={syncing}
-              className="btn-primary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer px-2 sm:px-3 text-xs whitespace-nowrap"
+              className="btn-primary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer px-2.5 sm:px-3 text-xs whitespace-nowrap flex-shrink-0"
             >
               <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
               <span>{syncing ? 'Syncing...' : <><span className="sm:hidden">Sync Media</span><span className="hidden sm:inline">Sync Images Now</span></>}</span>
@@ -184,30 +184,30 @@ export const ImageSync: React.FC = () => {
       />
 
       {/* Summary Telemetry KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
         {[
           { label: 'TOTAL MEDIA ASSETS', value: '248,492', color: 'text-slate-900 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800', sub: 'Indexed across 25 suppliers' },
           { label: 'SYNCED & OPTIMIZED',  value: '243,120', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50', sub: '98.2% WebP CDN cached' },
           { label: 'PENDING PROCESSING', value: '3,840', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50', sub: 'Queued for CDN compression' },
-          { label: 'BROKEN / 404 LINKS', value: '1,532', color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50', sub: 'Requires supplier URL refetch' },
+          { label: 'BROKEN / 404 LINKS', value: '1,532', color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50', sub: 'Requires URL refetch' },
         ].map((card, i) => (
-          <div key={i} className={`p-5 rounded-2xl shadow-xs min-h-[120px] flex flex-col justify-between transition-all duration-200 ${card.bg}`}>
-            <p className="text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">{card.label}</p>
-            <p className={`text-2xl lg:text-3xl font-black tracking-tight my-1 ${card.color}`}>{card.value}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">{card.sub}</p>
+          <div key={i} className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-xs flex flex-col justify-between transition-all duration-200 ${card.bg}`}>
+            <p className="text-[10px] sm:text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider truncate">{card.label}</p>
+            <p className={`text-xl sm:text-2xl lg:text-3xl font-black tracking-tight my-0.5 ${card.color}`}>{card.value}</p>
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-semibold truncate">{card.sub}</p>
           </div>
         ))}
       </div>
 
       {/* Supplier Image Feed Status Breakdown */}
-      <div className="card p-5 border border-slate-200/90 dark:border-slate-800">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Layers size={16} className="text-primary-600 dark:text-primary-400" /> Image Feed Status by Supplier
+      <div className="card p-3.5 sm:p-5 border border-slate-200/90 dark:border-slate-800">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <Layers size={15} className="text-primary-600 dark:text-primary-400" /> Image Feed Status by Supplier
           </h3>
           <Badge variant="primary" dot>Live CDN Feed</Badge>
         </div>
-        <div className="space-y-3.5">
+        <div className="space-y-2.5">
           {[
             { name: 'TechParts International', total: 55260, synced: 55100, broken: 12, pending: 148, status: 'healthy' as const },
             { name: 'GlobalSource Limited',    total: 44400, synced: 44200, broken: 80, pending: 120, status: 'healthy' as const },
@@ -215,15 +215,15 @@ export const ImageSync: React.FC = () => {
             { name: 'AcmeDistributors',        total: 29400, synced: 26800, broken: 980, pending: 1620, status: 'degraded' as const },
             { name: 'QuickShip LLC',           total: 21900, synced: 21900, broken: 0,  pending: 0,   status: 'healthy' as const },
           ].map(s => (
-            <div key={s.name} className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div key={s.name} className="p-2.5 sm:p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">{s.name}</span>
-                <span className="text-2xs text-slate-400 font-medium">{s.total.toLocaleString()} total images indexed</span>
+                <span className="text-[10px] sm:text-2xs text-slate-400 font-medium">{s.total.toLocaleString()} total images indexed</span>
               </div>
-              <div className="flex items-center gap-4 text-xs">
-                <span className="text-emerald-600 dark:text-emerald-400 font-bold"><CheckCircle2 size={12} className="inline mr-1" />{s.synced.toLocaleString()} synced</span>
-                {s.broken > 0 && <span className="text-rose-600 dark:text-rose-400 font-bold"><XCircle size={12} className="inline mr-1" />{s.broken.toLocaleString()} broken</span>}
-                {s.pending > 0 && <span className="text-amber-600 dark:text-amber-400 font-bold"><AlertTriangle size={12} className="inline mr-1" />{s.pending.toLocaleString()} pending</span>}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs">
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[11px] sm:text-xs"><CheckCircle2 size={11} className="inline mr-0.5" />{s.synced.toLocaleString()} synced</span>
+                {s.broken > 0 && <span className="text-rose-600 dark:text-rose-400 font-bold text-[11px] sm:text-xs"><XCircle size={11} className="inline mr-0.5" />{s.broken.toLocaleString()} broken</span>}
+                {s.pending > 0 && <span className="text-amber-600 dark:text-amber-400 font-bold text-[11px] sm:text-xs"><AlertTriangle size={11} className="inline mr-0.5" />{s.pending.toLocaleString()} pending</span>}
                 <HealthIndicator status={s.status} label={s.status === 'healthy' ? 'OK' : 'Issues'} />
               </div>
             </div>
