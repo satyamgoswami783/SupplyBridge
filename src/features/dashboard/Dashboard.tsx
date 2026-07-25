@@ -329,7 +329,7 @@ export const Dashboard: React.FC = () => {
       {/* Charts Row */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
         {/* Sync Jobs Area Chart */}
-        <div className="xl:col-span-2 card p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <div className="xl:col-span-2 card p-4 sm:p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Synchronization Activity Trend</p>
@@ -337,49 +337,53 @@ export const Dashboard: React.FC = () => {
             </div>
             <Badge variant="primary" dot>Real-time</Badge>
           </div>
-          <ResponsiveContainer width="100%" height={230}>
-            <AreaChart data={mockSyncChartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colInv" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="colPri" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="colImg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: '1px solid #1e293b', color: '#f8fafc', fontSize: '12px', boxShadow: '0 8px 16px rgba(0,0,0,0.3)' }} />
-              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
-              <Area type="monotone" dataKey="inventory" name="Inventory Sync" stroke="#4f46e5" strokeWidth={2} fill="url(#colInv)" dot={false} />
-              <Area type="monotone" dataKey="pricing" name="Pricing Sync" stroke="#10b981" strokeWidth={2} fill="url(#colPri)" dot={false} />
-              <Area type="monotone" dataKey="image" name="Image Sync" stroke="#06b6d4" strokeWidth={2} fill="url(#colImg)" dot={false} />
-            </AreaChart>
-          </ResponsiveContainer>
+          <div className="w-full h-[240px] min-h-[240px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={mockSyncChartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colInv" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0.0} />
+                  </linearGradient>
+                  <linearGradient id="colPri" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
+                  </linearGradient>
+                  <linearGradient id="colImg" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.25} />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                <YAxis domain={[0, 'auto']} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: '1px solid #334155', color: '#f8fafc', fontSize: '12px', boxShadow: '0 8px 16px rgba(0,0,0,0.3)' }} />
+                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }} />
+                <Area type="monotone" dataKey="inventory" name="Inventory Sync" stroke="#6366f1" strokeWidth={2.5} fill="url(#colInv)" />
+                <Area type="monotone" dataKey="pricing" name="Pricing Sync" stroke="#10b981" strokeWidth={2.5} fill="url(#colPri)" />
+                <Area type="monotone" dataKey="image" name="Image Sync" stroke="#06b6d4" strokeWidth={2.5} fill="url(#colImg)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Products by Supplier Bar Chart */}
-        <div className="card p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <div className="card p-4 sm:p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div className="mb-4">
             <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Products by Supplier</p>
             <p className="text-xs text-slate-400 font-medium">Top supplier distribution by catalog count</p>
           </div>
-          <ResponsiveContainer width="100%" height={230}>
-            <BarChart data={[...mockProductsBySupplier].reverse()} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} width={95} />
-              <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: '1px solid #1e293b', color: '#f8fafc', fontSize: '12px', boxShadow: '0 8px 16px rgba(0,0,0,0.3)' }} />
-              <Bar dataKey="products" name="Products" fill="#6366f1" radius={[0, 6, 6, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="w-full h-[240px] min-h-[240px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={[...mockProductsBySupplier].reverse()} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.25} horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} width={95} />
+                <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: '1px solid #334155', color: '#f8fafc', fontSize: '12px', boxShadow: '0 8px 16px rgba(0,0,0,0.3)' }} />
+                <Bar dataKey="products" name="Products" fill="#6366f1" radius={[0, 6, 6, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
