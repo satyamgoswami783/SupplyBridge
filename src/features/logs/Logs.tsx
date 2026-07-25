@@ -316,10 +316,12 @@ export const Logs: React.FC = () => {
                       </span>
                     </td>
                     <td data-label="Message" className="py-3.5 px-4">
-                      <p className="font-semibold text-slate-800 dark:text-slate-100 leading-snug">{log.message}</p>
-                      {log.details && (
-                        <p className="text-xxs text-slate-400 dark:text-slate-400 mt-0.5 line-clamp-1">{log.details}</p>
-                      )}
+                      <div className="flex-1 text-right sm:text-left min-w-0">
+                        <p className="font-semibold text-slate-800 dark:text-slate-100 leading-snug">{log.message}</p>
+                        {log.details && (
+                          <p className="text-xxs text-slate-400 dark:text-slate-400 mt-0.5 line-clamp-1">{log.details}</p>
+                        )}
+                      </div>
                     </td>
                     <td data-label="Scope" className="py-3.5 px-4">
                       {log.supplierName ? (
