@@ -328,7 +328,7 @@ export const ProductMapping: React.FC = () => {
             </button>
             <button
               onClick={() => { setFormData({ field1: '', field2: '', supplierName: 'TechParts Int.', dataType: 'String' }); setAddModalOpen(true); }}
-              className="btn-primary btn-sm flex items-center justify-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer flex-1 sm:flex-initial whitespace-nowrap"
+              className="btn-primary btn-sm flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/25 cursor-pointer flex-1 sm:flex-initial whitespace-nowrap"
             >
               <Plus size={14} /> Add Mapping Rule
             </button>
@@ -674,7 +674,7 @@ export const ProductMapping: React.FC = () => {
           footer={
             <>
               <button onClick={() => setEditProductMapping(null)} className="btn-secondary">Cancel</button>
-              <button onClick={handleSaveProductEdit} className="btn-primary flex items-center gap-1.5 shadow-md shadow-indigo-500/20">
+              <button onClick={handleSaveProductEdit} className="btn-primary flex items-center gap-1.5 shadow-md shadow-amber-500/25">
                 <Save size={14} /> Save Product Mapping
               </button>
             </>
@@ -708,7 +708,7 @@ export const ProductMapping: React.FC = () => {
           footer={
             <>
               <button onClick={() => setEditAttributeMapping(null)} className="btn-secondary">Cancel</button>
-              <button onClick={handleSaveAttributeEdit} className="btn-primary flex items-center gap-1.5 shadow-md shadow-indigo-500/20 font-bold cursor-pointer">
+              <button onClick={handleSaveAttributeEdit} className="btn-primary flex items-center gap-1.5 shadow-md shadow-amber-500/25 font-bold cursor-pointer">
                 <Save size={14} /> Save Attribute Mapping
               </button>
             </>

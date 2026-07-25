@@ -84,7 +84,7 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
     <div>
       <button
         onClick={() => setExpanded(!expanded)}
-        className={cn('sidebar-item w-full justify-between', isChildActive && 'text-primary-300 font-bold bg-slate-800/40')}
+        className={cn('sidebar-item w-full justify-between', isChildActive && 'text-amber-400 font-bold bg-slate-800/80 border-l-2 border-amber-500 pl-3')}
       >
         <span className="flex items-center gap-3">
           <span className="opacity-80">{item.icon}</span>

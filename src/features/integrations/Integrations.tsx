@@ -217,7 +217,7 @@ export const Integrations: React.FC = () => {
             </button>
             <button
               onClick={() => setAddModalOpen(true)}
-              className="btn-primary btn-sm flex items-center justify-center gap-1.5 shadow-md shadow-indigo-500/20"
+              className="btn-primary btn-sm flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/25"
             >
               <Plus size={14} /> <span className="hidden sm:inline">Add New Integration</span><span className="sm:hidden">Add Integration</span>
             </button>
@@ -271,7 +271,7 @@ export const Integrations: React.FC = () => {
               <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
                   onClick={() => openConfig(type)}
-                  className="btn-primary btn-sm flex-1 flex items-center justify-center gap-1.5 shadow-md shadow-indigo-500/20"
+                  className="btn-primary btn-sm flex-1 flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/25"
                 >
                   <Settings size={13} /> Configure
                 </button>
@@ -361,7 +361,7 @@ export const Integrations: React.FC = () => {
 
           <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
             <button type="button" onClick={() => setAddModalOpen(false)} className="btn-secondary">Cancel</button>
-            <button type="submit" className="btn-primary flex items-center gap-1.5 shadow-md shadow-indigo-500/20">
+            <button type="submit" className="btn-primary flex items-center gap-1.5 shadow-md shadow-amber-500/25">
               <Plus size={14} /> Add Integration
             </button>
           </div>
