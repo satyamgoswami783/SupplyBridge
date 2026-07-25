@@ -228,15 +228,15 @@ export const Integrations: React.FC = () => {
       {/* Summary Interactive Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
         {[
-          { key: 'all',  label: 'Total Active', value: typesList.reduce((s, t) => s + t.activeCount, 0), color: 'text-primary-600', bg: 'bg-primary-50/40' },
-          { key: 'api',  label: 'REST APIs',     value: typesList.find(t => t.id === 'api')?.activeCount || 8,  color: 'text-violet-600',  bg: 'bg-violet-50/40' },
-          { key: 'ftp',  label: 'FTP / SFTP',    value: (typesList.find(t => t.id === 'ftp')?.activeCount || 6) + (typesList.find(t => t.id === 'sftp')?.activeCount || 3),  color: 'text-cyan-600',    bg: 'bg-cyan-50/40' },
-          { key: 'file', label: 'File Feeds',     value: (typesList.find(t => t.id === 'csv')?.activeCount || 5) + (typesList.find(t => t.id === 'excel')?.activeCount || 2) + (typesList.find(t => t.id === 'xml')?.activeCount || 3), color: 'text-emerald-600', bg: 'bg-emerald-50/40' },
+          { key: 'all',  label: 'Total Active', value: typesList.reduce((s, t) => s + t.activeCount, 0), color: 'text-primary-600 dark:text-primary-400', bg: 'bg-primary-50/40' },
+          { key: 'api',  label: 'REST APIs',     value: typesList.find(t => t.id === 'api')?.activeCount || 8,  color: 'text-violet-600 dark:text-violet-400',  bg: 'bg-violet-50/40' },
+          { key: 'ftp',  label: 'FTP / SFTP',    value: (typesList.find(t => t.id === 'ftp')?.activeCount || 6) + (typesList.find(t => t.id === 'sftp')?.activeCount || 3),  color: 'text-cyan-600 dark:text-cyan-400',    bg: 'bg-cyan-50/40' },
+          { key: 'file', label: 'File Feeds',     value: (typesList.find(t => t.id === 'csv')?.activeCount || 5) + (typesList.find(t => t.id === 'excel')?.activeCount || 2) + (typesList.find(t => t.id === 'xml')?.activeCount || 3), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/40' },
         ].map(s => (
           <div
             key={s.key}
             onClick={() => setFilterCategory(s.key)}
-            className={`card px-3 py-2.5 sm:px-5 sm:py-4 text-center sm:text-left cursor-pointer transition-all ${filterCategory === s.key ? 'ring-2 ring-primary-500 bg-white dark:bg-slate-800 shadow-md' : 'hover:border-slate-300 dark:hover:border-slate-700'}`}
+            className={`card px-3 py-2.5 sm:px-5 sm:py-4 text-center sm:text-left cursor-pointer transition-all bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 ${filterCategory === s.key ? 'ring-2 ring-primary-500 dark:bg-slate-800 shadow-md' : 'hover:border-slate-300 dark:hover:border-slate-700'}`}
           >
             <p className={`text-xl sm:text-2xl font-black ${s.color}`}>{s.value}</p>
             <p className="text-2xs sm:text-xs text-slate-500 dark:text-slate-400 font-semibold mt-0.5">{s.label}</p>
@@ -250,7 +250,7 @@ export const Integrations: React.FC = () => {
           const isTestingThis = testingId === type.id
 
           return (
-            <div key={type.id} className="card p-4 sm:p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200 flex flex-col justify-between">
+            <div key={type.id} className="card p-4 sm:p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200 flex flex-col justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
               <div>
                 <div className="flex items-start justify-between mb-4">
                   <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${type.color} flex items-center justify-center text-2xl shadow-sm text-white`}>
@@ -263,7 +263,7 @@ export const Integrations: React.FC = () => {
 
                 <div className="flex flex-wrap gap-1.5 mb-5">
                   {type.features.map(f => (
-                    <span key={f} className="text-2xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-md font-semibold">{f}</span>
+                    <span key={f} className="text-2xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-md font-semibold border border-slate-200/60 dark:border-slate-700/60">{f}</span>
                   ))}
                 </div>
               </div>
@@ -290,21 +290,21 @@ export const Integrations: React.FC = () => {
       </div>
 
       {/* Recent Integration Handshake Activity */}
-      <div className="card p-4 sm:p-5">
+      <div className="card p-4 sm:p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <h3 className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <ShieldCheck size={16} className="text-primary-600 flex-shrink-0" /> <span className="hidden sm:inline">Recent Protocol Handshakes & Events</span><span className="sm:hidden">Recent Events</span>
+            <ShieldCheck size={16} className="text-primary-600 dark:text-primary-400 flex-shrink-0" /> <span className="hidden sm:inline">Recent Protocol Handshakes & Events</span><span className="sm:hidden">Recent Events</span>
           </h3>
           <button
             onClick={() => setEvents(events.slice(0, 2))}
-            className="text-2xs font-bold text-slate-400 hover:text-slate-600 flex-shrink-0"
+            className="text-2xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex-shrink-0"
           >
             Clear
           </button>
         </div>
         <div className="space-y-2">
           {events.map(ev => (
-            <div key={ev.id} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 rounded-xl bg-slate-50/70 dark:bg-slate-850/50 border border-slate-100 dark:border-slate-800">
+            <div key={ev.id} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/80">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className={`w-2 h-2 rounded-full flex-shrink-0 ${ev.ok ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                 <Badge variant="info">{ev.type}</Badge>
