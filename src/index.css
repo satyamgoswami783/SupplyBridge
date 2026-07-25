@@ -139,18 +139,25 @@
 
   /* ─── Inputs ─────────────────────────────────────────── */
   .input {
-    @apply w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-900
+    @apply w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900
            placeholder-slate-400 transition-all duration-200 outline-none
            focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20
            hover:border-slate-300;
   }
 
   .input-sm {
-    @apply px-3 py-2 text-xs rounded-lg;
+    @apply px-3 py-1.5 rounded-lg;
+    font-size: 11px !important;
   }
 
   .select {
     @apply input appearance-none cursor-pointer bg-white;
+  }
+
+  select option {
+    @apply bg-white text-slate-800;
+    font-size: 11px !important;
+    padding: 4px 8px !important;
   }
 
   /* ─── Tables ─────────────────────────────────────────── */
@@ -296,7 +303,7 @@
 
   /* ─── KPI Cards ──────────────────────────────────────── */
   .kpi-card {
-    @apply card p-3 flex flex-col gap-1.5 hover:shadow-card-md hover:-translate-y-0.5 transition-all duration-300 cursor-default border-t-2 border-t-primary-500/20;
+    @apply card p-2.5 sm:p-3 flex flex-col gap-1.5 hover:shadow-card-md hover:-translate-y-0.5 transition-all duration-300 cursor-default border-t-2 border-t-primary-500/20;
   }
 
   .kpi-value {
@@ -304,7 +311,7 @@
   }
 
   .kpi-label {
-    @apply text-2xs font-bold text-slate-500 uppercase tracking-wider;
+    @apply text-[10px] font-bold text-slate-500 uppercase tracking-wider;
   }
 
   /* ─── Modal overlay ──────────────────────────────────── */

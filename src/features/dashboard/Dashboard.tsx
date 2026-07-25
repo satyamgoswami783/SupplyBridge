@@ -133,18 +133,18 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="relative space-y-6">
       {/* Static Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-card">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-card">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
+          <div className="flex items-center gap-2 mb-1">
             <Badge variant="purple" dot>{roleInfo.focus}</Badge>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">• Logged in as <strong className="text-slate-800 dark:text-slate-200">{currentUser.name}</strong></span>
+            <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-semibold">• Logged in as <strong className="text-slate-800 dark:text-slate-200">{currentUser.name}</strong></span>
           </div>
-          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{roleInfo.title}</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">{roleInfo.subtitle}</p>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{roleInfo.title}</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{roleInfo.subtitle}</p>
         </div>
 
         {/* Header Action Controls */}
-        <div className="flex items-center gap-2 flex-wrap self-start sm:self-center">
+        <div className="flex items-center gap-2 flex-wrap self-start sm:self-center mt-1 sm:mt-0">
           <HealthIndicator status="operational" label="All Systems" />
 
           {/* Trigger Manual Sync Button */}
@@ -173,7 +173,7 @@ export const Dashboard: React.FC = () => {
             title="Click to refresh dashboard metrics"
           >
             <RefreshCw size={13} className={isRefreshing ? 'animate-spin text-primary-600' : 'text-slate-500'} />
-            <span>{isRefreshing ? 'Refreshing...' : lastUpdated}</span>
+            <span className="hidden sm:inline">{isRefreshing ? 'Refreshing...' : lastUpdated}</span>
           </button>
         </div>
       </div>
@@ -199,12 +199,6 @@ export const Dashboard: React.FC = () => {
         animate="animate"
       >
 
-        {getKpis().map((item, i) => (
-          <motion.div key={i} variants={stagger.child} transition={{ duration: 0.3 }}>
-            <StatsCard {...item} />
-          </motion.div>
-        ))}
-
         {cards.map((card) => {
           const isSelected = activeCard === card.id;
           return (
@@ -217,11 +211,12 @@ export const Dashboard: React.FC = () => {
                 }`}
             >
               <div className="flex items-start justify-between">
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${card.iconBg}`}>
+                <div className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 ${card.iconBg}`}>
                   {card.icon}
                 </div>
                 {card.change && (
                   <span className={`text-2xs font-semibold px-1.5 py-0.5 rounded-full ${card.changeType === 'positive' ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800' : 'text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800'
+                    }`}>
                     }`}>
                     {card.change}
                   </span>

@@ -25,7 +25,7 @@ import {
   SlidersHorizontal
 } from 'lucide-react'
 import { Badge } from '../../components/ui/Badge'
-import { SectionHeader, FilterBar, Tabs, ConfirmDialog } from '../../components/ui'
+import { SectionHeader, FilterBar, Tabs, ConfirmDialog, Select } from '../../components/ui'
 import { Modal } from '../../components/ui/Modal'
 import { statusToVariant, timeAgo } from '../../utils'
 import type { Product, ProductStatus, ValidationStatus } from '../../types'
@@ -424,27 +424,29 @@ export const MasterCatalog: React.FC = () => {
       <Tabs tabs={tabs} active={tab} onChange={setTab} />
 
       <FilterBar search={search} onSearch={v => { setSearch(v); setCurrentPage(1); }} placeholder="Search by product name, SKU, or brand...">
-        <select
-          className="select input-sm w-auto min-w-[140px] font-medium"
-          value={supplierFilter}
-          onChange={e => { setSupplierFilter(e.target.value); setCurrentPage(1); }}
-        >
-          <option value="all">All Suppliers</option>
-          {suppliersList.map(s => (
-            <option key={s.id} value={s.name}>{s.name}</option>
-          ))}
-        </select>
-        <select
-          className="select input-sm w-auto min-w-[130px] font-medium"
-          value={statusFilter}
-          onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }}
-        >
-          <option value="all">All Status</option>
-          <option value="published">Published</option>
-          <option value="validation_required">Needs Review</option>
-          <option value="draft">Draft</option>
-          <option value="failed">Failed</option>
-        </select>
+        <div className="flex w-full gap-3 sm:w-auto">
+          <Select
+            className="w-full"
+            value={supplierFilter}
+            onChange={v => { setSupplierFilter(v); setCurrentPage(1); }}
+            options={[
+              { label: 'All Suppliers', value: 'all' },
+              ...suppliersList.map(s => ({ label: s.name, value: s.name }))
+            ]}
+          />
+          <Select
+            className="w-full"
+            value={statusFilter}
+            onChange={v => { setStatusFilter(v); setCurrentPage(1); }}
+            options={[
+              { label: 'All Status', value: 'all' },
+              { label: 'Published', value: 'published' },
+              { label: 'Needs Review', value: 'validation_required' },
+              { label: 'Draft', value: 'draft' },
+              { label: 'Failed', value: 'failed' }
+            ]}
+          />
+        </div>
       </FilterBar>
 
       {/* Bulk Actions Toolbar — Display cleanly when items selected */}

@@ -1,4 +1,8 @@
 import React from 'react'
+export * from './Select'
+export * from './Badge'
+export * from './Modal'
+export * from './UserProfileModal'
 import { cn } from '../../utils'
 
 // ─── Skeleton ─────────────────────────────────────────────
@@ -87,11 +91,11 @@ export const StatsCard: React.FC<StatsCardProps> = ({ label, value, change, chan
     className={cn('kpi-card group', onClick && 'cursor-pointer hover:shadow-card-md hover:border-primary-300 transition-all')}
   >
     <div className="flex items-start justify-between">
-      <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', iconBg)}>
+      <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0', iconBg)}>
         {icon}
       </div>
       {change && (
-        <span className={cn('text-xs font-semibold px-2 py-0.5 rounded-full',
+        <span className={cn('text-[10px] font-semibold px-1.5 py-0.5 rounded-full',
           changeType === 'positive' ? 'text-emerald-700 bg-emerald-50' :
           changeType === 'negative' ? 'text-rose-700 bg-rose-50' : 'text-slate-500 bg-slate-100'
         )}>
@@ -206,8 +210,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({ search, onSearch, placehol
         onChange={e => onSearch(e.target.value)}
       />
     </div>
-    {children && <div className="flex gap-2 flex-wrap">{children}</div>}
-    {actions && <div className="flex gap-2 flex-wrap">{actions}</div>}
+    {children && <div className="flex gap-4 flex-wrap">{children}</div>}
+    {actions && <div className="flex gap-3 flex-wrap">{actions}</div>}
   </div>
 )
 
