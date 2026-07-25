@@ -180,29 +180,29 @@ export const PricingSync: React.FC = () => {
         title="Pricing Synchronization"
         subtitle="Manage pricing markup rules and synchronize supplier price updates to storefronts"
         actions={
-          <>
+          <div className="grid grid-cols-3 gap-1.5 w-full sm:flex sm:w-auto sm:items-center sm:gap-2">
             <button
               onClick={handleExportPricingCSV}
-              className="btn-secondary btn-sm flex items-center gap-1.5 font-semibold cursor-pointer"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-semibold cursor-pointer px-2 sm:px-3 text-xs"
               title="Download Pricing Audit Log CSV"
             >
-              <FileSpreadsheet size={14} className="text-emerald-600" /> Export CSV
+              <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" /> Export <span className="hidden sm:inline">CSV</span>
             </button>
             <button
               onClick={handleOpenAddRule}
-              className="btn-secondary btn-sm flex items-center gap-1.5 font-semibold cursor-pointer"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-semibold cursor-pointer px-2 sm:px-3 text-xs"
             >
-              <Plus size={14} /> Add Price Rule
+              <Plus size={14} /> Add Rule
             </button>
             <button
               onClick={handleSyncPrices}
               disabled={syncing}
-              className="btn-primary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
+              className="btn-primary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer px-2 sm:px-3 text-xs whitespace-nowrap"
             >
-              <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
-              {syncing ? 'Syncing...' : 'Sync Prices Now'}
+              <RefreshCw size={14} className={syncing ? 'animate-spin text-white' : ''} />
+              <span>{syncing ? 'Syncing...' : <><span className="sm:hidden">Sync Prices</span><span className="hidden sm:inline">Sync Prices Now</span></>}</span>
             </button>
-          </>
+          </div>
         }
       />
 

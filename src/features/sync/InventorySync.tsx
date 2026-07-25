@@ -157,27 +157,27 @@ export const InventorySync: React.FC = () => {
         title="Inventory Synchronization"
         subtitle="Real-time multi-supplier stock buffer, warehouse inventory feeds, and Shift4Shop storefront stock sync"
         actions={
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="grid grid-cols-3 gap-1.5 w-full sm:flex sm:w-auto sm:items-center sm:gap-2">
             <button
               onClick={handleExportCSV}
-              className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer px-2 sm:px-3 text-xs"
               title="Download Inventory Audit CSV"
             >
-              <Download size={14} className="text-emerald-600" /> Export CSV
+              <Download size={14} className="text-emerald-600 dark:text-emerald-400" /> Export <span className="hidden sm:inline">CSV</span>
             </button>
             <button
               onClick={() => setBufferModalOpen(true)}
-              className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer px-2 sm:px-3 text-xs"
             >
-              <Sliders size={14} className="text-primary-600" /> Buffer Rules ({globalBuffer})
+              <Sliders size={14} className="text-primary-600 dark:text-primary-400" /> Buffer ({globalBuffer})
             </button>
             <button
               onClick={handleSyncAll}
               disabled={syncing}
-              className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer"
+              className="btn-primary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer px-2 sm:px-3 text-xs whitespace-nowrap"
             >
               <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
-              <span>{syncing ? 'Syncing All Stock...' : 'Sync All Stock Now'}</span>
+              <span>{syncing ? 'Syncing...' : <><span className="sm:hidden">Sync All</span><span className="hidden sm:inline">Sync All Stock Now</span></>}</span>
             </button>
           </div>
         }

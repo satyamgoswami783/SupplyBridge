@@ -158,10 +158,10 @@ export const WebsiteSync: React.FC = () => {
         title="Shift4Shop Website Synchronization (Phase 2)"
         subtitle="Publish master PIM products, taxonomy categories, pricing, and stock to Shift4Shop ecommerce storefronts"
         actions={
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto sm:items-center">
             <button
               onClick={handleExportCatalogCSV}
-              className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer"
               title="Download Storefront Publishing Audit CSV"
             >
               <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" /> Export CSV
@@ -169,10 +169,10 @@ export const WebsiteSync: React.FC = () => {
             <button
               onClick={handleSyncAllStores}
               disabled={syncingAll}
-              className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer"
+              className="btn-primary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer whitespace-nowrap"
             >
               <RefreshCw size={14} className={syncingAll ? 'animate-spin text-white' : ''} />
-              <span>{syncingAll ? 'Publishing to Stores...' : 'Publish to All Storefronts'}</span>
+              <span>{syncingAll ? 'Publishing...' : <><span className="sm:hidden">Publish All</span><span className="hidden sm:inline">Publish to All Storefronts</span></>}</span>
             </button>
           </div>
         }
