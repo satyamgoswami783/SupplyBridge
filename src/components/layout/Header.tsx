@@ -87,9 +87,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
             <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900" />
           </button>
           {showNotifications && (
-            <div className="absolute right-0 top-10 w-80 card dark:bg-slate-900 dark:border-slate-800 shadow-card-lg z-50 overflow-hidden">
+            <div className="fixed inset-x-3 top-14 sm:absolute sm:inset-x-auto sm:right-0 sm:top-10 sm:w-80 card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card-lg z-50 overflow-hidden">
               <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <span className="font-semibold text-sm dark:text-slate-100">Notifications</span>
+                <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">Notifications</span>
                 <span className="badge-danger">4 new</span>
               </div>
               <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-72 overflow-y-auto">
@@ -100,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
                     onClick={() => setShowNotifications(false)}
                     className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer block text-left"
                   >
-                    <p className="text-sm text-slate-700 dark:text-slate-200">{n.message}</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-200 leading-snug">{n.message}</p>
                     <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{n.time}</p>
                   </Link>
                 ))}
@@ -136,7 +136,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
           </button>
 
           {showProfileMenu && (
-            <div className="absolute right-0 top-11 w-60 card dark:bg-slate-900 dark:border-slate-800 shadow-card-lg z-50 p-2 overflow-hidden border border-slate-200">
+            <div className="fixed right-3 top-14 sm:absolute sm:inset-x-auto sm:right-0 sm:top-11 w-60 card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card-lg z-50 p-2 overflow-hidden">
               {/* User info preview header */}
               <div
                 onClick={() => { setShowProfileMenu(false); openCurrentUserProfile(); }}
