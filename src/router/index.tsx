@@ -9,7 +9,10 @@ import { Integrations } from '../features/integrations/Integrations'
 import { MasterCatalog } from '../features/catalog/MasterCatalog'
 import { Categories } from '../features/catalog/Categories'
 import { Brands } from '../features/catalog/Brands'
+import { Manufacturers } from '../features/catalog/Manufacturers'
 import { Variants } from '../features/catalog/Variants'
+import { MediaLibrary } from '../features/catalog/MediaLibrary'
+import { SupplierOnboardingWizard } from '../features/suppliers/SupplierOnboardingWizard'
 import { ProductMapping } from '../features/mapping/ProductMapping'
 import { ValidationCenter } from '../features/validation/ValidationCenter'
 import { InventorySync } from '../features/sync/InventorySync'
@@ -34,13 +37,16 @@ export const AppRouter: React.FC = () => (
       <Route element={<AppShell />}>
         <Route index element={<Dashboard />} />
         <Route path="suppliers" element={<ProtectedRoute module="suppliers" moduleName="Suppliers"><Suppliers /></ProtectedRoute>} />
+        <Route path="suppliers/onboarding" element={<ProtectedRoute module="suppliers" moduleName="Supplier Onboarding"><SupplierOnboardingWizard /></ProtectedRoute>} />
         <Route path="integrations" element={<ProtectedRoute module="integrations" moduleName="Integration Configuration"><Integrations /></ProtectedRoute>} />
         <Route path="catalog">
           <Route index element={<ProtectedRoute module="catalog" moduleName="Master Catalog"><MasterCatalog /></ProtectedRoute>} />
           <Route path="products" element={<ProtectedRoute module="products" moduleName="Products Catalog"><MasterCatalog /></ProtectedRoute>} />
           <Route path="categories" element={<ProtectedRoute module="categories" moduleName="Categories"><Categories /></ProtectedRoute>} />
           <Route path="brands" element={<ProtectedRoute module="brands" moduleName="Brands"><Brands /></ProtectedRoute>} />
+          <Route path="manufacturers" element={<ProtectedRoute module="manufacturers" moduleName="Manufacturers"><Manufacturers /></ProtectedRoute>} />
           <Route path="variants" element={<ProtectedRoute module="variants" moduleName="Variants"><Variants /></ProtectedRoute>} />
+          <Route path="media" element={<ProtectedRoute module="media" moduleName="Media Library"><MediaLibrary /></ProtectedRoute>} />
         </Route>
         <Route path="mapping">
           <Route index element={<ProtectedRoute module="mapping" moduleName="Product Mapping"><ProductMapping /></ProtectedRoute>} />

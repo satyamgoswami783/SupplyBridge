@@ -6,7 +6,7 @@ import {
   Layers, ArrowLeftRight, ShieldCheck, RefreshCw, DollarSign,
   Image, Store, Globe, Briefcase, Download, FileText, Activity,
   BarChart3, Users, UserCog, Lock, Settings, ChevronDown,
-  ChevronRight, Zap, X, Menu, User, LogOut, Sliders
+  ChevronRight, Zap, X, Menu, User, LogOut, Sliders, Plus
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { cn, getInitials } from '../../utils'
@@ -22,47 +22,64 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { id: 'dashboard',    label: 'Dashboard',          icon: <LayoutDashboard size={18} />, path: '/',           module: 'dashboard' },
-  { id: 'suppliers',    label: 'Suppliers',           icon: <Truck size={18} />,           path: '/suppliers',  module: 'suppliers' },
-  { id: 'integrations', label: 'Integrations',        icon: <Plug size={18} />,            path: '/integrations', module: 'integrations' },
   {
-    id: 'catalog', label: 'Master Catalog (PIM)', icon: <Database size={18} />, module: 'catalog',
+    id: 'catalog', label: 'Catalog', icon: <Database size={18} />, module: 'catalog',
     children: [
-      { id: 'products',   label: 'Products',    icon: <Package size={17} />,  path: '/catalog/products',   module: 'products' },
-      { id: 'categories', label: 'Categories',  icon: <Tag size={17} />,      path: '/catalog/categories', module: 'categories' },
-      { id: 'brands',     label: 'Brands',      icon: <Award size={17} />,    path: '/catalog/brands',     module: 'brands' },
-      { id: 'variants',   label: 'Variants',    icon: <Layers size={17} />,   path: '/catalog/variants',   module: 'variants' },
+      { id: 'products',      label: 'Products',      icon: <Package size={16} />,  path: '/catalog/products',      module: 'products' },
+      { id: 'categories',    label: 'Categories',    icon: <Tag size={16} />,      path: '/catalog/categories',    module: 'categories' },
+      { id: 'brands',        label: 'Brands',        icon: <Award size={16} />,    path: '/catalog/brands',        module: 'brands' },
+      { id: 'manufacturers', label: 'Manufacturers', icon: <Truck size={16} />,    path: '/catalog/manufacturers', module: 'manufacturers' },
+      { id: 'variants',      label: 'Variants',      icon: <Layers size={16} />,   path: '/catalog/variants',      module: 'variants' },
+      { id: 'media',         label: 'Media Library', icon: <Image size={16} />,    path: '/catalog/media',         module: 'media' },
     ],
   },
   {
-    id: 'mapping', label: 'Product Mapping', icon: <ArrowLeftRight size={18} />, module: 'mapping',
+    id: 'suppliers', label: 'Suppliers', icon: <Truck size={18} />, module: 'suppliers',
     children: [
-      { id: 'product-mapping',   label: 'Product Mapping',   icon: <Package size={16} />,       path: '/mapping/products',   module: 'mapping' },
-      { id: 'category-mapping',  label: 'Category Mapping',  icon: <Tag size={16} />,           path: '/mapping/categories', module: 'mapping' },
-      { id: 'variant-mapping',   label: 'Variant Mapping',   icon: <Layers size={16} />,        path: '/mapping/variants',   module: 'mapping' },
-      { id: 'attribute-mapping', label: 'Attribute Mapping', icon: <Sliders size={16} />,      path: '/mapping/attributes', module: 'mapping' },
-      { id: 'supplier-mapping',  label: 'Supplier Mapping',  icon: <Truck size={16} />,         path: '/mapping/suppliers',  module: 'mapping' },
+      { id: 'supplier-mgmt',       label: 'Supplier Management', icon: <Truck size={16} />, path: '/suppliers',            module: 'suppliers' },
+      { id: 'supplier-onboarding', label: 'Supplier Onboarding', icon: <Plus size={16} />,  path: '/suppliers/onboarding', module: 'suppliers' },
     ],
   },
-  { id: 'validation',     label: 'Validation Center',       icon: <ShieldCheck size={18} />,  path: '/validation',      module: 'validation' },
-  { id: 'inventory-sync', label: 'Inventory Sync',          icon: <RefreshCw size={18} />,    path: '/sync/inventory',  module: 'inventory_sync' },
-  { id: 'pricing-sync',   label: 'Pricing Sync',            icon: <DollarSign size={18} />,   path: '/sync/pricing',    module: 'pricing_sync' },
-  { id: 'image-sync',     label: 'Image Sync',              icon: <Image size={18} />,        path: '/sync/images',     module: 'image_sync' },
-  { id: 'stores',         label: 'Store Management',        icon: <Store size={18} />,        path: '/stores',          module: 'store_management' },
-  { id: 'website-sync',   label: 'Website Sync',            icon: <Globe size={18} />,        path: '/sync/website',    module: 'website_sync' },
-  { id: 'sync-jobs',      label: 'Sync Jobs',               icon: <Briefcase size={18} />,    path: '/sync/jobs',       module: 'sync_jobs' },
-  { id: 'import-queue',   label: 'Import Queue',            icon: <Download size={18} />,     path: '/import-queue',    module: 'import_queue' },
-  { id: 'logs',           label: 'Logs',                    icon: <FileText size={18} />,     path: '/logs',            module: 'logs' },
-  { id: 'monitoring',     label: 'Monitoring',              icon: <Activity size={18} />,     path: '/monitoring',      module: 'monitoring' },
-  { id: 'reports',        label: 'Reports',                 icon: <BarChart3 size={18} />,    path: '/reports',         module: 'reports' },
+  { id: 'stores', label: 'Stores', icon: <Store size={18} />, path: '/stores', module: 'store_management' },
   {
-    id: 'access', label: 'User Management', icon: <Users size={18} />, module: 'users',
+    id: 'mapping', label: 'Data Mapping', icon: <ArrowLeftRight size={18} />, module: 'mapping',
     children: [
-      { id: 'users',       label: 'Users',       icon: <Users size={16} />,   path: '/users',       module: 'users' },
-      { id: 'roles',       label: 'Roles',       icon: <UserCog size={16} />, path: '/roles',       module: 'roles' },
-      { id: 'permissions', label: 'Permissions', icon: <Lock size={16} />,    path: '/permissions', module: 'permissions' },
+      { id: 'product-mapping',   label: 'Product Mapping',   icon: <Package size={16} />,  path: '/mapping/products',   module: 'mapping' },
+      { id: 'category-mapping',  label: 'Category Mapping',  icon: <Tag size={16} />,      path: '/mapping/categories', module: 'mapping' },
+      { id: 'brand-mapping',     label: 'Brand Mapping',     icon: <Award size={16} />,    path: '/mapping/brands',     module: 'mapping' },
+      { id: 'variant-mapping',   label: 'Variant Mapping',   icon: <Layers size={16} />,   path: '/mapping/variants',   module: 'mapping' },
+      { id: 'attribute-mapping', label: 'Attribute Mapping', icon: <Sliders size={16} />, path: '/mapping/attributes', module: 'mapping' },
     ],
   },
-  { id: 'settings', label: 'Settings', icon: <Settings size={18} />, path: '/settings', module: 'settings' },
+  { id: 'validation', label: 'Validation Center', icon: <ShieldCheck size={18} />, path: '/validation', module: 'validation' },
+  {
+    id: 'sync', label: 'Synchronization', icon: <RefreshCw size={18} />, module: 'inventory_sync',
+    children: [
+      { id: 'sync-jobs',      label: 'Queue Management', icon: <Briefcase size={16} />, path: '/sync/jobs',      module: 'sync_jobs' },
+      { id: 'inventory-sync', label: 'Inventory Sync',   icon: <RefreshCw size={16} />, path: '/sync/inventory', module: 'inventory_sync' },
+      { id: 'pricing-sync',   label: 'Pricing Sync',     icon: <DollarSign size={16} />,path: '/sync/pricing',   module: 'pricing_sync' },
+      { id: 'image-sync',     label: 'Image Sync',       icon: <Image size={16} />,     path: '/sync/images',    module: 'image_sync' },
+      { id: 'website-sync',   label: 'Website Sync',     icon: <Globe size={16} />,     path: '/sync/website',   module: 'website_sync' },
+    ],
+  },
+  { id: 'reports', label: 'Reports', icon: <BarChart3 size={18} />, path: '/reports', module: 'reports' },
+  {
+    id: 'activity-logs', label: 'Activity & Logs', icon: <FileText size={18} />, module: 'logs',
+    children: [
+      { id: 'activity-feed', label: 'Activity Feed', icon: <Activity size={16} />, path: '/logs?view=activity', module: 'logs' },
+      { id: 'system-logs',   label: 'System Logs',   icon: <FileText size={16} />, path: '/logs?view=system',   module: 'logs' },
+    ],
+  },
+  {
+    id: 'administration', label: 'Administration', icon: <UserCog size={18} />, module: 'users',
+    children: [
+      { id: 'users',         label: 'Users',         icon: <Users size={16} />,    path: '/users',         module: 'users' },
+      { id: 'roles',         label: 'Roles',         icon: <UserCog size={16} />,  path: '/roles',         module: 'roles' },
+      { id: 'permissions',   label: 'Permissions',   icon: <Lock size={16} />,     path: '/permissions',   module: 'permissions' },
+      { id: 'notifications', label: 'Notifications', icon: <Zap size={16} />,      path: '/notifications', module: 'settings' },
+      { id: 'settings',      label: 'Settings',      icon: <Settings size={16} />, path: '/settings',      module: 'settings' },
+    ],
+  },
 ]
 
 interface SidebarProps {

@@ -246,7 +246,7 @@ export const Logs: React.FC = () => {
       {/* Filter Bar with Dropdowns */}
       <FilterBar search={search} onSearch={setSearch} placeholder="Search log message, details, job ID...">
         <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto">
-          {/* Level Filter Dropdown */}
+          {/* Supplier Filter Dropdown */}
           <select
             className="input py-1.5 px-3 text-xs flex-1 sm:w-36 min-w-[120px]"
             value={levelFilter}
@@ -257,24 +257,21 @@ export const Logs: React.FC = () => {
             <option value="success">Success</option>
             <option value="warning">Warning</option>
             <option value="error">Error</option>
-            <option value="debug">Debug</option>
           </select>
 
-          {/* Type Filter Dropdown */}
+          {/* Log Category Filter Dropdown */}
           <select
-            className="input py-1.5 px-3 text-xs flex-1 sm:w-36 min-w-[120px]"
+            className="input py-1.5 px-3 text-xs flex-1 sm:w-40 min-w-[130px]"
             value={typeFilter}
             onChange={e => setTypeFilter(e.target.value)}
           >
-            <option value="all">All Types</option>
-            <option value="import">Import</option>
-            <option value="sync">Sync</option>
-            <option value="api">API Connection</option>
-            <option value="ftp">FTP Connection</option>
-            <option value="validation">Validation</option>
-            <option value="audit">Audit Log</option>
-            <option value="system">System Status</option>
-            <option value="error">General Error</option>
+            <option value="all">All Log Types</option>
+            <option value="api">API Logs</option>
+            <option value="ftp">FTP Logs</option>
+            <option value="import">Import Logs</option>
+            <option value="sync">Sync Logs</option>
+            <option value="audit">User Activity</option>
+            <option value="error">Error Logs</option>
           </select>
         </div>
       </FilterBar>

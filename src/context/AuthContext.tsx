@@ -19,8 +19,8 @@ interface AuthContextType {
 
 export const DEFAULT_ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   super_admin:         ['*'],
-  admin:               ['dashboard', 'suppliers', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation', 'inventory_sync', 'pricing_sync', 'image_sync', 'store_management', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports'],
-  catalog_manager:     ['dashboard', 'catalog', 'products', 'categories', 'brands', 'variants', 'mapping', 'validation', 'reports'],
+  admin:               ['dashboard', 'suppliers', 'catalog', 'products', 'categories', 'brands', 'manufacturers', 'variants', 'media', 'mapping', 'validation', 'inventory_sync', 'pricing_sync', 'image_sync', 'store_management', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports'],
+  catalog_manager:     ['dashboard', 'catalog', 'products', 'categories', 'brands', 'manufacturers', 'variants', 'media', 'mapping', 'validation', 'reports'],
   integration_manager: ['dashboard', 'suppliers', 'integrations', 'mapping', 'inventory_sync', 'pricing_sync', 'image_sync', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports'],
   operations_staff:    ['dashboard', 'validation', 'monitoring', 'reports', 'logs', 'sync_jobs', 'import_queue'],
 }

@@ -200,27 +200,56 @@ export const SyncJobs: React.FC = () => {
                 <RotateCcw size={14} /> Retry <span className="hidden sm:inline">Failed ({failedCount})</span><span className="sm:hidden">({failedCount})</span>
               </button>
             )}
-            <button
-              onClick={() => showNotification('Sync jobs queue refreshed.')}
-              className="btn-secondary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer flex-1 sm:flex-initial px-2 sm:px-3 text-xs"
-            >
-              <RefreshCw size={14} /> Refresh
-            </button>
             {role !== 'operations_staff' && (
-              <button onClick={handleTriggerSync} className="btn-primary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer flex-1 sm:flex-initial px-2 sm:px-3 text-xs whitespace-nowrap">
-                <PlayCircle size={14} /> Trigger <span className="hidden sm:inline">Sync</span>
-              </button>
+              <>
+                <button onClick={() => showNotification('Syncing all active suppliers...')} className="btn-secondary btn-sm flex items-center gap-1 font-bold">
+                  <PlayCircle size={14} className="text-amber-500" /> Sync All Suppliers
+                </button>
+                <button onClick={() => showNotification('Queue paused successfully.')} className="btn-secondary btn-sm font-bold">
+                  Pause Queue
+                </button>
+                <button onClick={() => showNotification('Catalog rebuilding started in background.')} className="btn-secondary btn-sm font-bold">
+                  Rebuild Catalog
+                </button>
+                <button onClick={handleTriggerSync} className="btn-primary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 shadow-md shadow-amber-500/25 cursor-pointer flex-1 sm:flex-initial px-2 sm:px-3 text-xs whitespace-nowrap">
+                  <PlayCircle size={14} /> Trigger Sync
+                </button>
+              </>
             )}
           </div>
         }
       />
 
-      {/* KPI Summary Stats — High Resolution & Responsive Layout */}
+      {/* Queue Real-time Processing Metrics Bar */}
+      <div className="card p-3 sm:p-4 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div>
+            <span className="text-[10px] text-slate-400 font-bold uppercase block">Processing Speed</span>
+            <span className="text-sm font-black text-emerald-400 font-mono">840 rec/sec</span>
+          </div>
+          <div className="h-8 w-px bg-slate-800" />
+          <div>
+            <span className="text-[10px] text-slate-400 font-bold uppercase block">Estimated Completion</span>
+            <span className="text-sm font-black text-amber-400 font-mono">~3 mins 45 sec</span>
+          </div>
+          <div className="h-8 w-px bg-slate-800 hidden sm:block" />
+          <div className="hidden sm:block">
+            <span className="text-[10px] text-slate-400 font-bold uppercase block">Max Retry Limit</span>
+            <span className="text-sm font-black text-slate-200 font-mono">3 Attempts</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button onClick={() => showNotification('Queue resumed.')} className="btn-secondary btn-sm text-2xs py-1">Resume Queue</button>
+          <button onClick={() => showNotification('Active Queue cancelled.')} className="btn-danger btn-sm text-2xs py-1">Cancel Queue</button>
+        </div>
+      </div>
+
       {/* KPI Summary Stats — High Resolution & Responsive Layout */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
         {[
           { label: 'RUNNING JOBS',   value: jobsList.filter(j => j.status === 'running').length,   color: 'text-cyan-600 dark:text-cyan-400',    bg: 'bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200/80 dark:border-cyan-900/50',    icon: <RefreshCw size={20} className="animate-spin text-cyan-600" /> },
-          { label: 'QUEUED JOBS',    value: jobsList.filter(j => j.status === 'queued').length,    color: 'text-amber-600 dark:text-amber-400',   bg: 'bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50',   icon: <Clock size={20} className="text-amber-600" /> },
+          { label: 'QUEUED JOBS',    value: jobsList.filter(j => j.status === 'queued').length,    color: 'text-amber-600 dark:text-amber-400',   bg: 'bg-amber-50/70 dark:bg-amber-200/80 dark:border-amber-900/50',   icon: <Clock size={20} className="text-amber-600" /> },
           { label: 'COMPLETED JOBS', value: jobsList.filter(j => j.status === 'completed').length, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50', icon: <CheckCircle2 size={20} className="text-emerald-600" /> },
           { label: 'FAILED JOBS',    value: jobsList.filter(j => j.status === 'failed').length,    color: 'text-rose-600 dark:text-rose-400',    bg: 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50',    icon: <XCircle size={20} className="text-rose-600" /> },
         ].map((s, i) => (

@@ -10,11 +10,14 @@ import type { ValidationItem, ValidationStatus } from '../../types'
 import { useAuth } from '../../context/AuthContext'
 
 const errorTypeLabel: Record<string, string> = {
-  missing_image: 'Missing Image',
   duplicate_sku: 'Duplicate SKU',
-  invalid_category: 'Invalid Category',
-  missing_price: 'Missing Price',
-  invalid_attribute: 'Invalid Attribute',
+  duplicate_upc: 'Duplicate UPC',
+  missing_image: 'Missing Images',
+  missing_price: 'Missing Pricing',
+  missing_inventory: 'Missing Inventory',
+  invalid_category: 'Missing Categories',
+  missing_attribute: 'Missing Attributes',
+  invalid_variant: 'Invalid Variants',
   duplicate_product: 'Duplicate Product',
   missing_description: 'Missing Description',
 }
@@ -197,6 +200,16 @@ export const ValidationCenter: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Publishing Guard Alert Banner */}
+      <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 rounded-xl flex items-center justify-between gap-3 text-xs text-amber-900 dark:text-amber-200 shadow-xs">
+        <div className="flex items-center gap-2">
+          <AlertTriangle size={16} className="text-amber-500 flex-shrink-0" />
+          <span className="font-bold">Publishing Guard Active:</span>
+          <span>Products with validation issues (Duplicate SKU, Missing Pricing, Invalid Variants) are blocked from publishing.</span>
+        </div>
+        <Badge variant="warning" dot>PUBLISH BLOCKED</Badge>
+      </div>
 
       {/* Error Summary KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
