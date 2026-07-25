@@ -156,28 +156,28 @@ export const ImageSync: React.FC = () => {
         title="Image Synchronization"
         subtitle="Monitor and synchronize supplier media feeds, CDN hosting, WebP image compression, and 404 URL repairs"
         actions={
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="grid grid-cols-3 gap-1.5 w-full sm:flex sm:w-auto sm:items-center sm:gap-2">
             <button
               onClick={handleExportCSV}
-              className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer px-2 sm:px-3 text-xs"
               title="Download Image Audit CSV Report"
             >
-              <Download size={14} className="text-emerald-600" /> Export CSV
+              <Download size={14} className="text-emerald-600 dark:text-emerald-400" /> Export <span className="hidden sm:inline">CSV</span>
             </button>
             <button
               onClick={handleRetryBroken}
-              className="btn-secondary btn-sm text-rose-600 hover:bg-rose-50 border-rose-200 flex items-center gap-1.5 font-bold cursor-pointer"
+              className="btn-secondary btn-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 border-rose-200 dark:border-rose-900/60 flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer px-2 sm:px-3 text-xs whitespace-nowrap"
               title="Re-fetch all broken 404 image URLs"
             >
-              <RotateCcw size={14} /> Retry Broken (1,532)
+              <RotateCcw size={14} /> Retry <span className="hidden sm:inline">Broken (1,532)</span><span className="sm:hidden">(1.5k)</span>
             </button>
             <button
               onClick={handleSyncImages}
               disabled={syncing}
-              className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer"
+              className="btn-primary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer px-2 sm:px-3 text-xs whitespace-nowrap"
             >
               <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
-              <span>{syncing ? 'Syncing Media...' : 'Sync Images Now'}</span>
+              <span>{syncing ? 'Syncing...' : <><span className="sm:hidden">Sync Media</span><span className="hidden sm:inline">Sync Images Now</span></>}</span>
             </button>
           </div>
         }

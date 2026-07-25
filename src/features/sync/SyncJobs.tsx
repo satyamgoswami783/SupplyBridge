@@ -183,32 +183,32 @@ export const SyncJobs: React.FC = () => {
         title="Synchronization Jobs"
         subtitle="Monitor, audit, and trigger background synchronization jobs across all suppliers and stores"
         actions={
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
             <button
               onClick={handleExportJobsCSV}
-              className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer flex-1 sm:flex-initial px-2 sm:px-3 text-xs"
               title="Download Jobs Report CSV"
             >
-              <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" /> Export CSV
+              <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" /> Export <span className="hidden sm:inline">CSV</span>
             </button>
             {failedCount > 0 && (
               <button
                 onClick={handleRetryAllFailed}
-                className="btn-secondary btn-sm text-rose-600 hover:bg-rose-50 border-rose-200 flex items-center gap-1.5 font-bold cursor-pointer"
+                className="btn-secondary btn-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 border-rose-200 dark:border-rose-900/60 flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer flex-1 sm:flex-initial px-2 sm:px-3 text-xs"
                 title="Retry all failed jobs"
               >
-                <RotateCcw size={14} /> Retry Failed ({failedCount})
+                <RotateCcw size={14} /> Retry <span className="hidden sm:inline">Failed ({failedCount})</span><span className="sm:hidden">({failedCount})</span>
               </button>
             )}
             <button
               onClick={() => showNotification('Sync jobs queue refreshed.')}
-              className="btn-secondary btn-sm flex items-center gap-1.5 font-bold cursor-pointer"
+              className="btn-secondary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer flex-1 sm:flex-initial px-2 sm:px-3 text-xs"
             >
               <RefreshCw size={14} /> Refresh
             </button>
             {role !== 'operations_staff' && (
-              <button onClick={handleTriggerSync} className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer">
-                <PlayCircle size={14} /> Trigger Sync
+              <button onClick={handleTriggerSync} className="btn-primary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer flex-1 sm:flex-initial px-2 sm:px-3 text-xs whitespace-nowrap">
+                <PlayCircle size={14} /> Trigger <span className="hidden sm:inline">Sync</span>
               </button>
             )}
           </div>
