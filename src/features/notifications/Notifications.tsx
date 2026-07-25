@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Bell, AlertCircle, AlertTriangle, CheckCircle2, Info, Eye, Check, Trash2, ArrowLeft, ShieldAlert } from 'lucide-react'
-import { SectionHeader, FilterBar } from '../../components/ui'
+import { SectionHeader, FilterBar, Select } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { format } from 'date-fns'
@@ -173,17 +173,18 @@ export const Notifications: React.FC = () => {
       </div>
 
       <FilterBar search={search} onSearch={setSearch} placeholder="Search notifications by title or message...">
-        <select
-          className="select input-sm w-auto min-w-[130px]"
+        <Select
+          className="w-auto min-w-[130px]"
           value={filterType}
-          onChange={e => setFilterType(e.target.value)}
-        >
-          <option value="all">All Types</option>
-          <option value="success">Success</option>
-          <option value="info">Info</option>
-          <option value="warning">Warning</option>
-          <option value="error">Errors</option>
-        </select>
+          onChange={setFilterType}
+          options={[
+            { label: 'All Types', value: 'all' },
+            { label: 'Success', value: 'success' },
+            { label: 'Info', value: 'info' },
+            { label: 'Warning', value: 'warning' },
+            { label: 'Errors', value: 'error' },
+          ]}
+        />
       </FilterBar>
 
       <div className="card overflow-hidden">

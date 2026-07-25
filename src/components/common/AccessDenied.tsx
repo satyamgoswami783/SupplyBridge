@@ -38,18 +38,18 @@ export const AccessDenied: React.FC<AccessDeniedProps> = ({ moduleName }) => {
         </p>
 
         <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 text-xs text-slate-600 mb-6 text-left space-y-1.5 font-mono">
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-2">
             <span className="text-slate-400">Logged-in Role:</span>
-            <span className="font-semibold text-slate-800">{formattedRole}</span>
+            <span className="font-semibold text-slate-800 sm:text-right">{formattedRole}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-2">
             <span className="text-slate-400">Required Role:</span>
-            <span className="font-semibold text-rose-600">Super Admin</span>
+            <span className="font-semibold text-rose-600 sm:text-right">Super Admin</span>
           </div>
           {moduleName && (
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-2">
               <span className="text-slate-400">Restricted Module:</span>
-              <span className="font-semibold text-slate-800">{moduleName}</span>
+              <span className="font-semibold text-slate-800 sm:text-right">{moduleName}</span>
             </div>
           )}
         </div>

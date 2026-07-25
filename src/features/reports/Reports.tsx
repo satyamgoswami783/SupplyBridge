@@ -53,56 +53,183 @@ export const Reports: React.FC = () => {
   const handleExportPDF = () => {
     showNotification('Generating PDF report...')
 
-    const fileName = `SupplyBridge_Operational_Report_${dateRange.replace(/\s+/g, '_')}.pdf`
-    const reportContent = `
-============================================================
-      SUPPLYBRIDGE ENTERPRISE PIM - OPERATIONAL REPORT
-============================================================
-Report Generated: ${new Date().toLocaleString()}
-Selected Date Range: ${dateRange}
-Active Report Focus: ${tab.toUpperCase()}
+    const htmlContent = `
+      <html>
+        <head>
+          <title>SupplyBridge_Operational_Report_${dateRange.replace(/\s+/g, '_')}</title>
+          <style>
+            body {
+              font-family: 'Inter', system-ui, -apple-system, sans-serif;
+              padding: 40px;
+              color: #1e293b;
+              line-height: 1.5;
+            }
+            .header {
+              border-bottom: 2px solid #e2e8f0;
+              padding-bottom: 20px;
+              margin-bottom: 25px;
+            }
+            .title {
+              font-size: 24px;
+              font-weight: 800;
+              color: #4f46e5;
+              margin: 0;
+            }
+            .subtitle {
+              font-size: 14px;
+              color: #64748b;
+              margin-top: 5px;
+              font-weight: 600;
+            }
+            .meta {
+              font-size: 11px;
+              color: #94a3b8;
+              margin-top: 8px;
+            }
+            h2 {
+              font-size: 15px;
+              font-weight: 700;
+              color: #0f172a;
+              margin-top: 25px;
+              border-bottom: 1px solid #e2e8f0;
+              padding-bottom: 6px;
+            }
+            ul {
+              padding-left: 20px;
+              margin: 10px 0;
+            }
+            li {
+              margin-bottom: 6px;
+              font-size: 13px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 15px;
+              margin-bottom: 15px;
+            }
+            th, td {
+              border: 1px solid #e2e8f0;
+              padding: 10px 12px;
+              text-align: left;
+              font-size: 12px;
+            }
+            th {
+              background-color: #f8fafc;
+              font-weight: 700;
+              color: #475569;
+            }
+            .footer {
+              margin-top: 60px;
+              border-top: 1px solid #e2e8f0;
+              padding-top: 15px;
+              font-size: 11px;
+              color: #94a3b8;
+              text-align: center;
+            }
+            @media print {
+              body { padding: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 class="title">SUPPLYBRIDGE ENTERPRISE PIM</h1>
+            <div class="subtitle">Operational Analytics & Reports - ${dateRange}</div>
+            <div class="meta">Generated: ${new Date().toLocaleString()} | Report Tab: ${tab.toUpperCase()}</div>
+          </div>
 
-1. EXECUTIVE SUMMARY & KPIS
-------------------------------------------------------------
-• Total Configured Suppliers: 27 Partners
-• Active API/FTP Connections: 23 Connections
-• Total Catalog Products: 84,329 SKUs
-• Overall Sync Health: 99.8% Operational
+          <h2>1. Executive Summary & KPIs</h2>
+          <ul>
+            <li><strong>Total Configured Suppliers:</strong> 27 Partners</li>
+            <li><strong>Active API/FTP Connections:</strong> 23 Connections</li>
+            <li><strong>Total Catalog Products:</strong> 84,329 SKUs</li>
+            <li><strong>Overall Sync Health:</strong> 99.8% Operational</li>
+          </ul>
 
-2. SUPPLIER PERFORMANCE & FEED PASS RATES
-------------------------------------------------------------
-${supplierData.map(s => `• ${s.name.padEnd(20)} | Protocol: ${s.type.padEnd(12)} | SKUs: ${s.products.toLocaleString().padStart(6)} | Pass Rate: ${s.passRate}%`).join('\n')}
+          <h2>2. Supplier Performance & Feed Pass Rates</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Supplier Partner</th>
+                <th>Protocol / Connection Type</th>
+                <th>Total SKUs</th>
+                <th>Synced SKUs</th>
+                <th>Validation Pass %</th>
+                <th>Uptime</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${supplierData.map(s => `
+                <tr>
+                  <td><strong>${s.name}</strong></td>
+                  <td>${s.type}</td>
+                  <td>${s.products.toLocaleString()}</td>
+                  <td>${s.synced.toLocaleString()}</td>
+                  <td>${s.passRate}%</td>
+                  <td>${s.uptime}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
 
-3. HISTORICAL SYNC TRENDS (LAST 6 MONTHS)
-------------------------------------------------------------
-${syncTrend.map(t => `• Month ${t.month}: ${t.success}% Success Rate | Avg Duration: ${t.durationMin} mins`).join('\n')}
+          <h2>3. Historical Sync Trends (Last 6 Months)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Success Rate %</th>
+                <th>Failed Rate %</th>
+                <th>Avg Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${syncTrend.map(t => `
+                <tr>
+                  <td>${t.month}</td>
+                  <td>${t.success}%</td>
+                  <td>${t.failed}%</td>
+                  <td>${t.durationMin} mins</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
 
-4. PIM CATALOG QUALITY & COMPLETENESS INDEX
-------------------------------------------------------------
-• Products With High-Res Images: 97.2%
-• Products With Full Descriptions: 91.5%
-• Category Taxonomy Mapped: 99.1%
-• Retail & MAP Pricing Set: 98.8%
-• Shift4Shop Storefront Published: 98.1%
+          <h2>4. PIM Catalog Quality & Completeness Index</h2>
+          <ul>
+            <li><strong>Products With High-Res Images:</strong> 97.2%</li>
+            <li><strong>Products With Full Descriptions:</strong> 91.5%</li>
+            <li><strong>Category Taxonomy Mapped:</strong> 99.1%</li>
+            <li><strong>Retail & MAP Pricing Set:</strong> 98.8%</li>
+            <li><strong>Shift4Shop Storefront Published:</strong> 98.1%</li>
+          </ul>
 
-============================================================
-Confidential - SupplyBridge Enterprise PIM & Middleware Platform
-============================================================
-`
+          <div class="footer">
+            Confidential - SupplyBridge Enterprise PIM & Middleware Platform
+          </div>
 
-    const blob = new Blob([reportContent], { type: 'application/pdf' })
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 800);
+            }
+          </script>
+        </body>
+      </html>
+    `
+
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = fileName
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+    const printWindow = window.open(url, '_blank')
+    if (!printWindow) {
+      showNotification('Pop-up blocker active! Please allow pop-ups to export PDF.')
+      return
+    }
 
+    // Revoke the blob URL after 5 seconds to free resources
     setTimeout(() => {
-      showNotification(`File "${fileName}" downloaded to your browser Downloads folder!`)
-    }, 500)
+      URL.revokeObjectURL(url)
+    }, 5000)
   }
 
   const handleExportCSV = () => {
