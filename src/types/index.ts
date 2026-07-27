@@ -1,21 +1,13 @@
 // ─── Shared ──────────────────────────────────────────────
 export type Status = 'active' | 'inactive' | 'pending' | 'failed' | 'success' | 'warning' | 'processing' | 'queued' | 'cancelled'
-export type ConnectionType = 'api' | 'ftp' | 'sftp' | 'soap' | 'csv' | 'excel' | 'xml'
+export type ConnectionType = 'api' | 'ftp' | 'sftp' | 'csv' | 'excel' | 'xml'
 export type SyncType = 'inventory' | 'pricing' | 'image' | 'website' | 'full'
 export type ProductStatus = 'published' | 'unpublished' | 'draft' | 'validation_required' | 'failed'
 export type ValidationStatus = 'passed' | 'failed' | 'pending' | 'review'
 export type SupplierStatus = 'connected' | 'disconnected' | 'error' | 'syncing'
 
 // ─── Auth / RBAC ─────────────────────────────────────────
-export type UserRole = 
-  | 'platform_owner'
-  | 'administrator'
-  | 'catalog_manager'
-  | 'integration_manager'
-  | 'operations_staff'
-  | 'read_only'
-  | 'super_admin'
-  | 'admin'
+export type UserRole = 'super_admin' | 'admin' | 'catalog_manager' | 'integration_manager' | 'operations_staff'
 
 export interface User {
   id: string
@@ -61,18 +53,11 @@ export interface Supplier {
   productCount: number
   lastSync?: string
   nextSync?: string
-  lastSuccessfulSync?: string
-  lastFailedSync?: string
   errorCount: number
   createdAt: string
   credentials?: SupplierCredentials
   importHistory?: ImportRecord[]
   tags?: string[]
-  feedHealth?: number
-  inventoryStatus?: 'healthy' | 'degraded' | 'error'
-  pricingStatus?: 'healthy' | 'degraded' | 'error'
-  imageStatus?: 'healthy' | 'degraded' | 'error'
-  assignedStores?: string[]
 }
 
 export interface SupplierCredentials {
@@ -83,8 +68,6 @@ export interface SupplierCredentials {
   ftpPort?: number
   ftpUsername?: string
   ftpPassword?: string
-  soapEndpoint?: string
-  soapAction?: string
   filePath?: string
 }
 
@@ -105,7 +88,6 @@ export interface Product {
   id: string
   sku: string
   masterSku: string
-  upc?: string
   masterId?: string
   name: string
   description?: string
@@ -119,15 +101,9 @@ export interface Product {
   supplierSku: string
   status: ProductStatus
   validationStatus: ValidationStatus
-  validationScore?: number
-  confidenceScore?: number
-  isAutoMatched?: boolean
-  duplicateDetected?: boolean
   images: ProductImage[]
   variants: ProductVariant[]
   attributes: ProductAttribute[]
-  supplierAttributes?: Record<string, string>
-  masterAttributes?: Record<string, string>
   pricing: ProductPricing
   inventory: ProductInventory
   seo?: {
@@ -139,17 +115,6 @@ export interface Product {
   updatedAt: string
   publishedAt?: string
   stores: string[]
-  mappingHistory?: MappingHistoryItem[]
-}
-
-export interface MappingHistoryItem {
-  id: string
-  timestamp: string
-  user: string
-  action: string
-  previousValue: string
-  newValue: string
-  reason?: string
 }
 
 export interface ProductImage {
@@ -205,135 +170,6 @@ export interface ProductInventory {
   lastSynced: string
 }
 
-// ─── Enterprise Mapping Engine Types ────────────────────────
-
-export interface SupplierCategoryNode {
-  id: string
-  supplierId: string
-  code: string
-  name: string
-  fullPath: string
-  productCount: number
-  parentId?: string
-  children?: SupplierCategoryNode[]
-  mappedMasterCategoryId?: string
-  mappedMasterCategoryName?: string
-  status: 'mapped' | 'unmapped' | 'conflict'
-  confidence?: number
-}
-
-export interface MasterCategoryNode {
-  id: string
-  code: string
-  name: string
-  fullPath: string
-  productCount: number
-  parentId?: string
-  children?: MasterCategoryNode[]
-  mappedSupplierCategoriesCount: number
-}
-
-export interface VariantType {
-  id: string
-  name: 'Color' | 'Size' | 'Memory' | 'Storage' | 'Voltage' | 'Length' | 'Width' | 'Height' | 'Material' | 'Region' | 'Language' | 'Model' | string
-  values: string[]
-  standardizedValues?: Record<string, string>
-  productCount: number
-  createdAt?: string
-}
-
-export interface VariantMappingRule {
-  id: string
-  variantType: string
-  rawSupplierValue: string
-  standardizedValue: string
-  targetUnit?: string
-  conversionFactor?: number
-  supplierId?: string
-  appliedCount: number
-}
-
-export interface AttributeDefinition {
-  id: string
-  code: string
-  name: string
-  group: 'General' | 'Physical Specs' | 'Electrical' | 'Packaging' | 'Compliance' | 'Marketing'
-  dataType: 'text' | 'number' | 'boolean' | 'select' | 'formula'
-  isRequired: boolean
-  validationRegex?: string
-  lookupValues?: string[]
-  defaultUnit?: string
-  defaultValue?: string
-  formulaExpression?: string
-  mappedSupplierFieldsCount: number
-  coveragePct: number
-}
-
-export interface AttributeFieldMapping {
-  id: string
-  supplierId: string
-  supplierFieldName: string
-  masterAttributeId: string
-  masterAttributeName: string
-  transformationType: 'direct' | 'unit_convert' | 'lookup' | 'formula' | 'default'
-  lookupMap?: Record<string, string>
-  unitConversion?: { from: string; to: string; factor: number }
-  status: 'mapped' | 'pending' | 'error'
-  sampleValue?: string
-}
-
-export interface MappingRule {
-  id: string
-  name: string
-  priority: number
-  isEnabled: boolean
-  version: number
-  conditions: RuleCondition[]
-  actions: RuleAction[]
-  appliedCount: number
-  lastExecuted?: string
-}
-
-export interface RuleCondition {
-  field: string // e.g., 'brand', 'category', 'supplier_sku', 'weight'
-  operator: 'equals' | 'contains' | 'starts_with' | 'is_empty' | 'greater_than' | 'less_than'
-  value: string
-}
-
-export interface RuleAction {
-  targetField: string
-  actionType: 'set_value' | 'map_field' | 'trigger_validation_error' | 'assign_category' | 'convert_unit'
-  value: string
-}
-
-export interface MappingAuditLog {
-  id: string
-  timestamp: string
-  userId: string
-  userName: string
-  userRole: UserRole
-  module: 'product' | 'category' | 'variant' | 'attribute' | 'supplier'
-  entityId: string
-  entityName: string
-  previousValue: string
-  newValue: string
-  reason: string
-}
-
-export interface SupplierFeedConfig {
-  id: string
-  supplierId: string
-  supplierName: string
-  protocol: ConnectionType
-  authType: 'api_key' | 'bearer_token' | 'basic_auth' | 'ssh_key' | 'none'
-  syncScheduleCron: string
-  fieldMappings: AttributeFieldMapping[]
-  transformationRulesCount: number
-  lastSyncResult: 'success' | 'failed' | 'partial'
-  lastSyncTime: string
-  healthScore: number
-}
-
 // ─── Categories ──────────────────────────────────────────
 export interface Category {
   id: string
@@ -358,6 +194,15 @@ export interface Brand {
   status: 'active' | 'inactive'
   createdAt: string
   updatedAt?: string
+}
+
+// ─── Variants ────────────────────────────────────────────
+export interface VariantType {
+  id: string
+  name: string
+  values: string[]
+  productCount: number
+  createdAt?: string
 }
 
 // ─── Sync Jobs ────────────────────────────────────────────
@@ -396,23 +241,11 @@ export interface ValidationItem {
   createdAt: string
   reviewedAt?: string
   reviewedBy?: string
-  validationScore?: number
 }
 
 export interface ValidationError {
   field: string
-  type: 
-    | 'missing_image'
-    | 'duplicate_sku'
-    | 'duplicate_upc'
-    | 'invalid_category'
-    | 'missing_price'
-    | 'missing_inventory'
-    | 'missing_brand'
-    | 'missing_attribute'
-    | 'invalid_variant'
-    | 'duplicate_product'
-    | 'missing_description'
+  type: 'missing_image' | 'duplicate_sku' | 'invalid_category' | 'missing_price' | 'invalid_attribute' | 'duplicate_product' | 'missing_description'
   message: string
   severity: 'error' | 'warning'
 }
@@ -454,7 +287,36 @@ export interface Store {
 
 // ─── Logs ─────────────────────────────────────────────────
 export type LogLevel = 'info' | 'warning' | 'error' | 'debug' | 'success'
-export type LogType = 'import' | 'sync' | 'api' | 'ftp' | 'soap' | 'validation' | 'audit' | 'system' | 'error'
+export type UserRole = 'platform_owner' | 'administrator' | 'catalog_manager' | 'read_only' | 'super_admin' | 'admin' | 'integration_manager' | 'operations_staff'
+
+export interface User {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+  avatar?: string
+  status: 'active' | 'inactive' | 'invited'
+  lastLogin?: string
+  createdAt: string
+  department?: string
+}
+
+export interface Permission {
+  id: string
+  module: string
+  action: 'view' | 'create' | 'edit' | 'delete' | 'approve' | 'sync' | 'export'
+  roles: UserRole[]
+}
+
+export interface Role {
+  id: string
+  name: string
+  slug: UserRole
+  description: string
+  userCount: number
+  permissions: string[]
+  createdAt: string
+}
 
 export interface LogEntry {
   id: string
@@ -483,14 +345,11 @@ export interface DashboardMetrics {
   publishedProducts: number
   productsImportedToday: number
   productsReadyToPublish: number
-  productsAwaitingReview: number
   duplicateProducts: number
   missingImages: number
-  missingPricing: number
   missingCategories: number
-  inventoryUpdatedToday: number
-  priceChangesToday: number
-  newProductsToday: number
+  missingPricing: number
+  productsAwaitingReview: number
   inventorySyncStatus: 'healthy' | 'degraded' | 'critical'
   pricingSyncStatus: 'healthy' | 'degraded' | 'critical'
   imageSyncStatus: 'healthy' | 'degraded' | 'critical'
@@ -505,4 +364,3 @@ export interface DashboardMetrics {
   storesSynced: number
   totalStores: number
 }
-

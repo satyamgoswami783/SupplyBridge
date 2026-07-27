@@ -7,7 +7,7 @@ import {
   Globe, Wifi, Server, Database, Clock, TrendingUp,
 
   ArrowUpRight, ArrowDownRight, Activity, ShieldCheck, UserCheck, Tag,
-  Zap, RotateCcw
+  Zap, RotateCcw, Search, Filter
 } from 'lucide-react'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis,
@@ -24,16 +24,6 @@ import type { UserRole } from '../../types'
 
 
 const ROLE_DESCRIPTIONS: Record<UserRole, { title: string; subtitle: string; focus: string }> = {
-  platform_owner: {
-    title: 'Platform Owner Control Center',
-    subtitle: 'Complete strategic platform control, system governance & full operational status',
-    focus: 'Platform Owner',
-  },
-  administrator: {
-    title: 'Business Operations Overview',
-    subtitle: 'Daily platform administration, supplier inventory, pricing & catalog performance',
-    focus: 'Business Administrator',
-  },
   super_admin: {
     title: 'Super Admin Control Center',
     subtitle: 'Complete platform control, system architecture health & full operational status',
@@ -59,12 +49,7 @@ const ROLE_DESCRIPTIONS: Record<UserRole, { title: string; subtitle: string; foc
     subtitle: 'Real-time operational monitoring, validation review, failed sync retries & logs',
     focus: 'Operations Specialist',
   },
-  read_only: {
-    title: 'Audit & Compliance Dashboard',
-    subtitle: 'Read-only operational monitoring, audit trails, and system reporting',
-    focus: 'Platform Auditor',
-  },
-}
+} as any
 
 const stagger = {
   parent: { transition: { staggerChildren: 0.05 } },
@@ -80,8 +65,15 @@ export const Dashboard: React.FC = () => {
     { id: 'connected', label: 'Connected Suppliers', value: m.connectedSuppliers, icon: <Truck size={13} className="text-emerald-600 dark:text-emerald-400" />, iconBg: 'bg-emerald-50 dark:bg-emerald-950/60', change: '+2 this week', changeType: 'positive' as const, activeClass: 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-25/50 dark:bg-emerald-950/40', activeNumberClass: 'text-emerald-600 dark:text-emerald-400' },
     { id: 'disconnected', label: 'Disconnected', value: m.disconnectedSuppliers, icon: <Wifi size={13} className="text-rose-600 dark:text-rose-400" />, iconBg: 'bg-rose-50 dark:bg-rose-950/60', change: '-1 resolved', changeType: 'positive' as const, activeClass: 'border-rose-500 ring-2 ring-rose-500/10 bg-rose-25/50 dark:bg-rose-950/40', activeNumberClass: 'text-rose-600 dark:text-rose-400' },
     { id: 'total-products', label: 'Total Products', value: formatNumber(m.totalProducts), icon: <Package size={13} className="text-primary-600 dark:text-primary-400" />, iconBg: 'bg-primary-50 dark:bg-primary-950/60', change: '+1.2K today', changeType: 'positive' as const, activeClass: 'border-primary-500 ring-2 ring-primary-500/10 bg-primary-25/50 dark:bg-primary-950/40', activeNumberClass: 'text-primary-600 dark:text-primary-400' },
+    { id: 'imported-today', label: 'Products Imported Today', value: formatNumber(m.productsImportedToday), icon: <Package size={13} className="text-cyan-600 dark:text-cyan-400" />, iconBg: 'bg-cyan-50 dark:bg-cyan-950/60', change: '+1.4K today', changeType: 'positive' as const, activeClass: 'border-cyan-500 ring-2 ring-cyan-500/10 bg-cyan-25/50 dark:bg-cyan-950/40', activeNumberClass: 'text-cyan-600 dark:text-cyan-400' },
+    { id: 'ready-publish', label: 'Products Ready to Publish', value: formatNumber(m.productsReadyToPublish), icon: <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />, iconBg: 'bg-emerald-50 dark:bg-emerald-950/60', change: 'Ready', changeType: 'positive' as const, activeClass: 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-25/50 dark:bg-emerald-950/40', activeNumberClass: 'text-emerald-600 dark:text-emerald-400' },
     { id: 'pending-validation', label: 'Pending Validation', value: m.pendingProducts, icon: <AlertTriangle size={13} className="text-amber-600 dark:text-amber-400" />, iconBg: 'bg-amber-50 dark:bg-amber-950/60', change: '-84 resolved', changeType: 'positive' as const, activeClass: 'border-amber-500 ring-2 ring-amber-500/10 bg-amber-25/50 dark:bg-amber-950/40', activeNumberClass: 'text-amber-600 dark:text-amber-400' },
     { id: 'published-products', label: 'Published Products', value: formatNumber(m.publishedProducts), icon: <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />, iconBg: 'bg-emerald-50 dark:bg-emerald-950/60', change: '+982 today', changeType: 'positive' as const, activeClass: 'border-emerald-500 ring-2 ring-emerald-500/10 bg-emerald-25/50 dark:bg-emerald-950/40', activeNumberClass: 'text-emerald-600 dark:text-emerald-400' },
+    { id: 'awaiting-review', label: 'Products Awaiting Review', value: m.productsAwaitingReview, icon: <Clock size={13} className="text-amber-600 dark:text-amber-400" />, iconBg: 'bg-amber-50 dark:bg-amber-950/60', change: 'Review', changeType: 'positive' as const, activeClass: 'border-amber-500 ring-2 ring-amber-500/10 bg-amber-25/50 dark:bg-amber-950/40', activeNumberClass: 'text-amber-600 dark:text-amber-400' },
+    { id: 'duplicate-products', label: 'Duplicate Products', value: m.duplicateProducts, icon: <XCircle size={13} className="text-rose-600 dark:text-rose-400" />, iconBg: 'bg-rose-50 dark:bg-rose-950/60', change: 'Fix needed', changeType: 'negative' as const, activeClass: 'border-rose-500 ring-2 ring-rose-500/10 bg-rose-25/50 dark:bg-rose-950/40', activeNumberClass: 'text-rose-600 dark:text-rose-400' },
+    { id: 'missing-images', label: 'Missing Images', value: m.missingImages, icon: <Image size={13} className="text-violet-600 dark:text-violet-400" />, iconBg: 'bg-violet-50 dark:bg-violet-950/60', change: 'Fix needed', changeType: 'negative' as const, activeClass: 'border-violet-500 ring-2 ring-violet-500/10 bg-violet-25/50 dark:bg-violet-950/40', activeNumberClass: 'text-violet-600 dark:text-violet-400' },
+    { id: 'missing-categories', label: 'Missing Categories', value: m.missingCategories, icon: <Tag size={13} className="text-indigo-600 dark:text-indigo-400" />, iconBg: 'bg-indigo-50 dark:bg-indigo-950/60', change: 'Fix needed', changeType: 'negative' as const, activeClass: 'border-indigo-500 ring-2 ring-indigo-500/10 bg-indigo-25/50 dark:bg-indigo-950/40', activeNumberClass: 'text-indigo-600 dark:text-indigo-400' },
+    { id: 'missing-pricing', label: 'Missing Pricing', value: m.missingPricing, icon: <DollarSign size={13} className="text-amber-600 dark:text-amber-400" />, iconBg: 'bg-amber-50 dark:bg-amber-950/60', change: 'Fix needed', changeType: 'negative' as const, activeClass: 'border-amber-500 ring-2 ring-amber-500/10 bg-amber-25/50 dark:bg-amber-950/40', activeNumberClass: 'text-amber-600 dark:text-amber-400' },
     { id: 'failed-products', label: 'Failed Products', value: m.failedProducts, icon: <XCircle size={13} className="text-rose-600 dark:text-rose-400" />, iconBg: 'bg-rose-50 dark:bg-rose-950/60', change: '+12 today', changeType: 'negative' as const, activeClass: 'border-rose-500 ring-2 ring-rose-500/10 bg-rose-25/50 dark:bg-rose-950/40', activeNumberClass: 'text-rose-600 dark:text-rose-400' },
   ]
 
@@ -98,6 +90,10 @@ export const Dashboard: React.FC = () => {
   const [selectedSyncType, setSelectedSyncType] = useState('Inventory Sync')
   const [syncLaunching, setSyncLaunching] = useState(false)
   const [syncSuccessMsg, setSyncSuccessMsg] = useState('')
+
+  // Activity Feed Filter State
+  const [activityFilter, setActivityFilter] = useState('All')
+  const [activitySearch, setActivitySearch] = useState('')
 
   const handleRefresh = () => {
     setIsRefreshing(true)
@@ -406,33 +402,79 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Recent Activity */}
         <div className="card p-5 border border-slate-200 dark:border-slate-800">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
             <p className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Activity size={16} className="text-primary-600 dark:text-primary-400" /> Recent Activity Feed
             </p>
             <Link to="/logs" className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 font-medium">View all logs →</Link>
           </div>
+
+          {/* Activity Feed Filters & Search */}
+          <div className="space-y-2 mb-4">
+            <div className="relative">
+              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search activity timeline..."
+                value={activitySearch}
+                onChange={e => setActivitySearch(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:border-primary-500"
+              />
+            </div>
+            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-1">
+              {[
+                'All', 'Supplier', 'Store', 'Inventory', 'Pricing', 'Images', 'Errors', 'Warnings', 'Manual Actions'
+              ].map(f => (
+                <button
+                  key={f}
+                  onClick={() => setActivityFilter(f)}
+                  className={`px-2.5 py-1 rounded-lg text-2xs font-bold whitespace-nowrap transition-all ${
+                    activityFilter === f
+                      ? 'bg-primary-600 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="space-y-3.5">
-            {mockActivities.map(act => {
-              const colorMap: Record<string, string> = {
-                emerald: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400',
-                blue: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400',
-                rose: 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400',
-                amber: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400',
-                violet: 'bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-400',
-              }
-              return (
-                <div key={act.id} className="flex items-start gap-3 p-2 rounded-xl">
-                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${colorMap[act.color]}`}>
-                    <span className="text-xs font-bold">●</span>
+            {mockActivities
+              .filter(act => {
+                const matchesSearch = act.message.toLowerCase().includes(activitySearch.toLowerCase())
+                if (activityFilter === 'All') return matchesSearch
+                if (activityFilter === 'Supplier') return matchesSearch && (act.message.includes('Supplier') || act.message.includes('TechParts') || act.message.includes('Acme'))
+                if (activityFilter === 'Store') return matchesSearch && (act.message.includes('Store') || act.message.includes('Shop'))
+                if (activityFilter === 'Inventory') return matchesSearch && (act.message.includes('Inventory') || act.message.includes('Stock'))
+                if (activityFilter === 'Pricing') return matchesSearch && (act.message.includes('Price') || act.message.includes('Pricing') || act.message.includes('Cost'))
+                if (activityFilter === 'Images') return matchesSearch && (act.message.includes('Image') || act.message.includes('Media'))
+                if (activityFilter === 'Errors') return matchesSearch && (act.color === 'rose' || act.message.includes('failed') || act.message.includes('Error'))
+                if (activityFilter === 'Warnings') return matchesSearch && (act.color === 'amber' || act.message.includes('warning'))
+                if (activityFilter === 'Manual Actions') return matchesSearch && (act.message.includes('Manual') || act.message.includes('triggered'))
+                return matchesSearch
+              })
+              .map(act => {
+                const colorMap: Record<string, string> = {
+                  emerald: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400',
+                  blue: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400',
+                  rose: 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400',
+                  amber: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400',
+                  violet: 'bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-400',
+                }
+                return (
+                  <div key={act.id} className="flex items-start gap-3 p-2 rounded-xl">
+                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${colorMap[act.color]}`}>
+                      <span className="text-xs font-bold">●</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-snug">{act.message}</p>
+                      <p className="text-2xs text-slate-400 font-mono mt-0.5">{act.time}</p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-snug">{act.message}</p>
-                    <p className="text-2xs text-slate-400 font-mono mt-0.5">{act.time}</p>
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })}
           </div>
         </div>
 

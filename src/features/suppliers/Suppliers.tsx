@@ -34,14 +34,13 @@ const CONNECTION_TYPES: { value: ConnectionType; label: string }[] = [
   { value: 'api',   label: 'REST API' },
   { value: 'ftp',   label: 'FTP' },
   { value: 'sftp',  label: 'SFTP' },
-  { value: 'soap',  label: 'SOAP XML' },
   { value: 'csv',   label: 'CSV Feed' },
   { value: 'excel', label: 'Excel' },
   { value: 'xml',   label: 'XML Feed' },
 ]
 
 const connTypeIcon: Record<ConnectionType, string> = {
-  api: '🔌', ftp: '📁', sftp: '🔐', soap: '🧼', csv: '📄', excel: '📊', xml: '📋'
+  api: '🔌', ftp: '📁', sftp: '🔐', csv: '📄', excel: '📊', xml: '📋'
 }
 
 export const Suppliers: React.FC = () => {

@@ -273,11 +273,14 @@ export const Reports: React.FC = () => {
   }
 
   const tabs = [
-    { id: 'supplier',  label: 'Supplier Performance' },
-    { id: 'catalog',   label: 'Catalog & PIM Quality' },
-    { id: 'inventory', label: 'Inventory Buffer' },
-    { id: 'sync',      label: 'Sync Pipeline' },
-    { id: 'validation',label: 'Validation Audit' },
+    { id: 'import_summary',      label: 'Import Summary' },
+    { id: 'failed_imports',      label: 'Failed Imports' },
+    { id: 'supplier_performance', label: 'Supplier Performance' },
+    { id: 'price_changes',       label: 'Price Changes' },
+    { id: 'inventory_changes',   label: 'Inventory Changes' },
+    { id: 'new_products',        label: 'New Products' },
+    { id: 'publishing_activity',  label: 'Publishing Activity' },
+    { id: 'sync_performance',    label: 'Sync Performance' },
   ]
 
   return (
@@ -318,28 +321,14 @@ export const Reports: React.FC = () => {
                 <option value="Year to Date">Year to Date</option>
               </select>
             </div>
-            <button
-              onClick={handleExportPDF}
-              className="btn-secondary btn-sm flex items-center gap-1.5 shadow-sm font-bold cursor-pointer"
-              title="Download PDF Operational Report"
-            >
-              <FileText size={14} className="text-rose-600 dark:text-rose-400" /> Export PDF
-            </button>
-            <button
-              onClick={handleExportCSV}
-              className="btn-secondary btn-sm flex items-center gap-1.5 shadow-sm font-bold cursor-pointer"
-              title="Download CSV Analytics File"
-            >
-              <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" /> Export CSV
-            </button>
           </div>
         }
       />
 
-      <Tabs tabs={tabs} active={tab} onChange={setTab} />
+      <Tabs tabs={tabs} active={tab === 'supplier' ? 'supplier_performance' : tab === 'catalog' ? 'import_summary' : tab === 'inventory' ? 'inventory_changes' : tab === 'sync' ? 'sync_performance' : tab} onChange={setTab} />
 
-      {/* 1. SUPPLIER REPORTS TAB */}
-      {tab === 'supplier' && (
+      {/* 1. SUPPLIER PERFORMANCE & IMPORT SUMMARY TAB */}
+      {(tab === 'supplier' || tab === 'supplier_performance' || tab === 'import_summary') && (
         <div className="space-y-4 sm:space-y-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {[
@@ -417,8 +406,8 @@ export const Reports: React.FC = () => {
         </div>
       )}
 
-      {/* 2. CATALOG REPORTS TAB */}
-      {tab === 'catalog' && (
+      {/* 2. CATALOG & NEW PRODUCTS TAB */}
+      {(tab === 'catalog' || tab === 'new_products' || tab === 'publishing_activity') && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="card p-5">
@@ -459,8 +448,8 @@ export const Reports: React.FC = () => {
         </div>
       )}
 
-      {/* 3. INVENTORY REPORTS TAB */}
-      {tab === 'inventory' && (
+      {/* 3. INVENTORY & PRICE CHANGES TAB */}
+      {(tab === 'inventory' || tab === 'inventory_changes' || tab === 'price_changes') && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
@@ -493,8 +482,8 @@ export const Reports: React.FC = () => {
         </div>
       )}
 
-      {/* 4. SYNC PIPELINE TAB */}
-      {tab === 'sync' && (
+      {/* 4. SYNC PIPELINE & PERFORMANCE TAB */}
+      {(tab === 'sync' || tab === 'sync_performance') && (
         <div className="space-y-4">
           <div className="card p-5">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Sync Pipeline Success Rate (%) & Duration (Mins) — Last 6 Months</h3>
@@ -511,8 +500,8 @@ export const Reports: React.FC = () => {
         </div>
       )}
 
-      {/* 5. VALIDATION AUDIT TAB */}
-      {tab === 'validation' && (
+      {/* 5. FAILED IMPORTS TAB */}
+      {tab === 'failed_imports' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="card p-5">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Pre-Publish Validation Error Share</h3>
@@ -527,7 +516,7 @@ export const Reports: React.FC = () => {
           </div>
 
           <div className="card p-5">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Validation Audit Resolution Index</h3>
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Failed Import Diagnostics Index</h3>
             <div className="space-y-4 text-xs">
               <div className="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800">
                 <span className="font-bold text-emerald-800 dark:text-emerald-300">Resolved & Approved Products</span>

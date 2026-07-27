@@ -18,36 +18,27 @@ interface AuthContextType {
 }
 
 export const DEFAULT_ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  platform_owner:      ['*'],
-  administrator:       ['dashboard', 'suppliers', 'catalog', 'products', 'categories', 'brands', 'manufacturers', 'variants', 'media', 'mapping', 'validation', 'inventory_sync', 'pricing_sync', 'image_sync', 'store_management', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports'],
   super_admin:         ['*'],
   admin:               ['dashboard', 'suppliers', 'catalog', 'products', 'categories', 'brands', 'manufacturers', 'variants', 'media', 'mapping', 'validation', 'inventory_sync', 'pricing_sync', 'image_sync', 'store_management', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports'],
   catalog_manager:     ['dashboard', 'catalog', 'products', 'categories', 'brands', 'manufacturers', 'variants', 'media', 'mapping', 'validation', 'reports'],
   integration_manager: ['dashboard', 'suppliers', 'integrations', 'mapping', 'inventory_sync', 'pricing_sync', 'image_sync', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports'],
   operations_staff:    ['dashboard', 'validation', 'monitoring', 'reports', 'logs', 'sync_jobs', 'import_queue'],
-  read_only:           ['dashboard', 'catalog', 'products', 'categories', 'brands', 'manufacturers', 'variants', 'media', 'reports', 'logs'],
 }
 
 const demoUsers: Record<UserRole, User> = {
-  platform_owner:      { id: 'u0', name: 'Victoria Vance', email: 'owner@supplybridge.io', role: 'platform_owner', status: 'active', createdAt: '2024-01-01T00:00:00Z', department: 'Executive Governance' },
-  administrator:       { id: 'u2a', name: 'Robert Vance', email: 'admin@supplybridge.io', role: 'administrator', status: 'active', createdAt: '2024-01-10T00:00:00Z', department: 'Platform Administration' },
   super_admin:         { id: 'u1', name: 'Alex Morrison', email: 'alex@supplybridge.io', role: 'super_admin', status: 'active', createdAt: '2024-01-01T00:00:00Z', department: 'Executive Management' },
   admin:               { id: 'u2', name: 'Sarah Kim', email: 'sarah@supplybridge.io', role: 'admin', status: 'active', createdAt: '2024-02-15T00:00:00Z', department: 'Platform Operations' },
   catalog_manager:     { id: 'u3', name: 'James Patel', email: 'jpatel@supplybridge.io', role: 'catalog_manager', status: 'active', createdAt: '2024-04-01T00:00:00Z', department: 'Catalog & Merchandising' },
   integration_manager: { id: 'u4', name: 'Emily Chen', email: 'echen@supplybridge.io', role: 'integration_manager', status: 'active', createdAt: '2024-05-10T00:00:00Z', department: 'Supplier Integration' },
   operations_staff:    { id: 'u5', name: 'Marcus Johnson', email: 'mjohnson@supplybridge.io', role: 'operations_staff', status: 'active', createdAt: '2024-07-20T00:00:00Z', department: 'System Monitoring' },
-  read_only:           { id: 'u6', name: 'Elena Rostova', email: 'auditor@supplybridge.io', role: 'read_only', status: 'active', createdAt: '2024-08-01T00:00:00Z', department: 'Compliance & Audit' },
 }
 
 const ROLE_PRESETS: { role: UserRole; label: string; email: string; desc: string; color: string }[] = [
-  { role: 'platform_owner',      label: 'Platform Owner',      email: 'owner@supplybridge.io',    desc: 'Complete Strategic Governance',    color: 'from-amber-600 to-purple-600' },
-  { role: 'administrator',       label: 'Administrator',       email: 'admin@supplybridge.io',    desc: 'Platform Operations & Config',     color: 'from-indigo-600 to-blue-600' },
   { role: 'super_admin',         label: 'Super Admin',         email: 'alex@supplybridge.io',     desc: 'Full Platform Access & Control',   color: 'from-purple-600 to-indigo-600' },
   { role: 'admin',               label: 'Admin',               email: 'sarah@supplybridge.io',    desc: 'Daily Platform Operations',        color: 'from-indigo-600 to-blue-600' },
   { role: 'catalog_manager',     label: 'Catalog Manager',     email: 'jpatel@supplybridge.io',   desc: 'PIM, Products & Validation',       color: 'from-blue-600 to-cyan-600' },
   { role: 'integration_manager', label: 'Integration Manager', email: 'echen@supplybridge.io',    desc: 'Suppliers, FTP/API & Sync Jobs',    color: 'from-cyan-600 to-teal-600' },
-  { role: 'operations_staff',    label: 'Operations Staff',    email: 'mjohnson@supplybridge.io', desc: 'Real-time System Monitoring',      color: 'from-teal-600 to-emerald-600' },
-  { role: 'read_only',           label: 'Read Only',           email: 'auditor@supplybridge.io',  desc: 'Audit & View-Only Access',         color: 'from-slate-600 to-slate-800' },
+  { role: 'operations_staff',    label: 'Operations Staff',    email: 'mjohnson@supplybridge.io', desc: 'Monitoring, Logs & Reports',       color: 'from-emerald-600 to-slate-700' },
 ]
 
 const AuthContext = createContext<AuthContextType | null>(null)

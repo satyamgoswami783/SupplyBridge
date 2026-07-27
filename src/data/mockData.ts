@@ -13,16 +13,13 @@ export const mockDashboardMetrics: DashboardMetrics = {
   pendingProducts: 1247,
   failedProducts: 312,
   publishedProducts: 82770,
-  productsImportedToday: 1240,
+  productsImportedToday: 1420,
   productsReadyToPublish: 982,
-  productsAwaitingReview: 84,
-  duplicateProducts: 12,
-  missingImages: 18,
-  missingPricing: 42,
-  missingCategories: 14,
-  inventoryUpdatedToday: 18420,
-  priceChangesToday: 1240,
-  newProductsToday: 350,
+  duplicateProducts: 14,
+  missingImages: 86,
+  missingCategories: 32,
+  missingPricing: 19,
+  productsAwaitingReview: 142,
   inventorySyncStatus: 'healthy',
   pricingSyncStatus: 'degraded',
   imageSyncStatus: 'healthy',
@@ -276,11 +273,10 @@ export const mockUsers: User[] = [
 
 // ─── Roles ────────────────────────────────────────────────
 export const mockRoles: Role[] = [
-  { id: 'r1', name: 'Super Admin', slug: 'super_admin', description: 'Full system access. Can manage all modules, users, roles, and settings.', userCount: 1, permissions: ['*'], createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'r2', name: 'Admin', slug: 'admin', description: 'Daily operations management. Access to most modules except sensitive settings.', userCount: 1, permissions: ['dashboard', 'suppliers', 'integrations', 'catalog', 'mapping', 'validation', 'sync', 'logs', 'monitoring', 'reports', 'users'], createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'r3', name: 'Catalog Manager', slug: 'catalog_manager', description: 'Manages products, categories, variants, mapping, and validation.', userCount: 2, permissions: ['dashboard', 'catalog', 'categories', 'brands', 'variants', 'mapping', 'validation'], createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'r4', name: 'Integration Manager', slug: 'integration_manager', description: 'Manages supplier connections, API/FTP configs, imports, and synchronization.', userCount: 1, permissions: ['dashboard', 'suppliers', 'integrations', 'import_queue', 'sync', 'logs', 'mapping'], createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'r5', name: 'Operations Staff', slug: 'operations_staff', description: 'Read-only access to monitoring, reports, logs, and validation review.', userCount: 2, permissions: ['dashboard', 'monitoring', 'reports', 'logs', 'validation_review'], createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'r1', name: 'Platform Owner', slug: 'platform_owner', description: 'Full platform owner access. Can manage all modules, users, roles, and settings.', userCount: 1, permissions: ['*'], createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'r2', name: 'Administrator', slug: 'administrator', description: 'Daily platform administration, supplier inventory, pricing & catalog performance.', userCount: 1, permissions: ['dashboard', 'suppliers', 'integrations', 'catalog', 'mapping', 'validation', 'sync', 'logs', 'monitoring', 'reports', 'users'], createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'r3', name: 'Catalog Manager', slug: 'catalog_manager', description: 'Manages products, categories, variants, mapping, and validation queue.', userCount: 2, permissions: ['dashboard', 'catalog', 'categories', 'brands', 'variants', 'mapping', 'validation'], createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'r4', name: 'Read Only', slug: 'read_only', description: 'Read-only access to monitoring, reports, system logs, and validation status.', userCount: 2, permissions: ['dashboard', 'monitoring', 'reports', 'logs', 'validation_review'], createdAt: '2024-01-01T00:00:00Z' },
 ]
 
 // ─── Activity Feed ────────────────────────────────────────
