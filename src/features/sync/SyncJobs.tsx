@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { RefreshCw, PlayCircle, CheckCircle2, XCircle, AlertTriangle, Clock, RotateCcw, FileSpreadsheet, Terminal, Activity } from 'lucide-react'
+import { RefreshCw, PlayCircle, CheckCircle2, XCircle, Clock, RotateCcw, FileSpreadsheet, Terminal, PauseCircle, Play, Layers, Eye } from 'lucide-react'
 import { SectionHeader, FilterBar, Tabs, ProgressBar } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
@@ -22,6 +22,7 @@ export const SyncJobs: React.FC = () => {
   const [jobsList, setJobsList] = useState<SyncJob[]>(mockSyncJobs)
   const [tab, setTab] = useState('all')
   const [search, setSearch] = useState('')
+  const [selectedJobIds, setSelectedJobIds] = useState<string[]>([])
   const [detailJob, setDetailJob] = useState<SyncJob | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
 
@@ -30,31 +31,33 @@ export const SyncJobs: React.FC = () => {
     setTimeout(() => setToastMessage(null), 3500)
   }
 
-  // --- Handlers ---
+  // --- Handlers for Synchronization Controls ---
+  
+  // 1. Manual Trigger Sync (Creates running job, updates counters immediately)
   const handleTriggerSync = () => {
     const newJob: SyncJob = {
-      id: `job_${Date.now()}`,
+      id: `job_${Date.now().toString().slice(-4)}`,
       type: 'full',
-      name: 'Full Supplier & Catalog Resync',
+      name: 'Full Catalog Resync',
       status: 'running',
-      progress: 25,
-      processedItems: 4200,
+      progress: 20,
+      processedItems: 3600,
       totalItems: 18450,
       failedItems: 0,
       startedAt: new Date().toISOString(),
       triggeredBy: 'Manual Trigger',
       canRetry: false,
       logs: [
-        'Job initialized by administrator',
-        'Fetching supplier FTP & API channels...',
-        'Processing product catalog updates...',
+        'Manual sync job triggered',
+        'Initializing background data pipeline...',
+        'Processing product catalog synchronization...',
       ],
     }
 
-    setJobsList([newJob, ...jobsList])
-    showNotification('New Sync Job started successfully!')
+    setJobsList(prev => [newJob, ...prev])
+    showNotification('New Sync Job created and running!')
 
-    // Simulate progress
+    // Auto-advance progress to completion
     setTimeout(() => {
       setJobsList(prev =>
         prev.map(j =>
@@ -64,9 +67,10 @@ export const SyncJobs: React.FC = () => {
         )
       )
       showNotification('Sync Job completed successfully!')
-    }, 2500)
+    }, 3000)
   }
 
+  // 2. Retry Failed Jobs (Toolbar action & single row action)
   const handleRetryJob = (id: string, name: string) => {
     setJobsList(prev =>
       prev.map(j =>
@@ -74,14 +78,16 @@ export const SyncJobs: React.FC = () => {
           ? {
               ...j,
               status: 'running',
-              progress: 45,
+              progress: 40,
               failedItems: 0,
+              retryAttempts: (j.retryAttempts || 1) + 1,
+              maxRetries: j.maxRetries || 3,
               startedAt: new Date().toISOString(),
             }
           : j
       )
     )
-    showNotification(`Retrying sync job "${name}"...`)
+    showNotification(`Retrying failed job "${name}"...`)
 
     setTimeout(() => {
       setJobsList(prev =>
@@ -97,40 +103,143 @@ export const SyncJobs: React.FC = () => {
             : j
         )
       )
-      showNotification(`Job "${name}" completed successfully!`)
-    }, 2000)
+      showNotification(`Job "${name}" retried and completed successfully!`)
+    }, 2200)
   }
 
   const handleRetryAllFailed = () => {
-    showNotification('Re-queueing all failed background sync jobs...')
+    const failedJobs = jobsList.filter(j => j.status === 'failed')
+    if (failedJobs.length === 0) return
+    showNotification(`Re-queueing ${failedJobs.length} failed sync job(s)...`)
+    setJobsList(prev =>
+      prev.map(j =>
+        j.status === 'failed'
+          ? {
+              ...j,
+              status: 'running',
+              progress: 35,
+              retryAttempts: (j.retryAttempts || 1) + 1,
+            }
+          : j
+      )
+    )
+
     setTimeout(() => {
       setJobsList(prev =>
         prev.map(j =>
-          j.status === 'failed'
+          j.status === 'running' && failedJobs.some(f => f.id === j.id)
             ? { ...j, status: 'completed', progress: 100, processedItems: j.totalItems, canRetry: false }
             : j
         )
       )
-      showNotification('All failed background sync jobs completed successfully!')
-    }, 1800)
+      showNotification('All failed sync jobs retried successfully!')
+    }, 2200)
   }
 
-  const handleCancelJob = (id: string, name: string) => {
+  // 3. Sync Selected Suppliers/Jobs
+  const handleSyncSelectedSuppliers = () => {
+    if (selectedJobIds.length === 0) return
+    const selectedCount = selectedJobIds.length
+    showNotification(`Syncing ${selectedCount} selected supplier job(s)...`)
+
     setJobsList(prev =>
       prev.map(j =>
-        j.id === id
-          ? { ...j, status: 'failed', canRetry: true, progress: 50 }
+        selectedJobIds.includes(j.id)
+          ? { ...j, status: 'running', progress: 15, startedAt: new Date().toISOString() }
           : j
+      )
+    )
+
+    setTimeout(() => {
+      setJobsList(prev =>
+        prev.map(j =>
+          selectedJobIds.includes(j.id)
+            ? { ...j, status: 'completed', progress: 100, processedItems: j.totalItems, failedItems: 0 }
+            : j
+        )
+      )
+      setSelectedJobIds([])
+      showNotification(`${selectedCount} selected supplier job(s) synced successfully!`)
+    }, 2500)
+  }
+
+  // 4. Sync All Suppliers
+  const handleSyncAllSuppliers = () => {
+    showNotification('Synchronizing all active suppliers...')
+    setJobsList(prev =>
+      prev.map(j => ({
+        ...j,
+        status: 'running',
+        progress: 25,
+        startedAt: new Date().toISOString(),
+      }))
+    )
+
+    setTimeout(() => {
+      setJobsList(prev =>
+        prev.map(j => ({
+          ...j,
+          status: 'completed',
+          progress: 100,
+          processedItems: j.totalItems,
+          failedItems: 0,
+        }))
+      )
+      showNotification('All active suppliers synchronized successfully!')
+    }, 2500)
+  }
+
+  // 5. Pause Queue (Pauses running jobs)
+  const handlePauseQueue = () => {
+    setJobsList(prev =>
+      prev.map(j => (j.status === 'running' ? { ...j, status: 'paused' } : j))
+    )
+    showNotification('Queue paused: All running sync jobs placed on hold.')
+  }
+
+  // 6. Resume Queue (Restores paused jobs to running)
+  const handleResumeQueue = () => {
+    setJobsList(prev =>
+      prev.map(j => (j.status === 'paused' ? { ...j, status: 'running' } : j))
+    )
+    showNotification('Queue resumed: Execution restored for paused sync jobs.')
+  }
+
+  // 7. Cancel Queue (Cancels Running or Queued jobs only)
+  const handleCancelQueue = () => {
+    setJobsList(prev =>
+      prev.map(j =>
+        j.status === 'running' || j.status === 'queued'
+          ? { ...j, status: 'cancelled', canRetry: false, progress: 0 }
+          : j
+      )
+    )
+    showNotification('Queue cancelled: Active and queued jobs terminated.')
+  }
+
+  const handleCancelSingleJob = (id: string, name: string) => {
+    setJobsList(prev =>
+      prev.map(j =>
+        j.id === id ? { ...j, status: 'cancelled', canRetry: false } : j
       )
     )
     showNotification(`Job "${name}" cancelled.`)
   }
 
+  // 8. Rebuild Catalog
+  const handleRebuildCatalog = () => {
+    showNotification('Rebuilding master product catalog indexes...')
+    setTimeout(() => {
+      showNotification('Master product catalog rebuilt and indexed successfully!')
+    }, 1800)
+  }
+
+  // Export CSV Report
   const handleExportJobsCSV = () => {
     showNotification('Generating Sync Jobs CSV report...')
-    const csvHeaders = 'Job ID,Job Name,Type,Status,Progress %,Processed Items,Total Items,Failed Items,Started At,Triggered By\n'
+    const csvHeaders = 'Job ID,Job Name,Type,Status,Progress %,Processed Items,Total Items,Failed Items,Retry Attempts,Started At,Triggered By\n'
     const csvRows = jobsList.map(j =>
-      `"${j.id}","${j.name}","${j.type}","${j.status}",${j.progress},${j.processedItems},${j.totalItems},${j.failedItems},"${j.startedAt || ''}","${j.triggeredBy || ''}"`
+      `"${j.id}","${j.name}","${j.type}","${j.status}",${j.progress},${j.processedItems},${j.totalItems},${j.failedItems},"${j.retryAttempts ? `${j.retryAttempts}/${j.maxRetries || 3}` : '—'}","${j.startedAt || ''}","${j.triggeredBy || ''}"`
     ).join('\n')
     const csvContent = csvHeaders + csvRows
 
@@ -143,24 +252,39 @@ export const SyncJobs: React.FC = () => {
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
-    showNotification('Sync Jobs CSV file downloaded!')
+    showNotification('Sync Jobs CSV report downloaded!')
   }
 
+  // Checkbox selection toggle
+  const toggleSelectJob = (id: string) =>
+    setSelectedJobIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]))
+
+  // Counts for dynamic updates
+  const failedCount = jobsList.filter(j => j.status === 'failed').length
+  const runningCount = jobsList.filter(j => j.status === 'running').length
+  const pausedCount = jobsList.filter(j => j.status === 'paused').length
+  const queuedCount = jobsList.filter(j => j.status === 'queued').length
+
+  // Tab definitions dynamically updated after every action
   const tabs = [
     { id: 'all',       label: 'All Jobs',  count: jobsList.length },
-    { id: 'running',   label: 'Running',   count: jobsList.filter(j => j.status === 'running').length },
-    { id: 'queued',    label: 'Queued',    count: jobsList.filter(j => j.status === 'queued').length },
+    { id: 'running',   label: 'Running',   count: runningCount },
+    { id: 'queued',    label: 'Queued',    count: queuedCount },
     { id: 'completed', label: 'Completed', count: jobsList.filter(j => j.status === 'completed').length },
-    { id: 'failed',    label: 'Failed',    count: jobsList.filter(j => j.status === 'failed').length },
+    { id: 'failed',    label: 'Failed',    count: failedCount },
   ]
 
+  // Multi-field search (Job Name, Job ID, Supplier Name)
   const filtered = jobsList.filter(j => {
     const matchTab = tab === 'all' || j.status === tab
-    const matchSearch = j.name.toLowerCase().includes(search.toLowerCase())
+    const query = search.toLowerCase()
+    const matchSearch =
+      j.name.toLowerCase().includes(query) ||
+      j.id.toLowerCase().includes(query) ||
+      (j.supplierName && j.supplierName.toLowerCase().includes(query)) ||
+      (j.storeName && j.storeName.toLowerCase().includes(query))
     return matchTab && matchSearch
   })
-
-  const failedCount = jobsList.filter(j => j.status === 'failed').length
 
   return (
     <div className="relative space-y-7 sm:space-y-8">
@@ -191,24 +315,34 @@ export const SyncJobs: React.FC = () => {
             >
               <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" /> Export <span className="hidden sm:inline">CSV</span>
             </button>
-            {failedCount > 0 && (
-              <button
-                onClick={handleRetryAllFailed}
-                className="btn-secondary btn-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 border-rose-200 dark:border-rose-900/60 flex items-center justify-center gap-1 sm:gap-1.5 font-bold cursor-pointer flex-1 sm:flex-initial px-2 sm:px-3 text-xs"
-                title="Retry all failed jobs"
-              >
-                <RotateCcw size={14} /> Retry <span className="hidden sm:inline">Failed ({failedCount})</span><span className="sm:hidden">({failedCount})</span>
-              </button>
-            )}
+            <button
+              onClick={handleRetryAllFailed}
+              disabled={failedCount === 0}
+              className={`btn-secondary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 font-bold flex-1 sm:flex-initial px-2 sm:px-3 text-xs ${
+                failedCount === 0
+                  ? 'opacity-50 cursor-not-allowed text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-800'
+                  : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 border-rose-200 dark:border-rose-900/60 cursor-pointer'
+              }`}
+              title={failedCount === 0 ? 'No failed jobs to retry' : `Retry ${failedCount} failed job(s)`}
+            >
+              <RotateCcw size={14} /> Retry Failed Jobs {failedCount > 0 && `(${failedCount})`}
+            </button>
             {role !== 'operations_staff' && (
               <>
-                <button onClick={() => showNotification('Syncing all active suppliers...')} className="btn-secondary btn-sm flex items-center gap-1 font-bold">
+                <button
+                  onClick={handleSyncSelectedSuppliers}
+                  disabled={selectedJobIds.length === 0}
+                  className={`btn-secondary btn-sm flex items-center gap-1 font-bold ${
+                    selectedJobIds.length === 0 ? 'opacity-50 cursor-not-allowed text-slate-400' : 'cursor-pointer'
+                  }`}
+                  title={selectedJobIds.length === 0 ? 'Select one or more jobs/suppliers to sync' : 'Sync Selected Jobs'}
+                >
+                  <Layers size={14} className="text-cyan-500" /> Sync Selected {selectedJobIds.length > 0 && `(${selectedJobIds.length})`}
+                </button>
+                <button onClick={handleSyncAllSuppliers} className="btn-secondary btn-sm flex items-center gap-1 font-bold cursor-pointer">
                   <PlayCircle size={14} className="text-amber-500" /> Sync All Suppliers
                 </button>
-                <button onClick={() => showNotification('Queue paused successfully.')} className="btn-secondary btn-sm font-bold">
-                  Pause Queue
-                </button>
-                <button onClick={() => showNotification('Catalog rebuilding started in background.')} className="btn-secondary btn-sm font-bold">
+                <button onClick={handleRebuildCatalog} className="btn-secondary btn-sm font-bold cursor-pointer">
                   Rebuild Catalog
                 </button>
                 <button onClick={handleTriggerSync} className="btn-primary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 shadow-md shadow-amber-500/25 cursor-pointer flex-1 sm:flex-initial px-2 sm:px-3 text-xs whitespace-nowrap">
@@ -220,7 +354,7 @@ export const SyncJobs: React.FC = () => {
         }
       />
 
-      {/* Queue Real-time Processing Metrics Bar */}
+      {/* Queue Real-time Processing Metrics & Queue Control Bar */}
       <div className="card p-3 sm:p-4 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div>
@@ -240,18 +374,50 @@ export const SyncJobs: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <button onClick={() => showNotification('Queue resumed.')} className="btn-secondary btn-sm text-2xs py-1">Resume Queue</button>
-          <button onClick={() => showNotification('Active Queue cancelled.')} className="btn-danger btn-sm text-2xs py-1">Cancel Queue</button>
+          {pausedCount > 0 ? (
+            <button
+              onClick={handleResumeQueue}
+              className="btn-success btn-sm text-2xs py-1 flex items-center gap-1 cursor-pointer font-bold"
+              title="Resume execution for paused jobs"
+            >
+              <Play size={12} /> Resume Queue ({pausedCount})
+            </button>
+          ) : (
+            <button
+              onClick={handlePauseQueue}
+              disabled={runningCount === 0}
+              className={`btn-secondary btn-sm text-2xs py-1 flex items-center gap-1 font-bold ${
+                runningCount === 0
+                  ? 'opacity-50 cursor-not-allowed text-slate-400 border-slate-700 bg-slate-800'
+                  : 'cursor-pointer hover:bg-slate-800 text-slate-200'
+              }`}
+              title={runningCount === 0 ? 'No running jobs to pause' : 'Pause all running sync jobs'}
+            >
+              <PauseCircle size={12} className="text-amber-400" /> Pause Queue
+            </button>
+          )}
+          <button
+            onClick={handleCancelQueue}
+            disabled={runningCount === 0 && queuedCount === 0}
+            className={`btn-danger btn-sm text-2xs py-1 font-bold ${
+              runningCount === 0 && queuedCount === 0
+                ? 'opacity-50 cursor-not-allowed'
+                : 'cursor-pointer'
+            }`}
+            title={runningCount === 0 && queuedCount === 0 ? 'No active jobs to cancel' : 'Cancel active and queued jobs'}
+          >
+            Cancel Queue
+          </button>
         </div>
       </div>
 
-      {/* KPI Summary Stats — High Resolution & Responsive Layout */}
+      {/* KPI Summary Stats — Dynamic Updates */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
         {[
-          { label: 'RUNNING JOBS',   value: jobsList.filter(j => j.status === 'running').length,   color: 'text-cyan-600 dark:text-cyan-400',    bg: 'bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200/80 dark:border-cyan-900/50',    icon: <RefreshCw size={20} className="animate-spin text-cyan-600" /> },
-          { label: 'QUEUED JOBS',    value: jobsList.filter(j => j.status === 'queued').length,    color: 'text-amber-600 dark:text-amber-400',   bg: 'bg-amber-50/70 dark:bg-amber-200/80 dark:border-amber-900/50',   icon: <Clock size={20} className="text-amber-600" /> },
+          { label: 'RUNNING JOBS',   value: runningCount,   color: 'text-cyan-600 dark:text-cyan-400',    bg: 'bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200/80 dark:border-cyan-900/50',    icon: <RefreshCw size={20} className="animate-spin text-cyan-600" /> },
+          { label: 'QUEUED JOBS',    value: queuedCount,    color: 'text-amber-600 dark:text-amber-400',   bg: 'bg-amber-50/70 dark:bg-amber-200/80 dark:border-amber-900/50',   icon: <Clock size={20} className="text-amber-600" /> },
           { label: 'COMPLETED JOBS', value: jobsList.filter(j => j.status === 'completed').length, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50', icon: <CheckCircle2 size={20} className="text-emerald-600" /> },
-          { label: 'FAILED JOBS',    value: jobsList.filter(j => j.status === 'failed').length,    color: 'text-rose-600 dark:text-rose-400',    bg: 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50',    icon: <XCircle size={20} className="text-rose-600" /> },
+          { label: 'FAILED JOBS',    value: failedCount,    color: 'text-rose-600 dark:text-rose-400',    bg: 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50',    icon: <XCircle size={20} className="text-rose-600" /> },
         ].map((s, i) => (
           <div key={i} className={`p-4 sm:p-5 rounded-2xl shadow-xs min-h-[105px] sm:min-h-[115px] flex items-center justify-between border transition-all duration-200 ${s.bg}`}>
             <div>
@@ -267,16 +433,24 @@ export const SyncJobs: React.FC = () => {
 
       <div className="space-y-4">
         <Tabs tabs={tabs} active={tab} onChange={setTab} />
-        <FilterBar search={search} onSearch={setSearch} placeholder="Search jobs by name, ID, or supplier..." />
+        <FilterBar search={search} onSearch={setSearch} placeholder="Search jobs by Job Name, Job ID, or Supplier..." />
       </div>
 
-      {/* Synchronization Jobs Table — Exact Image 1 UI with Responsive Horizontal Scroll */}
+      {/* Synchronization Jobs Table */}
       <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-card w-full">
         <div className="table-container w-full overflow-x-auto scrollbar-thin">
-          <table className="table min-w-[950px] w-full">
+          <table className="table min-w-[980px] w-full">
             <thead>
               <tr className="bg-slate-100/90 dark:bg-slate-950/90 border-b-2 border-slate-200 dark:border-slate-800">
-                <th className="whitespace-nowrap px-4 py-3.5">JOB NAME</th>
+                <th className="w-10 text-center px-3 py-3.5">
+                  <input
+                    type="checkbox"
+                    className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+                    checked={filtered.length > 0 && filtered.every(j => selectedJobIds.includes(j.id))}
+                    onChange={e => setSelectedJobIds(e.target.checked ? filtered.map(j => j.id) : [])}
+                  />
+                </th>
+                <th className="whitespace-nowrap px-4 py-3.5">JOB NAME / ID</th>
                 <th className="whitespace-nowrap px-4 py-3.5">TYPE</th>
                 <th className="whitespace-nowrap px-4 py-3.5">STATUS</th>
                 <th className="whitespace-nowrap px-4 py-3.5">PROGRESS</th>
@@ -289,17 +463,26 @@ export const SyncJobs: React.FC = () => {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="text-center py-16 text-slate-400 font-medium">
-                    No synchronization jobs found matching your criteria.
+                  <td colSpan={9} className="text-center py-16 text-slate-400 font-medium">
+                    No synchronization jobs found matching your search criteria.
                   </td>
                 </tr>
               )}
               {filtered.map(job => (
                 <tr key={job.id} className="cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors" onClick={() => setDetailJob(job)}>
+                  <td className="w-10 text-center px-3 py-3.5" onClick={e => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+                      checked={selectedJobIds.includes(job.id)}
+                      onChange={() => toggleSelectJob(job.id)}
+                    />
+                  </td>
                   <td data-label="Job Name" className="whitespace-nowrap px-4 py-3.5">
                     <p className="font-bold text-slate-900 dark:text-slate-100 text-xs leading-normal">{job.name}</p>
-                    {job.supplierName && <p className="text-2xs text-slate-400 font-medium mt-0.5">{job.supplierName}</p>}
-                    {job.storeName && <p className="text-2xs text-slate-400 font-medium mt-0.5">{job.storeName}</p>}
+                    <p className="text-2xs text-slate-400 font-mono mt-0.5">ID: {job.id}</p>
+                    {job.supplierName && <p className="text-2xs text-slate-500 font-medium mt-0.5">Supplier: {job.supplierName}</p>}
+                    {job.storeName && <p className="text-2xs text-slate-500 font-medium mt-0.5">Store: {job.storeName}</p>}
                   </td>
                   <td data-label="Type" className="whitespace-nowrap px-4 py-3.5">
                     <span className={`px-2.5 py-1 rounded-lg text-2xs font-bold uppercase tracking-wider border ${jobTypeColor[job.type] || 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}`}>
@@ -308,6 +491,11 @@ export const SyncJobs: React.FC = () => {
                   </td>
                   <td data-label="Status" className="whitespace-nowrap px-4 py-3.5">
                     <Badge variant={statusToVariant(job.status)} dot>{job.status}</Badge>
+                    {job.status === 'failed' && (
+                      <span className="block text-2xs font-mono font-bold text-rose-600 dark:text-rose-400 mt-1">
+                        Retry {job.retryAttempts || 1}/{job.maxRetries || 3}
+                      </span>
+                    )}
                   </td>
                   <td data-label="Progress" className="whitespace-nowrap px-4 py-3.5 min-w-[140px]">
                     <ProgressBar
@@ -330,25 +518,31 @@ export const SyncJobs: React.FC = () => {
                   </td>
                   <td data-label="Triggered By" className="whitespace-nowrap px-4 py-3.5"><span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{job.triggeredBy}</span></td>
                   <td className="whitespace-nowrap px-4 py-3.5 text-right pr-4">
-                    <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
-                      {role !== 'operations_staff' && job.status === 'running' && (
+                    <div className="flex justify-end items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                      <button
+                        onClick={() => setDetailJob(job)}
+                        className="btn-secondary btn-sm flex items-center gap-1 font-bold cursor-pointer text-xs"
+                        title="View Job Details & Logs"
+                      >
+                        <Eye size={13} /> View
+                      </button>
+                      {role !== 'operations_staff' && (job.status === 'running' || job.status === 'queued' || job.status === 'paused') && (
                         <button
-                          onClick={() => handleCancelJob(job.id, job.name)}
-                          className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1 font-bold cursor-pointer"
+                          onClick={() => handleCancelSingleJob(job.id, job.name)}
+                          className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1 font-bold cursor-pointer text-xs"
+                          title="Cancel Job"
                         >
                           <XCircle size={13} /> Cancel
                         </button>
                       )}
-                      {role !== 'operations_staff' && job.canRetry && (
+                      {role !== 'operations_staff' && job.status === 'failed' && (
                         <button
                           onClick={() => handleRetryJob(job.id, job.name)}
-                          className="btn-secondary btn-sm flex items-center gap-1 font-bold cursor-pointer"
+                          className="btn-secondary btn-sm flex items-center gap-1 font-bold cursor-pointer text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-xs border-amber-300"
+                          title="Retry Failed Job"
                         >
                           <RotateCcw size={13} /> Retry
                         </button>
-                      )}
-                      {role === 'operations_staff' && (
-                        <span className="text-xs text-slate-400 italic pr-1">View Only</span>
                       )}
                     </div>
                   </td>
@@ -370,7 +564,7 @@ export const SyncJobs: React.FC = () => {
           footer={
             <>
               <button onClick={() => setDetailJob(null)} className="btn-secondary">Close</button>
-              {role !== 'operations_staff' && detailJob.canRetry && (
+              {role !== 'operations_staff' && detailJob.status === 'failed' && (
                 <button
                   onClick={() => { handleRetryJob(detailJob.id, detailJob.name); setDetailJob(null); }}
                   className="btn-primary flex items-center gap-1.5 cursor-pointer font-bold"
@@ -389,7 +583,7 @@ export const SyncJobs: React.FC = () => {
                 { label: 'Total Catalog SKUs', value: detailJob.totalItems.toLocaleString() },
                 { label: 'Processed SKUs', value: detailJob.processedItems.toLocaleString() },
                 { label: 'Failed Items', value: <span className={detailJob.failedItems > 0 ? 'text-rose-600 font-bold' : 'text-emerald-600 font-bold'}>{detailJob.failedItems}</span> },
-                { label: 'Triggered By', value: detailJob.triggeredBy },
+                { label: 'Retry Attempts', value: detailJob.status === 'failed' ? `Retry ${detailJob.retryAttempts || 1}/${detailJob.maxRetries || 3}` : 'N/A' },
               ].map(item => (
                 <div key={item.label} className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
                   <p className="text-2xs text-slate-400 font-semibold uppercase tracking-wider mb-1">{item.label}</p>

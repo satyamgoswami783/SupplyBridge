@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShieldCheck, CheckCircle2, XCircle, Eye, AlertTriangle, RefreshCw, Loader2, Check, Info, PhoneForwarded } from 'lucide-react'
+import { ShieldCheck, CheckCircle2, XCircle, Eye, AlertTriangle, RefreshCw, Info, PhoneForwarded } from 'lucide-react'
 import { SectionHeader, FilterBar, Tabs, Spinner } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { mockValidationItems } from '../../data/mockData'
 import { statusToVariant, timeAgo } from '../../utils'
-import type { ValidationItem, ValidationStatus } from '../../types'
+import type { ValidationItem } from '../../types'
 import { useAuth } from '../../context/AuthContext'
 
 const errorTypeLabel: Record<string, string> = {
@@ -86,6 +86,7 @@ export const ValidationCenter: React.FC = () => {
   const getErrorCount = (type: string) => {
     return items.filter(item => item.errors.some(err => err.type === type)).length
   }
+
   // Toggle selection for a single item
   const toggleSelect = (id: string) =>
     setSelectedIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]))
@@ -102,10 +103,19 @@ export const ValidationCenter: React.FC = () => {
   }
 
   const handleApproveSingle = (id: string, name?: string) => {
+    const targetItem = items.find(i => i.id === id)
+    if (!targetItem) return
+    if (targetItem.errors.length > 0) {
+      setToastMessage({
+        text: `Cannot approve "${name || 'Item'}". All validation issues must be resolved first.`,
+        type: 'error',
+      })
+      return
+    }
     setItems(prev =>
       prev.map(item => (item.id === id ? { ...item, status: 'approved' } : item))
     )
-    setToastMessage({ text: `Product "${name || 'Item'}" approved successfully.`, type: 'success' })
+    setToastMessage({ text: `Product "${name || 'Item'}" approved and moved to Approved tab.`, type: 'success' })
     setSelectedIds(prev => prev.filter(x => x !== id))
     if (reviewItem?.id === id) setReviewItem(null)
   }
@@ -114,17 +124,26 @@ export const ValidationCenter: React.FC = () => {
     setItems(prev =>
       prev.map(item => (item.id === id ? { ...item, status: 'rejected' } : item))
     )
-    setToastMessage({ text: `Product "${name || 'Item'}" rejected.`, type: 'info' })
+    setToastMessage({ text: `Product "${name || 'Item'}" moved to Rejected tab.`, type: 'info' })
     setSelectedIds(prev => prev.filter(x => x !== id))
     if (reviewItem?.id === id) setReviewItem(null)
   }
 
   const handleBulkApprove = () => {
     if (selectedIds.length === 0) return
+    const selectedItems = items.filter(i => selectedIds.includes(i.id))
+    const invalidItems = selectedItems.filter(i => i.errors.length > 0)
+    if (invalidItems.length > 0) {
+      setToastMessage({
+        text: `Approval Blocked: ${invalidItems.length} selected item(s) have unresolved validation issues.`,
+        type: 'error',
+      })
+      return
+    }
     setItems(prev =>
       prev.map(item => (selectedIds.includes(item.id) ? { ...item, status: 'approved' } : item))
     )
-    setToastMessage({ text: `${selectedIds.length} items approved successfully.`, type: 'success' })
+    setToastMessage({ text: `${selectedIds.length} item(s) approved and moved to Approved tab.`, type: 'success' })
     setSelectedIds([])
   }
 
@@ -133,7 +152,7 @@ export const ValidationCenter: React.FC = () => {
     setItems(prev =>
       prev.map(item => (selectedIds.includes(item.id) ? { ...item, status: 'rejected' } : item))
     )
-    setToastMessage({ text: `${selectedIds.length} items rejected.`, type: 'info' })
+    setToastMessage({ text: `${selectedIds.length} items moved to Rejected tab.`, type: 'info' })
     setSelectedIds([])
   }
 
@@ -144,15 +163,39 @@ export const ValidationCenter: React.FC = () => {
         prev.map(x => (x.id === item.id ? { ...x, status: 'review' } : x))
       )
     }
-    // Set item to active modal review view
     setReviewItem({ ...item, status: item.status === 'pending' ? 'review' : item.status })
+  }
+
+  const handleResolveSingleError = (itemId: string, errorIndex: number) => {
+    setItems(prev =>
+      prev.map(item => {
+        if (item.id !== itemId) return item
+        const updatedErrors = item.errors.filter((_, idx) => idx !== errorIndex)
+        return { ...item, errors: updatedErrors }
+      })
+    )
+    if (reviewItem && reviewItem.id === itemId) {
+      const updatedErrors = reviewItem.errors.filter((_, idx) => idx !== errorIndex)
+      setReviewItem({ ...reviewItem, errors: updatedErrors })
+    }
+    setToastMessage({ text: 'Validation issue marked as resolved.', type: 'success' })
+  }
+
+  const handleResolveAll = (itemId: string) => {
+    setItems(prev =>
+      prev.map(item => (item.id === itemId ? { ...item, errors: [] } : item))
+    )
+    if (reviewItem && reviewItem.id === itemId) {
+      setReviewItem({ ...reviewItem, errors: [] })
+    }
+    setToastMessage({ text: 'All validation issues resolved. Product is now Ready For Approval.', type: 'success' })
   }
 
   return (
     <div className="relative pb-12 sm:pb-6">
       <SectionHeader
         title="Validation Center"
-        subtitle="Review, audit, and approve products before publishing to the master catalog"
+        subtitle="Review and audit product validation errors before publishing to the master catalog"
         actions={
           <>
             {selectedIds.length > 0 && role !== 'operations_staff' && (
@@ -204,7 +247,7 @@ export const ValidationCenter: React.FC = () => {
         <div className="flex items-center gap-2">
           <AlertTriangle size={16} className="text-amber-500 flex-shrink-0" />
           <span className="font-bold">Publishing Guard Active:</span>
-          <span>Products with validation issues cannot be published until resolved.</span>
+          <span>Validation issues should be resolved before publishing.</span>
         </div>
         <Badge variant="warning" dot>PUBLISH BLOCKED</Badge>
       </div>
@@ -314,22 +357,37 @@ export const ValidationCenter: React.FC = () => {
                           <span>{timeAgo(item.createdAt)}</span>
                         </p>
                       </div>
-                      <div className="flex-shrink-0 self-start sm:self-auto">
-                        <Badge variant={statusToVariant(item.status)}>{item.status}</Badge>
+                      <div className="flex-shrink-0 self-start sm:self-auto flex items-center gap-1.5">
+                        {item.errors.length === 0 && item.status !== 'approved' && item.status !== 'rejected' ? (
+                          <span className="text-2xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900/60 px-2.5 py-1 rounded-full">
+                            Ready For Approval
+                          </span>
+                        ) : (
+                          <Badge variant={statusToVariant(item.status)}>
+                            {item.status === 'pending' ? 'Pending Review' : item.status === 'review' ? 'In Review' : item.status}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3">
-                      {item.errors.map((err, i) => (
-                        <div
-                          key={i}
-                          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                            err.severity === 'error' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
-                          }`}
-                        >
-                          {err.severity === 'error' ? <XCircle size={11} className="flex-shrink-0" /> : <AlertTriangle size={11} className="flex-shrink-0" />}
-                          <span>{errorTypeLabel[err.type] ?? err.type}</span>
+                      {item.errors.length > 0 ? (
+                        item.errors.map((err, i) => (
+                          <div
+                            key={i}
+                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+                              err.severity === 'error' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
+                            }`}
+                          >
+                            {err.severity === 'error' ? <XCircle size={11} className="flex-shrink-0" /> : <AlertTriangle size={11} className="flex-shrink-0" />}
+                            <span>{errorTypeLabel[err.type] ?? err.type}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
+                          <CheckCircle2 size={11} className="flex-shrink-0" />
+                          <span>All Issues Resolved</span>
                         </div>
-                      ))}
+                      )}
                     </div>
                   </div>
                 </div>
@@ -338,8 +396,13 @@ export const ValidationCenter: React.FC = () => {
                     <>
                       <button
                         onClick={() => handleApproveSingle(item.id, item.productName)}
-                        className="btn-success btn-sm flex items-center justify-center gap-1 flex-1 md:flex-none"
-                        disabled={item.status === 'approved'}
+                        className={`btn-sm flex items-center justify-center gap-1 flex-1 md:flex-none ${
+                          item.errors.length > 0
+                            ? 'bg-slate-100 text-slate-400 dark:bg-slate-800/80 dark:text-slate-500 cursor-not-allowed border border-slate-200 dark:border-slate-800'
+                            : 'btn-success'
+                        }`}
+                        disabled={item.status === 'approved' || item.errors.length > 0}
+                        title={item.errors.length > 0 ? 'Cannot approve until validation issues are resolved' : 'Approve product'}
                       >
                         <CheckCircle2 size={13} /> Approve
                       </button>
@@ -360,7 +423,7 @@ export const ValidationCenter: React.FC = () => {
                       <PhoneForwarded size={13} /> Escalate
                     </button>
                   )}
-                  <button onClick={() => handleOpenReview(item)} className="btn-secondary btn-sm flex items-center justify-center gap-1 flex-1 md:flex-none">
+                  <button onClick={() => handleOpenReview(item)} className="btn-secondary btn-sm flex items-center justify-center gap-1 flex-1 md:flex-none" title="View Validation Details">
                     <Eye size={13} /> View
                   </button>
                 </div>
@@ -370,12 +433,12 @@ export const ValidationCenter: React.FC = () => {
         )}
       </div>
 
-      {/* Review Modal */}
+      {/* Review Modal - View Details & Resolve Issues */}
       {reviewItem && (
         <Modal
           open
           onClose={() => setReviewItem(null)}
-          title={reviewItem.productName}
+          title={`Validation Details: ${reviewItem.productName}`}
           subtitle={`Supplier: ${reviewItem.supplierName} · SKU: ${reviewItem.supplierSku}`}
           size="lg"
           footer={
@@ -404,44 +467,79 @@ export const ValidationCenter: React.FC = () => {
                   >
                     <XCircle size={14} /> Reject Item
                   </button>
-                  <button
-                    onClick={() => {
-                      handleApproveSingle(reviewItem.id, reviewItem.productName)
-                      setReviewItem(null)
-                    }}
-                    className="btn-success flex items-center gap-1.5"
-                  >
-                    <CheckCircle2 size={14} /> Approve Item
-                  </button>
+                  {reviewItem.errors.length > 0 ? (
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3 py-1.5 rounded-lg border border-amber-200 dark:border-amber-900/60">
+                      <AlertTriangle size={14} />
+                      <span>Approval Blocked (Resolve issues first)</span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        handleApproveSingle(reviewItem.id, reviewItem.productName)
+                        setReviewItem(null)
+                      }}
+                      className="btn-success flex items-center gap-1.5"
+                    >
+                      <CheckCircle2 size={14} /> Approve Item
+                    </button>
+                  )}
                 </>
               )}
             </>
           }
         >
           <div className="space-y-4">
-            <div className="bg-rose-50 border border-rose-200 rounded-xl p-4">
-              <p className="text-sm font-semibold text-rose-800 mb-2">
-                Validation Errors ({reviewItem.errors.length})
-              </p>
-              {reviewItem.errors.map((err, i) => (
-                <div key={i} className="flex items-start gap-2 text-sm text-rose-700 mt-1.5">
-                  {err.severity === 'error' ? (
-                    <XCircle size={14} className="flex-shrink-0 mt-0.5" />
-                  ) : (
-                    <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
-                  )}
-                  <span>
-                    <strong>{errorTypeLabel[err.type]}:</strong> {err.message}
-                  </span>
+            {reviewItem.errors.length > 0 ? (
+              <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-rose-800 dark:text-rose-300">
+                    Validation Issues to Resolve ({reviewItem.errors.length})
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleResolveAll(reviewItem.id)}
+                    className="text-2xs font-bold text-emerald-700 dark:text-emerald-400 hover:underline bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900 px-2 py-1 rounded"
+                  >
+                    Mark All Issues Resolved
+                  </button>
                 </div>
-              ))}
-            </div>
+                {reviewItem.errors.map((err, i) => (
+                  <div key={i} className="flex items-center justify-between gap-2 text-sm text-rose-700 dark:text-rose-400 bg-white/60 dark:bg-slate-900/60 p-2.5 rounded-lg border border-rose-100 dark:border-rose-900/40">
+                    <div className="flex items-start gap-2 min-w-0">
+                      {err.severity === 'error' ? (
+                        <XCircle size={14} className="flex-shrink-0 mt-0.5" />
+                      ) : (
+                        <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
+                      )}
+                      <span>
+                        <strong>{errorTypeLabel[err.type] || err.type}:</strong> {err.message}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleResolveSingleError(reviewItem.id, i)}
+                      className="btn-secondary btn-xs text-xs flex-shrink-0 text-emerald-700 hover:bg-emerald-50 border-emerald-300"
+                    >
+                      Resolve
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 rounded-xl p-4 flex items-center gap-3 text-xs text-emerald-800 dark:text-emerald-300">
+                <CheckCircle2 size={18} className="text-emerald-600 flex-shrink-0" />
+                <div>
+                  <p className="font-bold text-sm">All Validation Issues Resolved!</p>
+                  <p className="text-slate-600 dark:text-slate-400 mt-0.5">This product is now ready for approval and publishing.</p>
+                </div>
+              </div>
+            )}
             <div>
-              <label className="text-xs font-semibold text-slate-600 block mb-1.5">Review Notes</label>
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 block mb-1.5">Review Notes / Validation Audit Log</label>
               <textarea
                 className="input"
                 rows={3}
-                placeholder="Add audit notes for this validation review decision..."
+                placeholder="Add audit notes for this validation review..."
                 value={reviewNotes}
                 onChange={e => setReviewNotes(e.target.value)}
               />

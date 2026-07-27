@@ -40,7 +40,7 @@ const validationErrorsPie = [
 ]
 
 export const Reports: React.FC = () => {
-  const [tab, setTab] = useState('supplier')
+  const [tab, setTab] = useState('import_summary')
   const [dateRange, setDateRange] = useState('Last 30 days')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -329,6 +329,20 @@ export const Reports: React.FC = () => {
         subtitle="Detailed operational activity, feed import summaries, supplier metrics, and store publishing activity"
         actions={
           <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportCSV}
+              className="btn-secondary btn-sm flex items-center justify-center gap-1.5 font-bold cursor-pointer text-xs"
+              title="Export Report CSV"
+            >
+              <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" /> Export CSV
+            </button>
+            <button
+              onClick={handleExportPDF}
+              className="btn-secondary btn-sm flex items-center justify-center gap-1.5 font-bold cursor-pointer text-xs"
+              title="Print or Export PDF Report"
+            >
+              <FileText size={14} className="text-primary-600 dark:text-primary-400" /> Export PDF
+            </button>
             <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5">
               <Calendar size={14} className="text-slate-400" />
               <select
@@ -354,16 +368,51 @@ export const Reports: React.FC = () => {
       {/* 1. IMPORT SUMMARY TAB */}
       {tab === 'import_summary' && (
         <div className="space-y-4">
-          <div className="card p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Feed Import Volume & Master Catalog Category Share</h3>
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie data={catalogPie} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
-                  {catalogPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                </Pie>
-                <Tooltip formatter={(v) => (v as number).toLocaleString()} contentStyle={{ borderRadius: '12px', fontSize: '12px' }} />
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+            {[
+              { label: 'TOTAL IMPORTED SKUS', value: '84,329 SKUs', color: 'text-slate-900 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800', sub: 'Across 5 active supplier feeds' },
+              { label: 'FEED VALIDATION PASS RATE', value: '98.4%', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50', sub: 'Passed Validation Rules' },
+              { label: 'FAILED IMPORT RECORDS', value: '843 Records', color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50', sub: 'Pending review in Validation' },
+              { label: 'STOREFRONT PUBLISHED RATE', value: '99.2%', color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/50', sub: 'Published across channels' },
+            ].map((card, i) => (
+              <div key={i} className={`p-4 rounded-2xl shadow-xs flex flex-col justify-between transition-all duration-200 ${card.bg}`}>
+                <p className="text-[10px] sm:text-2xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">{card.label}</p>
+                <p className={`text-xl sm:text-2xl font-black tracking-tight my-1 ${card.color}`}>{card.value}</p>
+                <p className="text-2xs text-slate-500 dark:text-slate-400 font-semibold">{card.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="card p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Feed Import Volume & Master Catalog Category Share</h3>
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Pie data={catalogPie} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
+                    {catalogPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip formatter={(v) => (v as number).toLocaleString()} contentStyle={{ borderRadius: '12px', fontSize: '12px' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="card p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Category Volume & Quality Index</h3>
+              <div className="space-y-3">
+                {catalogPie.map((cat, idx) => (
+                  <div key={cat.name} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/70 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
+                      <span className="font-bold text-slate-800 dark:text-slate-200">{cat.name}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-slate-500">{cat.value.toLocaleString()} SKUs</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">99.5% Health</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -214,11 +214,13 @@ export interface SyncJob {
   supplierName?: string
   storeId?: string
   storeName?: string
-  status: 'running' | 'queued' | 'completed' | 'failed' | 'cancelled'
+  status: 'running' | 'queued' | 'completed' | 'failed' | 'cancelled' | 'paused'
   progress: number
   totalItems: number
   processedItems: number
   failedItems: number
+  retryAttempts?: number
+  maxRetries?: number
   startedAt?: string
   completedAt?: string
   scheduledAt?: string

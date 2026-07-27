@@ -1,6 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { Bell, Search, ChevronDown, Menu, Sun, Moon, Zap, User, LogOut, Settings, X, Package, Truck, Tag, Award, Briefcase, FileText, Layers, ShieldCheck } from 'lucide-react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import {
+  Bell, Search, ChevronDown, Menu, Sun, Moon, Zap, User, LogOut, X,
+  Package, Truck, FileText, Layers, ShieldCheck, Briefcase, Award, Tag, AlertTriangle
+} from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { getInitials } from '../../utils'
 import type { UserRole } from '../../types'
@@ -16,6 +19,51 @@ const ROLE_LABELS: Record<UserRole, string> = {
   operations_staff:    'Read Only',
 }
 
+interface SearchItem {
+  id: string
+  title: string
+  subtitle: string
+  category: 'products' | 'suppliers' | 'manufacturers' | 'brands' | 'categories' | 'skus' | 'jobs' | 'logs'
+  badge: string
+  badgeColor: string
+  path: string
+  icon: React.ReactNode
+}
+
+const SEARCH_DATABASE: SearchItem[] = [
+  // Products & SKUs
+  { id: 'p1', title: 'AMD Ryzen 9 7950X Processor 16-Core', subtitle: 'Master SKU: CPU-AMD-7950X · AMD Processor Category', category: 'products', badge: 'Product', badgeColor: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-400 dark:border-emerald-900/60', path: '/catalog/products', icon: <Package size={16} className="text-emerald-600 dark:text-emerald-400" /> },
+  { id: 'p2', title: 'NVIDIA GeForce RTX 4090 24GB OC Edition', subtitle: 'Master SKU: GPU-NV-4090 · NVIDIA Graphics Card', category: 'products', badge: 'Product', badgeColor: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-400 dark:border-emerald-900/60', path: '/catalog/products', icon: <Package size={16} className="text-emerald-600 dark:text-emerald-400" /> },
+  { id: 'p3', title: 'DDR5 32GB 6000MHz RGB Memory Kit', subtitle: 'Master SKU: RAM-DDR5-001 · Corsair PC RAM', category: 'products', badge: 'Product', badgeColor: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-400 dark:border-emerald-900/60', path: '/catalog/products', icon: <Package size={16} className="text-emerald-600 dark:text-emerald-400" /> },
+  { id: 'p4', title: 'Samsung 990 Pro 2TB NVMe PCIe 4.0 SSD', subtitle: 'Master SKU: SSD-990P-2TB · Samsung Storage', category: 'products', badge: 'Product', badgeColor: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-400 dark:border-emerald-900/60', path: '/catalog/products', icon: <Package size={16} className="text-emerald-600 dark:text-emerald-400" /> },
+  { id: 'sku1', title: 'SKU: CPU-AMD-7950X', subtitle: 'Product: AMD Ryzen 9 7950X · Supplier: TechParts Int.', category: 'skus', badge: 'SKU', badgeColor: 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-400 dark:border-indigo-900/60', path: '/catalog/products', icon: <Tag size={16} className="text-indigo-600 dark:text-indigo-400" /> },
+  { id: 'sku2', title: 'SKU: GPU-NV-4090', subtitle: 'Product: NVIDIA RTX 4090 · Supplier: TechParts Int.', category: 'skus', badge: 'SKU', badgeColor: 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-400 dark:border-indigo-900/60', path: '/catalog/products', icon: <Tag size={16} className="text-indigo-600 dark:text-indigo-400" /> },
+
+  // Suppliers
+  { id: 'sup1', title: 'TechParts International', subtitle: 'Protocol: REST API v2 · 18,420 SKUs Active Feed', category: 'suppliers', badge: 'Supplier', badgeColor: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/60 dark:text-amber-400 dark:border-amber-900/60', path: '/suppliers', icon: <Truck size={16} className="text-amber-600 dark:text-amber-400" /> },
+  { id: 'sup2', title: 'GlobalSource Ltd.', subtitle: 'Protocol: SFTP (CSV) · 14,800 SKUs Active Feed', category: 'suppliers', badge: 'Supplier', badgeColor: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/60 dark:text-amber-400 dark:border-amber-900/60', path: '/suppliers', icon: <Truck size={16} className="text-amber-600 dark:text-amber-400" /> },
+  { id: 'sup3', title: 'PrimeSupply Corp', subtitle: 'Protocol: FTP (XML) · 11,200 SKUs Active Feed', category: 'suppliers', badge: 'Supplier', badgeColor: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/60 dark:text-amber-400 dark:border-amber-900/60', path: '/suppliers', icon: <Truck size={16} className="text-amber-600 dark:text-amber-400" /> },
+  { id: 'sup4', title: 'Acme Distributors', subtitle: 'Protocol: Excel Feed Upload · 9,800 SKUs Feed', category: 'suppliers', badge: 'Supplier', badgeColor: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/60 dark:text-amber-400 dark:border-amber-900/60', path: '/suppliers', icon: <Truck size={16} className="text-amber-600 dark:text-amber-400" /> },
+
+  // Manufacturers & Brands
+  { id: 'm1', title: 'NVIDIA Corporation', subtitle: 'Manufacturer Partner · GPU & AI Accelerators', category: 'manufacturers', badge: 'Manufacturer', badgeColor: 'bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950/60 dark:text-purple-400 dark:border-purple-900/60', path: '/catalog/manufacturers', icon: <Award size={16} className="text-purple-600 dark:text-purple-400" /> },
+  { id: 'm2', title: 'Advanced Micro Devices (AMD)', subtitle: 'Manufacturer Partner · CPUs & GPUs', category: 'manufacturers', badge: 'Manufacturer', badgeColor: 'bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950/60 dark:text-purple-400 dark:border-purple-900/60', path: '/catalog/manufacturers', icon: <Award size={16} className="text-purple-600 dark:text-purple-400" /> },
+  { id: 'b1', title: 'Corsair Components', subtitle: 'Brand Partner · PC Memory, Power Supplies & Cooling', category: 'brands', badge: 'Brand', badgeColor: 'bg-pink-50 text-pink-600 border-pink-200 dark:bg-pink-950/60 dark:text-pink-400 dark:border-pink-900/60', path: '/catalog/brands', icon: <Award size={16} className="text-pink-600 dark:text-pink-400" /> },
+  { id: 'b2', title: 'Samsung Electronics', subtitle: 'Brand Partner · High Performance Solid State Drives', category: 'brands', badge: 'Brand', badgeColor: 'bg-pink-50 text-pink-600 border-pink-200 dark:bg-pink-950/60 dark:text-pink-400 dark:border-pink-900/60', path: '/catalog/brands', icon: <Award size={16} className="text-pink-600 dark:text-pink-400" /> },
+
+  // Categories
+  { id: 'c1', title: 'Computer Processors (CPUs)', subtitle: 'Category Taxonomy · 1,420 Master SKUs', category: 'categories', badge: 'Category', badgeColor: 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/60 dark:text-blue-400 dark:border-blue-900/60', path: '/catalog/categories', icon: <Tag size={16} className="text-blue-600 dark:text-blue-400" /> },
+  { id: 'c2', title: 'Graphics Cards (GPUs)', subtitle: 'Category Taxonomy · 2,100 Master SKUs', category: 'categories', badge: 'Category', badgeColor: 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/60 dark:text-blue-400 dark:border-blue-900/60', path: '/catalog/categories', icon: <Tag size={16} className="text-blue-600 dark:text-blue-400" /> },
+
+  // Jobs
+  { id: 'j1', title: 'Full Catalog Inventory Sync', subtitle: 'Background Execution Job ID: job_84290 · 100% Synced', category: 'jobs', badge: 'Sync Job', badgeColor: 'bg-cyan-50 text-cyan-600 border-cyan-200 dark:bg-cyan-950/60 dark:text-cyan-400 dark:border-cyan-900/60', path: '/sync/jobs', icon: <Briefcase size={16} className="text-cyan-600 dark:text-cyan-400" /> },
+  { id: 'j2', title: 'Storefront Price Push Execution', subtitle: 'Background Execution Job ID: job_84291 · Running', category: 'jobs', badge: 'Sync Job', badgeColor: 'bg-cyan-50 text-cyan-600 border-cyan-200 dark:bg-cyan-950/60 dark:text-cyan-400 dark:border-cyan-900/60', path: '/sync/jobs', icon: <Briefcase size={16} className="text-cyan-600 dark:text-cyan-400" /> },
+
+  // Logs & Validation Errors
+  { id: 'l1', title: 'Missing Pricing Error (SKU-ERR-994)', subtitle: 'Validation Issue: Retail price missing · Pending Review', category: 'logs', badge: 'Validation Log', badgeColor: 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-900/60', path: '/validation', icon: <AlertTriangle size={16} className="text-rose-600 dark:text-rose-400" /> },
+  { id: 'l2', title: 'Duplicate UPC Code Error (SKU-ERR-102)', subtitle: 'Validation Issue: Duplicate UPC detected · Pending Review', category: 'logs', badge: 'Validation Log', badgeColor: 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-900/60', path: '/validation', icon: <AlertTriangle size={16} className="text-rose-600 dark:text-rose-400" /> },
+]
+
 interface HeaderProps {
   onMenuClick: () => void
   darkMode: boolean
@@ -23,6 +71,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleDark }) => {
+  const navigate = useNavigate()
   const { currentUser, role, logout, openCurrentUserProfile } = useAuth()
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
@@ -61,6 +110,30 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // --- Dynamic Search Result Filtering ---
+  const filteredSearchResults = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase()
+
+    return SEARCH_DATABASE.filter(item => {
+      // Category Match
+      const matchCategory = searchCategory === 'all' || item.category === searchCategory
+
+      // Query Match
+      const matchQuery =
+        query === '' ||
+        item.title.toLowerCase().includes(query) ||
+        item.subtitle.toLowerCase().includes(query) ||
+        item.badge.toLowerCase().includes(query)
+
+      return matchCategory && matchQuery
+    })
+  }, [searchQuery, searchCategory])
+
+  const handleSelectResult = (path: string) => {
+    setShowSearchModal(false)
+    navigate(path)
+  }
 
   const notifications = [
     { id: 1, message: 'QuickShip sync failed — 256 items', time: '1 min ago', type: 'error' },
@@ -257,9 +330,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
                 <button
                   key={cat.id}
                   onClick={() => setSearchCategory(cat.id)}
-                  className={`px-2.5 py-1 rounded-lg text-2xs font-bold whitespace-nowrap transition-all ${
+                  className={`px-2.5 py-1 rounded-lg text-2xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                     searchCategory === cat.id
-                      ? 'bg-primary-600 text-white shadow-xs'
+                      ? 'bg-amber-500 text-white shadow-xs'
                       : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
                   }`}
                 >
@@ -268,46 +341,76 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
               ))}
             </div>
 
-            {/* Search Results List */}
-            <div className="p-4 overflow-y-auto space-y-3 flex-1">
-              {searchQuery.trim() === '' ? (
+            {/* Search Results List / Command Palette Body */}
+            <div className="p-4 overflow-y-auto space-y-4 flex-1 max-h-[400px]">
+              {searchQuery.trim() === '' && searchCategory === 'all' ? (
+                <div className="space-y-4">
+                  {/* Quick Navigation Shortcuts */}
+                  <div>
+                    <p className="text-2xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Quick Navigation Shortcuts</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {[
+                        { label: 'Master Catalog', path: '/catalog/products', icon: <Package size={14} className="text-primary-600 dark:text-primary-400" /> },
+                        { label: 'Validation Center', path: '/validation', icon: <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400" /> },
+                        { label: 'Supplier Management', path: '/suppliers', icon: <Truck size={14} className="text-amber-600 dark:text-amber-400" /> },
+                        { label: 'Queue Management', path: '/sync/jobs', icon: <Briefcase size={14} className="text-cyan-600 dark:text-cyan-400" /> },
+                        { label: 'Inventory Sync', path: '/sync/inventory', icon: <Layers size={14} className="text-indigo-600 dark:text-indigo-400" /> },
+                        { label: 'Operational Reports', path: '/reports', icon: <FileText size={14} className="text-violet-600 dark:text-violet-400" /> },
+                      ].map(item => (
+                        <div
+                          key={item.path}
+                          onClick={() => handleSelectResult(item.path)}
+                          className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer"
+                        >
+                          {item.icon}
+                          <span className="truncate">{item.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Popular Searches */}
+                  <div>
+                    <p className="text-2xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Popular Searches</p>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {['RTX 4090', 'TechParts International', 'CPU-AMD-7950X', 'Missing Pricing', 'Full Sync Job'].map(tag => (
+                        <button
+                          key={tag}
+                          onClick={() => setSearchQuery(tag)}
+                          className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-primary-950/40 text-slate-600 dark:text-slate-300 hover:text-primary-600 text-2xs font-semibold transition-all border border-slate-200/80 dark:border-slate-700/80 cursor-pointer"
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : filteredSearchResults.length === 0 ? (
                 <div className="text-center py-8 text-slate-400 text-xs">
-                  Type to search across SupplyBridge Master Catalog, Suppliers, SKUs, and Background Jobs.
+                  No matching results found for <span className="font-bold text-slate-600 dark:text-slate-300">"{searchQuery || searchCategory}"</span>.
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <Package size={16} className="text-primary-600 dark:text-primary-400" />
-                      <div>
-                        <p className="text-xs font-bold text-slate-800 dark:text-slate-100">{searchQuery} - Master Product SKU</p>
-                        <p className="text-2xs text-slate-400">Master Catalog Product Result</p>
+                  {filteredSearchResults.map(item => (
+                    <div
+                      key={item.id}
+                      onClick={() => handleSelectResult(item.path)}
+                      className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60 flex items-center justify-between hover:border-primary-300 dark:hover:border-primary-700 transition-all cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                          {item.icon}
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-800 dark:text-slate-100">{item.title}</p>
+                          <p className="text-2xs text-slate-400 mt-0.5">{item.subtitle}</p>
+                        </div>
                       </div>
+                      <span className={`text-2xs font-bold px-2 py-0.5 rounded-full border ${item.badgeColor}`}>
+                        {item.badge}
+                      </span>
                     </div>
-                    <span className="text-2xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full">Product</span>
-                  </div>
-
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <Truck size={16} className="text-amber-600 dark:text-amber-400" />
-                      <div>
-                        <p className="text-xs font-bold text-slate-800 dark:text-slate-100">TechParts International Supplier</p>
-                        <p className="text-2xs text-slate-400">REST API Connection Partner</p>
-                      </div>
-                    </div>
-                    <span className="text-2xs font-bold text-amber-600 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full">Supplier</span>
-                  </div>
-
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <Briefcase size={16} className="text-cyan-600 dark:text-cyan-400" />
-                      <div>
-                        <p className="text-xs font-bold text-slate-800 dark:text-slate-100">Inventory Sync Execution Job</p>
-                        <p className="text-2xs text-slate-400">Background Sync Job ID: job_84290</p>
-                      </div>
-                    </div>
-                    <span className="text-2xs font-bold text-cyan-600 bg-cyan-50 dark:bg-cyan-950/60 px-2 py-0.5 rounded-full">Job</span>
-                  </div>
+                  ))}
                 </div>
               )}
             </div>

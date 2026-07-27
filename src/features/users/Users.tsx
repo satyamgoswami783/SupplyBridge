@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { UserPlus, MoreVertical, Edit, Ban, CheckCircle2, Mail, Eye, Shield, Users as UsersIcon } from 'lucide-react'
-import { SectionHeader, FilterBar, ConfirmDialog } from '../../components/ui'
+import { UserPlus, Ban, CheckCircle2, Mail, Eye, ShieldCheck, AlertCircle, AlertTriangle } from 'lucide-react'
+import { SectionHeader, FilterBar } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { mockUsers } from '../../data/mockData'
@@ -31,6 +31,13 @@ const ROLE_COLORS: Record<UserRole, string> = {
   operations_staff:    'neutral',
 } as any
 
+const ROLE_DESCRIPTIONS: Record<string, string> = {
+  platform_owner:  'Full unrestricted control over system configuration, user management, security, and global middleware settings.',
+  administrator:   'Manage catalog, suppliers, stores, data mappings, validation rules, and team member accounts.',
+  catalog_manager: 'Create, edit, and validate catalog products, taxonomy categories, pricing, and supplier sync settings.',
+  read_only:       'View catalog, inventory levels, pricing, sync status, and system activity logs without edit permissions.',
+}
+
 export const Users: React.FC = () => {
   const { setViewProfileUser } = useAuth()
   const [usersList, setUsersList] = useState<User[]>(mockUsers)
@@ -44,32 +51,86 @@ export const Users: React.FC = () => {
   const [inviteName, setInviteName] = useState('')
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState<UserRole>('catalog_manager')
-  const [inviteDept, setInviteDept] = useState('Catalog & Merchandising')
+  const [formError, setFormError] = useState<string | null>(null)
 
   const showNotification = (msg: string) => {
     setToastMessage(msg)
-    setTimeout(() => setToastMessage(null), 3000)
+    setTimeout(() => setToastMessage(null), 3500)
+  }
+
+  // Email Validation Regex
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+  }
+
+  // Duplicate Check
+  const isDuplicateEmail = usersList.some(
+    u => u.email.toLowerCase() === inviteEmail.trim().toLowerCase()
+  )
+
+  // Platform Owner Reserved Role Check
+  const existingOwnersCount = usersList.filter(
+    u => (u.role === 'platform_owner' || u.role === 'super_admin') && u.status !== 'inactive'
+  ).length
+  const isOwnerReserved = inviteRole === 'platform_owner' && existingOwnersCount >= 1
+
+  // Overall Form Validation
+  const isFormValid =
+    inviteName.trim().length >= 2 &&
+    isValidEmail(inviteEmail) &&
+    !isDuplicateEmail &&
+    !isOwnerReserved
+
+  const handleOpenInvite = () => {
+    setInviteName('')
+    setInviteEmail('')
+    setInviteRole('catalog_manager')
+    setFormError(null)
+    setInviteOpen(true)
   }
 
   const handleSendInvite = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!inviteName.trim() || !inviteEmail.trim()) return
+    setFormError(null)
+
+    const cleanName = inviteName.trim()
+    const cleanEmail = inviteEmail.trim().toLowerCase()
+
+    if (!cleanName) {
+      setFormError('Please enter a valid full name.')
+      return
+    }
+
+    if (!isValidEmail(cleanEmail)) {
+      setFormError('Please enter a valid email address format (e.g. name@domain.com).')
+      return
+    }
+
+    if (isDuplicateEmail) {
+      setFormError(`A user or pending invitation with email "${cleanEmail}" already exists.`)
+      return
+    }
+
+    if (isOwnerReserved) {
+      setFormError('Platform Owner is a reserved system role and cannot be assigned to additional users.')
+      return
+    }
 
     const newUser: User = {
       id: `u_${Date.now()}`,
-      name: inviteName.trim(),
-      email: inviteEmail.trim(),
+      name: cleanName,
+      email: cleanEmail,
       role: inviteRole,
       status: 'invited',
       createdAt: new Date().toISOString(),
-      department: inviteDept.trim() || 'Operations',
+      department: inviteRole === 'catalog_manager' ? 'Catalog & Merchandising' : inviteRole === 'administrator' ? 'Operations' : 'Platform Governance',
     }
 
     setUsersList(prev => [newUser, ...prev])
     setInviteOpen(false)
     setInviteName('')
     setInviteEmail('')
-    showNotification(`Invitation sent to ${newUser.email}! User added with role ${ROLE_LABELS[inviteRole]}.`)
+    showNotification(`Invitation email sent to ${newUser.email}! Account provisioned as ${ROLE_LABELS[inviteRole]}.`)
   }
 
   const toggleUserStatus = (user: User) => {
@@ -77,7 +138,7 @@ export const Users: React.FC = () => {
     setUsersList(prev =>
       prev.map(u => (u.id === user.id ? { ...u, status: nextStatus } : u))
     )
-    showNotification(`User ${user.name} is now ${nextStatus.toUpperCase()}`)
+    showNotification(`User ${user.name} account status updated to ${nextStatus.toUpperCase()}`)
   }
 
   const filtered = usersList.filter(u => {
@@ -108,13 +169,13 @@ export const Users: React.FC = () => {
         title="User Management & Access Control"
         subtitle={`${usersList.length} total team members — ${usersList.filter(u => u.status === 'active').length} active, ${usersList.filter(u => u.status === 'invited').length} pending invitation`}
         actions={
-          <button onClick={() => setInviteOpen(true)} className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20">
+          <button onClick={handleOpenInvite} className="btn-primary btn-sm flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer">
             <UserPlus size={14} /> Invite New User
           </button>
         }
       />
 
-      {/* KPI Cards */}
+      {/* KPI Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label: 'Total Users', value: usersList.length, color: 'text-slate-800 dark:text-slate-100' },
@@ -122,7 +183,7 @@ export const Users: React.FC = () => {
           { label: 'Pending Invites', value: usersList.filter(u => u.status === 'invited').length, color: 'text-amber-600 dark:text-amber-400' },
           { label: 'Inactive / Suspended', value: usersList.filter(u => u.status === 'inactive').length, color: 'text-slate-400' },
         ].map(s => (
-          <div key={s.label} className="card px-4 py-3 text-center">
+          <div key={s.label} className="card px-4 py-3 text-center border border-slate-200/90 dark:border-slate-800">
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
             <p className="text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
           </div>
@@ -132,7 +193,10 @@ export const Users: React.FC = () => {
       <FilterBar search={search} onSearch={setSearch} placeholder="Search team members by name or email...">
         <select className="select input-sm w-auto min-w-[140px]" value={roleFilter} onChange={e => setRoleFilter(e.target.value)}>
           <option value="all">All Roles</option>
-          {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          <option value="platform_owner">Platform Owner</option>
+          <option value="administrator">Administrator</option>
+          <option value="catalog_manager">Catalog Manager</option>
+          <option value="read_only">Read Only</option>
         </select>
         <select className="select input-sm w-auto min-w-[130px]" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option value="all">All Status</option>
@@ -156,7 +220,7 @@ export const Users: React.FC = () => {
                 <th className="text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filtered.map(user => (
                 <tr key={user.id} className="cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-850/50 transition-colors" onClick={() => setViewProfileUser(user)}>
                   <td data-label="User">
@@ -166,7 +230,7 @@ export const Users: React.FC = () => {
                       </div>
                       <div>
                         <p className="font-bold text-slate-800 dark:text-slate-100 text-sm hover:text-primary-600 transition-colors">{user.name}</p>
-                        <p className="text-2xs text-slate-400 dark:text-slate-400">{user.email}</p>
+                        <p className="text-2xs text-slate-400 dark:text-slate-400 font-mono">{user.email}</p>
                       </div>
                     </div>
                   </td>
@@ -183,13 +247,13 @@ export const Users: React.FC = () => {
                   <td data-label="Joined"><span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{formatDate(user.createdAt)}</span></td>
                   <td data-label="Actions" className="text-right" onClick={e => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-1">
-                      <button className="btn-icon" onClick={() => setViewProfileUser(user)} title="View User Profile"><Eye size={14} /></button>
+                      <button className="btn-icon cursor-pointer" onClick={() => setViewProfileUser(user)} title="View User Profile"><Eye size={14} /></button>
                       {user.status === 'active' ? (
-                        <button className="btn-icon text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/60" onClick={() => toggleUserStatus(user)} title="Suspend User Account">
+                        <button className="btn-icon text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/60 cursor-pointer" onClick={() => toggleUserStatus(user)} title="Suspend User Account">
                           <Ban size={14} />
                         </button>
                       ) : (
-                        <button className="btn-icon text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/60" onClick={() => toggleUserStatus(user)} title="Activate User Account">
+                        <button className="btn-icon text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 cursor-pointer" onClick={() => toggleUserStatus(user)} title="Activate User Account">
                           <CheckCircle2 size={14} />
                         </button>
                       )}
@@ -202,67 +266,120 @@ export const Users: React.FC = () => {
         </div>
       </div>
 
-      {/* INVITE USER MODAL */}
+      {/* --- REFINED INVITE TEAM MEMBER MODAL --- */}
       <Modal
         open={inviteOpen}
         onClose={() => setInviteOpen(false)}
-        title="Invite New Team Member"
-        subtitle="Provision platform access and send an activation email"
+        title="Invite Team Member"
+        subtitle="Provision user permissions and dispatch email invitation"
         size="md"
       >
         <form onSubmit={handleSendInvite} className="space-y-4">
+          {formError && (
+            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2">
+              <AlertCircle size={16} className="text-rose-500 flex-shrink-0" />
+              <span>{formError}</span>
+            </div>
+          )}
+
+          {/* 1. Full Name */}
           <div>
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Full Name *</label>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+              Full Name <span className="text-rose-500">*</span>
+            </label>
             <input
               type="text"
               required
-              placeholder="e.g. David Miller"
-              className="input"
+              placeholder="e.g. Sarah Jenkins"
+              className="input text-xs"
               value={inviteName}
-              onChange={e => setInviteName(e.target.value)}
+              onChange={e => {
+                setInviteName(e.target.value)
+                setFormError(null)
+              }}
             />
           </div>
 
+          {/* 2. Email Address */}
           <div>
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Email Address *</label>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+              Email Address <span className="text-rose-500">*</span>
+            </label>
             <input
               type="email"
               required
-              placeholder="david@supplybridge.io"
-              className="input"
+              placeholder="sarah@supplybridge.io"
+              className={`input text-xs ${
+                inviteEmail && (!isValidEmail(inviteEmail) || isDuplicateEmail)
+                  ? 'border-rose-400 dark:border-rose-600 focus:ring-rose-500/20'
+                  : ''
+              }`}
               value={inviteEmail}
-              onChange={e => setInviteEmail(e.target.value)}
+              onChange={e => {
+                setInviteEmail(e.target.value)
+                setFormError(null)
+              }}
             />
+            {inviteEmail && !isValidEmail(inviteEmail) && (
+              <p className="text-2xs text-rose-500 font-semibold mt-1">Please enter a valid email address format.</p>
+            )}
+            {inviteEmail && isDuplicateEmail && (
+              <p className="text-2xs text-rose-500 font-semibold mt-1">An account or pending invitation already exists for this email.</p>
+            )}
           </div>
 
+          {/* 3. Platform Role Selection */}
           <div>
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Assign Platform Role *</label>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+              Platform Role <span className="text-rose-500">*</span>
+            </label>
             <select
-              className="select"
+              className="select text-xs font-medium"
               value={inviteRole}
-              onChange={e => setInviteRole(e.target.value as UserRole)}
+              onChange={e => {
+                setInviteRole(e.target.value as UserRole)
+                setFormError(null)
+              }}
             >
-              <option value="platform_owner">Platform Owner</option>
+              <option value="platform_owner" disabled={existingOwnersCount >= 1}>
+                Platform Owner {existingOwnersCount >= 1 ? '(Reserved System Role)' : ''}
+              </option>
               <option value="administrator">Administrator</option>
               <option value="catalog_manager">Catalog Manager</option>
               <option value="read_only">Read Only</option>
             </select>
+
+            {/* Dynamic Role Permission Description */}
+            <div className="mt-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-800 text-2xs text-slate-600 dark:text-slate-300 font-medium">
+              <span className="font-bold text-slate-800 dark:text-slate-100 block mb-0.5">
+                Role Permissions ({ROLE_LABELS[inviteRole]}):
+              </span>
+              {ROLE_DESCRIPTIONS[inviteRole]}
+            </div>
+
+            {/* Reserved System Role Protection Warning */}
+            {isOwnerReserved && (
+              <div className="mt-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-amber-800 dark:text-amber-300 text-2xs font-semibold flex items-start gap-2">
+                <AlertTriangle size={15} className="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold block">Reserved Single System Role</span>
+                  Platform Owner is a restricted system role. Additional owner accounts cannot be created unless authorized by system configuration.
+                </div>
+              </div>
+            )}
           </div>
 
-          <div>
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Department</label>
-            <input
-              type="text"
-              placeholder="e.g. Supplier Integration / Merchandising"
-              className="input"
-              value={inviteDept}
-              onChange={e => setInviteDept(e.target.value)}
-            />
-          </div>
-
-          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-            <button type="button" onClick={() => setInviteOpen(false)} className="btn-secondary">Cancel</button>
-            <button type="submit" className="btn-primary flex items-center gap-1.5 shadow-md shadow-indigo-500/20">
+          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <button type="button" onClick={() => setInviteOpen(false)} className="btn-secondary text-xs">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={!isFormValid}
+              className={`btn-primary text-xs flex items-center gap-1.5 shadow-md shadow-indigo-500/20 ${
+                !isFormValid ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+              }`}
+            >
               <Mail size={14} /> Send Invitation Email
             </button>
           </div>
