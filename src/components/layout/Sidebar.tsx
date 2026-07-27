@@ -59,7 +59,7 @@ const NAV_ITEMS: NavItem[] = [
       { id: 'inventory-sync', label: 'Inventory Sync',   icon: <RefreshCw size={16} />, path: '/sync/inventory', module: 'inventory_sync' },
       { id: 'pricing-sync',   label: 'Pricing Sync',     icon: <DollarSign size={16} />,path: '/sync/pricing',   module: 'pricing_sync' },
       { id: 'image-sync',     label: 'Image Sync',       icon: <Image size={16} />,     path: '/sync/images',    module: 'image_sync' },
-      { id: 'website-sync',   label: 'Website Sync',     icon: <Globe size={16} />,     path: '/sync/website',   module: 'website_sync' },
+      { id: 'website-sync',   label: 'Store Synchronization', icon: <Globe size={16} />,     path: '/sync/website',   module: 'website_sync' },
     ],
   },
   { id: 'reports', label: 'Reports', icon: <BarChart3 size={18} />, path: '/reports', module: 'reports' },

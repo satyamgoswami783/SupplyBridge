@@ -65,8 +65,8 @@ export const AppRouter: React.FC = () => (
           <Route path="inventory" element={<ProtectedRoute module="inventory_sync" moduleName="Inventory Sync"><InventorySync /></ProtectedRoute>} />
           <Route path="pricing" element={<ProtectedRoute module="pricing_sync" moduleName="Pricing Sync"><PricingSync /></ProtectedRoute>} />
           <Route path="images" element={<ProtectedRoute module="image_sync" moduleName="Image Sync"><ImageSync /></ProtectedRoute>} />
-          <Route path="website" element={<ProtectedRoute module="website_sync" moduleName="Website Sync"><WebsiteSync /></ProtectedRoute>} />
-          <Route path="jobs" element={<ProtectedRoute module="sync_jobs" moduleName="Sync Jobs"><SyncJobs /></ProtectedRoute>} />
+          <Route path="website" element={<ProtectedRoute module="website_sync" moduleName="Store Synchronization"><WebsiteSync /></ProtectedRoute>} />
+          <Route path="jobs" element={<ProtectedRoute module="sync_jobs" moduleName="Queue Management"><SyncJobs /></ProtectedRoute>} />
         </Route>
         {/* Direct Route Aliases */}
         <Route path="inventory_sync" element={<Navigate to="/sync/inventory" replace />} />

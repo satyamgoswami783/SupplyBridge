@@ -62,7 +62,7 @@ export const StoreManagement: React.FC = () => {
   const handleOpenStoreWebsite = (store: Store, e: React.MouseEvent) => {
     e.stopPropagation()
     navigate('/sync/website')
-    showNotification(`Navigated to Website Sync status for ${store.name}`)
+    showNotification(`Navigated to Store Synchronization for ${store.name}`)
   }
 
   const handleOpenAdd = () => {
@@ -164,11 +164,20 @@ export const StoreManagement: React.FC = () => {
 
       <SectionHeader
         title="Store Management"
-        subtitle="Manage Shift4Shop websites and multi-store catalog synchronization status"
+        subtitle="Manage connected multi-channel ecommerce storefronts and store catalog synchronization status"
         actions={
-          <button onClick={handleOpenAdd} className="btn-primary btn-sm flex items-center gap-1.5 cursor-pointer">
-            <Plus size={14} /> Add Store Connection
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/sync/website')}
+              className="btn-secondary btn-sm flex items-center gap-1.5 cursor-pointer font-bold text-xs"
+              title="Go to Store Synchronization Page"
+            >
+              <Globe size={14} className="text-primary-600 dark:text-primary-400" /> Store Synchronization
+            </button>
+            <button onClick={handleOpenAdd} className="btn-primary btn-sm flex items-center gap-1.5 cursor-pointer text-xs">
+              <Plus size={14} /> Add Store Connection
+            </button>
+          </div>
         }
       />
 

@@ -9,9 +9,9 @@ import type { Role } from '../../types'
 
 const ALL_MODULES = [
   'Dashboard', 'Suppliers', 'Integrations', 'Master Catalog', 'Categories', 'Brands',
-  'Variants', 'Mapping', 'Validation', 'Inventory Sync', 'Pricing Sync', 'Image Sync',
-  'Store Management', 'Website Sync', 'Sync Jobs', 'Import Queue', 'Logs', 'Monitoring',
-  'Reports', 'Users', 'Roles', 'Permissions', 'Settings'
+  'Manufacturers', 'Variants', 'Media Library', 'Data Mapping', 'Validation', 'Inventory Sync',
+  'Pricing Sync', 'Image Sync', 'Store Management', 'Store Synchronization', 'Queue Management',
+  'Logs', 'Monitoring', 'Reports', 'Users', 'Roles', 'Permissions', 'Settings'
 ]
 
 const DEPARTMENTS = [

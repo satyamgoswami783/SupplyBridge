@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   RefreshCw, CheckCircle2, TrendingDown, TrendingUp,
-  Search, Download, Sliders, AlertTriangle, Layers, Filter, X
+  Search, Download, Sliders, AlertTriangle, Layers, Filter, X, Eye, RotateCcw
 } from 'lucide-react'
 import { SectionHeader, HealthIndicator, ProgressBar } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
@@ -15,32 +15,37 @@ export interface InventoryItem {
   supplier: string
   supplierStock: number
   buffer: number
-  websiteStock: number
-  isError?: boolean
+  storefrontStock: number
+  syncStatus: 'Synced' | 'Pending Push' | 'Out of Sync' | 'Error' | 'Syncing'
   lastSync: string
+  updatedAt: string
 }
 
 const INITIAL_ITEMS: InventoryItem[] = [
-  { id: 'inv1', name: 'AMD Ryzen 9 7950X Processor 16-Core', sku: 'CPU-AMD-7950X', supplier: 'TechParts International', supplierStock: 450, buffer: 5, websiteStock: 445, lastSync: '4 min ago' },
-  { id: 'inv2', name: 'NVIDIA GeForce RTX 4090 24GB OC', sku: 'GPU-NV-4090', supplier: 'TechParts International', supplierStock: 18, buffer: 3, websiteStock: 12, lastSync: '12 min ago' },
-  { id: 'inv3', name: 'DDR5 32GB 6000MHz RGB Memory Kit', sku: 'RAM-DDR5-001', supplier: 'TechParts International', supplierStock: 325, buffer: 5, websiteStock: 320, lastSync: '18 min ago' },
-  { id: 'inv4', name: 'Samsung 990 Pro 2TB NVMe PCIe 4.0 SSD', sku: 'SSD-990P-2TB', supplier: 'GlobalSource Limited', supplierStock: 195, buffer: 5, websiteStock: 180, lastSync: '28 min ago' },
-  { id: 'inv5', name: 'Corsair RM1000x 1000W 80+ Gold Modular PSU', sku: 'PSU-COR-1000W', supplier: 'GlobalSource Limited', supplierStock: 0, buffer: 2, websiteStock: 0, lastSync: '1 hr ago' },
-  { id: 'inv6', name: 'ASUS ROG Swift 27" 1440P 240Hz Gaming Monitor', sku: 'MON-ASUS-27', supplier: 'PrimeSupply Corp', supplierStock: 82, buffer: 2, websiteStock: 80, lastSync: '2 hr ago' },
-  { id: 'inv7', name: 'Logitech MX Master 3S Wireless Mouse', sku: 'MOUSE-MX3S', supplier: 'AcmeDistributors', supplierStock: 120, buffer: 5, websiteStock: 90, isError: true, lastSync: '3 hr ago' },
-  { id: 'inv8', name: 'Keychron Q1 Pro Wireless Mechanical Keyboard', sku: 'KEY-Q1PRO', supplier: 'QuickShip LLC', supplierStock: 64, buffer: 2, websiteStock: 62, lastSync: '5 min ago' },
+  { id: 'inv1', name: 'AMD Ryzen 9 7950X Processor 16-Core', sku: 'CPU-AMD-7950X', supplier: 'TechParts International', supplierStock: 450, buffer: 5, storefrontStock: 445, syncStatus: 'Synced', lastSync: '4 min ago', updatedAt: '2026-07-27 16:20' },
+  { id: 'inv2', name: 'NVIDIA GeForce RTX 4090 24GB OC', sku: 'GPU-NV-4090', supplier: 'TechParts International', supplierStock: 18, buffer: 3, storefrontStock: 12, syncStatus: 'Out of Sync', lastSync: '12 min ago', updatedAt: '2026-07-27 16:10' },
+  { id: 'inv3', name: 'DDR5 32GB 6000MHz RGB Memory Kit', sku: 'RAM-DDR5-001', supplier: 'TechParts International', supplierStock: 325, buffer: 5, storefrontStock: 320, syncStatus: 'Synced', lastSync: '18 min ago', updatedAt: '2026-07-27 16:00' },
+  { id: 'inv4', name: 'Samsung 990 Pro 2TB NVMe PCIe 4.0 SSD', sku: 'SSD-990P-2TB', supplier: 'GlobalSource Limited', supplierStock: 195, buffer: 5, storefrontStock: 180, syncStatus: 'Pending Push', lastSync: '28 min ago', updatedAt: '2026-07-27 15:50' },
+  { id: 'inv5', name: 'Corsair RM1000x 1000W 80+ Gold Modular PSU', sku: 'PSU-COR-1000W', supplier: 'GlobalSource Limited', supplierStock: 0, buffer: 2, storefrontStock: 0, syncStatus: 'Synced', lastSync: '1 hr ago', updatedAt: '2026-07-27 15:00' },
+  { id: 'inv6', name: 'ASUS ROG Swift 27" 1440P 240Hz Gaming Monitor', sku: 'MON-ASUS-27', supplier: 'PrimeSupply Corp', supplierStock: 82, buffer: 2, storefrontStock: 80, syncStatus: 'Synced', lastSync: '2 hr ago', updatedAt: '2026-07-27 14:00' },
+  { id: 'inv7', name: 'Logitech MX Master 3S Wireless Mouse', sku: 'MOUSE-MX3S', supplier: 'Acme Distributors', supplierStock: 120, buffer: 5, storefrontStock: 90, syncStatus: 'Error', lastSync: '3 hr ago', updatedAt: '2026-07-27 13:00' },
+  { id: 'inv8', name: 'Keychron Q1 Pro Wireless Mechanical Keyboard', sku: 'KEY-Q1PRO', supplier: 'QuickShip LLC', supplierStock: 64, buffer: 2, storefrontStock: 62, syncStatus: 'Synced', lastSync: '5 min ago', updatedAt: '2026-07-27 16:22' },
 ]
 
 export const InventorySync: React.FC = () => {
   const [items, setItems] = useState<InventoryItem[]>(INITIAL_ITEMS)
-  const [syncing, setSyncing] = useState(false)
+  const [syncingAll, setSyncingAll] = useState(false)
   const [syncingItemId, setSyncingItemId] = useState<string | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+
+  // Filters & Searches
   const [search, setSearch] = useState('')
   const [supplierFilter, setSupplierFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [quickFilter, setQuickFilter] = useState('All')
 
-  // Safety Buffer Modal State
+  // Modals
+  const [viewItem, setViewItem] = useState<InventoryItem | null>(null)
   const [bufferModalOpen, setBufferModalOpen] = useState(false)
   const [globalBuffer, setGlobalBuffer] = useState(5)
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null)
@@ -51,48 +56,72 @@ export const InventorySync: React.FC = () => {
     setTimeout(() => setToastMessage(null), 3500)
   }
 
-  // Dynamic Item Computation Helpers
-  const getItemMetrics = (item: InventoryItem) => {
+  // --- Dynamic Inventory Metrics Formulas ---
+  // Available Stock = Math.max(0, Supplier Stock - Safety Buffer)
+  // Variance = Available Stock - Storefront Stock
+  const getItemCalculations = (item: InventoryItem) => {
     const buffer = Math.max(0, item.buffer)
     const availableStock = Math.max(0, item.supplierStock - buffer)
-    const variance = availableStock - item.websiteStock
-
-    let syncStatus: 'synced' | 'pending' | 'out_of_sync' | 'error' = 'synced'
-    if (item.isError) {
-      syncStatus = 'error'
-    } else if (variance === 0) {
-      syncStatus = 'synced'
-    } else if (item.websiteStock === 0 && availableStock > 0) {
-      syncStatus = 'pending'
-    } else {
-      syncStatus = 'out_of_sync'
-    }
-
-    return { availableStock, variance, syncStatus, buffer }
+    const variance = availableStock - item.storefrontStock
+    return { availableStock, variance, buffer }
   }
 
-  // Dynamic Telemetry Metrics derived strictly from state
+  // --- Summary Telemetry KPI Cards ---
   const totalInStockSKUs = items.filter(i => i.supplierStock > 0).length
   const totalInStockUnits = items.reduce((acc, i) => acc + i.supplierStock, 0)
-  const pendingSyncQueueCount = items.filter(i => {
-    const { syncStatus } = getItemMetrics(i)
-    return syncStatus === 'pending' || syncStatus === 'out_of_sync'
-  }).length
+  const pendingSyncQueueCount = items.filter(i => i.syncStatus === 'Pending Push' || i.syncStatus === 'Out of Sync').length
   const totalItemsCount = items.length
-  const healthySyncedCount = items.filter(i => getItemMetrics(i).syncStatus === 'synced').length
+  const healthySyncedCount = items.filter(i => i.syncStatus === 'Synced').length
   const inventoryHealthPct = totalItemsCount > 0 ? Math.round((healthySyncedCount / totalItemsCount) * 100) : 100
   const lowStockWarningsCount = items.filter(i => {
-    const { availableStock, buffer } = getItemMetrics(i)
+    const { availableStock, buffer } = getItemCalculations(i)
     return availableStock <= buffer * 2
   }).length
 
-  // Unique Suppliers list for filter dropdown
+  // List of unique suppliers
   const suppliersList = ['all', ...Array.from(new Set(items.map(i => i.supplier)))]
 
-  // "Sync All Stock Now" Handler — Triggers inventory synchronization for all suppliers
+  // --- Supplier Pipeline Statuses (Healthy, Syncing, Pending, Warning, Error) ---
+  const supplierPipeline = useMemo(() => {
+    const uniqueSuppliers = Array.from(new Set(items.map(i => i.supplier)))
+
+    return uniqueSuppliers.map(supName => {
+      const supItems = items.filter(i => i.supplier === supName)
+      const errorCount = supItems.filter(i => i.syncStatus === 'Error').length
+      const syncingCount = supItems.filter(i => i.syncStatus === 'Syncing').length
+      const pendingCount = supItems.filter(i => i.syncStatus === 'Pending Push' || i.syncStatus === 'Out of Sync').length
+      const totalCount = supItems.length
+      const syncedCount = supItems.filter(i => i.syncStatus === 'Synced').length
+      const progress = Math.round((syncedCount / totalCount) * 100)
+
+      let pipelineState: 'Healthy' | 'Syncing' | 'Pending' | 'Warning' | 'Error' = 'Healthy'
+      if (errorCount > 0) pipelineState = 'Error'
+      else if (syncingCount > 0) pipelineState = 'Syncing'
+      else if (pendingCount > 0) pipelineState = 'Pending'
+
+      return {
+        name: supName,
+        totalCount,
+        pendingCount,
+        errorCount,
+        progress,
+        pipelineState,
+        lastSync: supItems[0]?.lastSync || 'Just now',
+      }
+    })
+  }, [items])
+
+  // --- Handlers for Sync Workflows ---
+
+  // 1. Sync All Stock Now
   const handleSyncAll = () => {
-    setSyncing(true)
-    showNotification('Synchronizing inventory stock levels across all suppliers...')
+    setSyncingAll(true)
+    showNotification('Initiating global inventory stock sync for all connected suppliers...')
+
+    setItems(prev =>
+      prev.map(item => ({ ...item, syncStatus: 'Syncing' }))
+    )
+
     setTimeout(() => {
       setItems(prev =>
         prev.map(item => {
@@ -100,20 +129,25 @@ export const InventorySync: React.FC = () => {
           const available = Math.max(0, item.supplierStock - buffer)
           return {
             ...item,
-            websiteStock: available,
-            isError: false,
+            storefrontStock: available,
+            syncStatus: 'Synced',
             lastSync: 'Just now',
+            updatedAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
           }
         })
       )
-      setSyncing(false)
-      showNotification('Global Inventory Synchronization completed! Storefront stock levels updated.')
-    }, 1500)
+      setSyncingAll(false)
+      showNotification('Global Inventory Stock Sync completed successfully!')
+    }, 1800)
   }
 
-  // Single Item Sync Handler
+  // 2. Single SKU Sync / Retry
   const handleSyncSingle = (id: string, name: string) => {
     setSyncingItemId(id)
+    setItems(prev =>
+      prev.map(item => (item.id === id ? { ...item, syncStatus: 'Syncing' } : item))
+    )
+
     setTimeout(() => {
       setItems(prev =>
         prev.map(item => {
@@ -122,120 +156,96 @@ export const InventorySync: React.FC = () => {
           const available = Math.max(0, item.supplierStock - buffer)
           return {
             ...item,
-            websiteStock: available,
-            isError: false,
+            storefrontStock: available,
+            syncStatus: 'Synced',
             lastSync: 'Just now',
+            updatedAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
           }
         })
       )
       setSyncingItemId(null)
-      showNotification(`Stock synced successfully to Shift4Shop for "${name}"!`)
-    }, 1000)
+      showNotification(`Stock levels synchronized successfully for "${name}"!`)
+    }, 1400)
   }
 
-  // Apply Global Buffer Rule
+  // Global Buffer Configuration
   const handleSaveGlobalBuffer = () => {
     const validBuffer = Math.max(0, globalBuffer)
     setItems(prev =>
-      prev.map(item => ({
-        ...item,
-        buffer: validBuffer,
-      }))
+      prev.map(item => ({ ...item, buffer: validBuffer }))
     )
     setBufferModalOpen(false)
-    showNotification(`Global Safety Reserve Buffer updated to ${validBuffer} units across catalog.`)
+    showNotification(`Global Safety Reserve Buffer set to ${validBuffer} units.`)
   }
 
-  // Open Individual SKU Buffer Modal
+  // SKU Buffer Configuration
   const handleOpenEditBuffer = (item: InventoryItem) => {
     setEditingItem(item)
     setEditItemBuffer(Math.max(0, item.buffer))
   }
 
-  // Save Individual SKU Buffer Rule
   const handleSaveItemBuffer = (e: React.FormEvent) => {
     e.preventDefault()
     if (!editingItem) return
     const validBuffer = Math.max(0, editItemBuffer)
     setItems(prev =>
-      prev.map(item =>
-        item.id === editingItem.id ? { ...item, buffer: validBuffer } : item
-      )
+      prev.map(item => (item.id === editingItem.id ? { ...item, buffer: validBuffer } : item))
     )
-    showNotification(`Safety Reserve Buffer set to ${validBuffer} units for SKU "${editingItem.sku}".`)
+    showNotification(`Safety Buffer set to ${validBuffer} units for SKU "${editingItem.sku}".`)
     setEditingItem(null)
   }
 
-  // Filtering Items
-  const filteredItems = items.filter(item => {
-    const query = search.toLowerCase()
-    const matchSearch =
-      item.name.toLowerCase().includes(query) ||
-      item.sku.toLowerCase().includes(query) ||
-      item.supplier.toLowerCase().includes(query)
-    
-    const matchSupplier = supplierFilter === 'all' || item.supplier === supplierFilter
-
-    const { syncStatus } = getItemMetrics(item)
-    const matchStatus = statusFilter === 'all' || syncStatus === statusFilter
-
-    return matchSearch && matchSupplier && matchStatus
-  })
-
-  // Export CSV Audit Report
+  // Export CSV
   const handleExportCSV = () => {
-    showNotification('Generating Inventory Stock Audit CSV Report...')
-    const headers = 'Product Name,Master SKU,Supplier,Supplier Stock,Safety Buffer,Available Stock,Shift4Shop Live Stock,Variance,Sync Status,Last Sync\n'
-    const rows = items.map(i => {
-      const { availableStock, variance, syncStatus, buffer } = getItemMetrics(i)
-      const statusLabel =
-        syncStatus === 'synced' ? 'Synced' :
-        syncStatus === 'pending' ? 'Pending Push' :
-        syncStatus === 'out_of_sync' ? 'Out of Sync' : 'Error'
-
-      return `"${i.name}","${i.sku}","${i.supplier}",${i.supplierStock},${buffer},${availableStock},${i.websiteStock},${variance},"${statusLabel}","${i.lastSync}"`
+    showNotification('Exporting Inventory Stock Audit CSV Report...')
+    const headers = 'Product Name,Master SKU,Supplier,Supplier Stock,Safety Buffer,Available Stock,Storefront Stock,Variance,Sync Status,Last Sync\n'
+    const rows = filteredItems.map(i => {
+      const { availableStock, variance, buffer } = getItemCalculations(i)
+      return `"${i.name}","${i.sku}","${i.supplier}",${i.supplierStock},${buffer},${availableStock},${i.storefrontStock},${variance},"${i.syncStatus}","${i.lastSync}"`
     }).join('\n')
 
     const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `SupplyBridge_Inventory_Sync_Report_${new Date().toISOString().split('T')[0]}.csv`
+    link.download = `SupplyBridge_Inventory_Report_${new Date().toISOString().split('T')[0]}.csv`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
+    showNotification('Inventory Audit CSV downloaded!')
   }
 
-  // Supplier Pipeline Summary
-  const supplierPipeline = Array.from(new Set(items.map(i => i.supplier))).map(supName => {
-    const supItems = items.filter(i => i.supplier === supName)
-    const pendingCount = supItems.filter(i => {
-      const { syncStatus } = getItemMetrics(i)
-      return syncStatus === 'pending' || syncStatus === 'out_of_sync'
-    }).length
-    const errorCount = supItems.filter(i => getItemMetrics(i).syncStatus === 'error').length
-    const totalCount = supItems.length
-    const progress = Math.round(((totalCount - pendingCount - errorCount) / totalCount) * 100)
-    const status: 'healthy' | 'degraded' | 'critical' = errorCount > 0 ? 'critical' : pendingCount > 0 ? 'degraded' : 'healthy'
-    const lastSync = supItems[0]?.lastSync || '—'
+  // Filtering Inventory Items
+  const filteredItems = useMemo(() => {
+    return items.filter(item => {
+      const query = search.toLowerCase()
+      const matchSearch =
+        item.name.toLowerCase().includes(query) ||
+        item.sku.toLowerCase().includes(query) ||
+        item.supplier.toLowerCase().includes(query)
 
-    return {
-      name: supName,
-      totalCount,
-      pendingCount,
-      errorCount,
-      progress,
-      status,
-      lastSync,
-    }
-  })
+      const matchSupplier = supplierFilter === 'all' || item.supplier === supplierFilter
+      const matchStatus = statusFilter === 'all' || item.syncStatus.toLowerCase().replace(/\s+/g, '_') === statusFilter
 
-  const hasActiveFilters = search !== '' || supplierFilter !== 'all' || statusFilter !== 'all'
+      // Quick Filters
+      const { availableStock, buffer } = getItemCalculations(item)
+      let matchQuick = true
+      if (quickFilter === 'Low Stock') matchQuick = availableStock <= buffer * 2
+      else if (quickFilter === 'Out of Sync') matchQuick = item.syncStatus === 'Out of Sync' || item.syncStatus === 'Pending Push'
+      else if (quickFilter === 'Error') matchQuick = item.syncStatus === 'Error'
+      else if (quickFilter === 'Recently Updated') matchQuick = item.lastSync.includes('min') || item.lastSync === 'Just now'
+
+      return matchSearch && matchSupplier && matchStatus && matchQuick
+    })
+  }, [items, search, supplierFilter, statusFilter, quickFilter])
+
+  const hasActiveFilters = search !== '' || supplierFilter !== 'all' || statusFilter !== 'all' || quickFilter !== 'All'
   const resetFilters = () => {
     setSearch('')
     setSupplierFilter('all')
     setStatusFilter('all')
+    setQuickFilter('All')
   }
 
   return (
@@ -258,7 +268,7 @@ export const InventorySync: React.FC = () => {
       {/* Page Header */}
       <SectionHeader
         title="Inventory Synchronization"
-        subtitle="Manage supplier stock feeds, reserve safety buffers, and synchronize Shift4Shop storefront inventory"
+        subtitle="Manage supplier stock feeds, safety buffers, available stock calculations, and storefront inventory synchronization"
         actions={
           <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
             <button
@@ -271,23 +281,23 @@ export const InventorySync: React.FC = () => {
             <button
               onClick={() => setBufferModalOpen(true)}
               className="btn-secondary btn-sm flex items-center justify-center gap-1.5 font-bold cursor-pointer px-3 text-xs"
-              title="Configure Global Safety Buffer"
+              title="Configure Global Safety Reserve Buffer"
             >
               <Sliders size={14} className="text-primary-600 dark:text-primary-400" /> Buffer ({globalBuffer} units)
             </button>
             <button
               onClick={handleSyncAll}
-              disabled={syncing}
+              disabled={syncingAll}
               className="btn-primary btn-sm flex items-center justify-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer px-3 text-xs whitespace-nowrap"
             >
-              <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
-              <span>{syncing ? 'Syncing...' : 'Sync All Stock Now'}</span>
+              <RefreshCw size={14} className={syncingAll ? 'animate-spin' : ''} />
+              <span>{syncingAll ? 'Syncing...' : 'Sync All Stock Now'}</span>
             </button>
           </div>
         }
       />
 
-      {/* Dynamic Summary Telemetry KPI Cards */}
+      {/* Dynamic Telemetry KPI Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
         {[
           {
@@ -327,20 +337,29 @@ export const InventorySync: React.FC = () => {
         ))}
       </div>
 
-      {/* Supplier Stock Feeds Pipeline (Clean Full-Width Overview) */}
+      {/* Supplier Stock Pipeline Grid (Client States: Healthy, Syncing, Pending, Warning, Error) */}
       <div className="card p-5 border border-slate-200/90 dark:border-slate-800">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Layers size={16} className="text-primary-600 dark:text-primary-400" /> Supplier Stock Feeds Pipeline
+            <Layers size={16} className="text-primary-600 dark:text-primary-400" /> Supplier Stock Pipeline
           </h3>
-          <Badge variant="primary" dot>Live Feeds ({supplierPipeline.length})</Badge>
+          <Badge variant="primary" dot>Live Suppliers ({supplierPipeline.length})</Badge>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
           {supplierPipeline.map(s => (
             <div key={s.name} className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex flex-col justify-between gap-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate pr-1" title={s.name}>{s.name}</span>
-                <HealthIndicator status={s.status} label={s.status === 'healthy' ? 'OK' : s.status === 'degraded' ? 'Lag' : 'Error'} />
+                <Badge
+                  variant={
+                    s.pipelineState === 'Healthy' ? 'success' :
+                    s.pipelineState === 'Syncing' ? 'info' :
+                    s.pipelineState === 'Error' ? 'danger' : 'warning'
+                  }
+                  dot
+                >
+                  {s.pipelineState}
+                </Badge>
               </div>
               <ProgressBar value={s.progress} color={s.progress === 100 ? 'emerald' : s.progress > 50 ? 'primary' : 'rose'} />
               <div className="flex items-center justify-between text-2xs">
@@ -358,13 +377,13 @@ export const InventorySync: React.FC = () => {
 
       {/* Main Filter & Table Section */}
       <div className="card p-5 border border-slate-200/90 dark:border-slate-800">
-        {/* Search & Filters Bar */}
+        {/* Search & Filters */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="relative flex-1 max-w-md">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Search by Master SKU, Product Title, or Supplier..."
+              placeholder="Search by Master SKU, Product Name, or Supplier..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="input pl-9 text-xs"
@@ -377,14 +396,26 @@ export const InventorySync: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1 rounded-xl text-2xs font-semibold text-slate-500">
-              <Filter size={13} /> Filters
+            <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+              {['All', 'Low Stock', 'Out of Sync', 'Error', 'Recently Updated'].map(qf => (
+                <button
+                  key={qf}
+                  onClick={() => setQuickFilter(qf)}
+                  className={`px-2.5 py-1 rounded-lg text-2xs font-bold whitespace-nowrap cursor-pointer transition-all ${
+                    quickFilter === qf
+                      ? 'bg-primary-600 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                  }`}
+                >
+                  {qf}
+                </button>
+              ))}
             </div>
 
             <select
               value={supplierFilter}
               onChange={e => setSupplierFilter(e.target.value)}
-              className="select text-xs w-auto py-2"
+              className="select text-xs w-auto py-1.5"
             >
               <option value="all">All Suppliers</option>
               {suppliersList.filter(s => s !== 'all').map(sup => (
@@ -395,11 +426,11 @@ export const InventorySync: React.FC = () => {
             <select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
-              className="select text-xs w-auto py-2"
+              className="select text-xs w-auto py-1.5"
             >
               <option value="all">All Sync Status</option>
               <option value="synced">Synced</option>
-              <option value="pending">Pending Push</option>
+              <option value="pending_push">Pending Push</option>
               <option value="out_of_sync">Out of Sync</option>
               <option value="error">Error</option>
             </select>
@@ -412,92 +443,121 @@ export const InventorySync: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Inventory Sync Table */}
-        <div className="table-container">
-          <table className="table">
+        {/* Main Inventory Sync Table (Exact Required Columns) */}
+        <div className="table-container w-full overflow-x-auto scrollbar-thin">
+          <table className="table min-w-[1000px] w-full">
             <thead>
-              <tr>
-                <th className="whitespace-nowrap">Product</th>
-                <th className="whitespace-nowrap">Master SKU</th>
-                <th className="whitespace-nowrap">Supplier</th>
-                <th className="whitespace-nowrap">Supplier Stock</th>
-                <th className="whitespace-nowrap">Safety Buffer</th>
-                <th className="whitespace-nowrap">Available Stock</th>
-                <th className="whitespace-nowrap">Shift4Shop Live Stock</th>
-                <th className="whitespace-nowrap">Variance</th>
-                <th className="whitespace-nowrap">Sync Status</th>
-                <th className="whitespace-nowrap">Last Sync</th>
-                <th className="text-right whitespace-nowrap">Action</th>
+              <tr className="bg-slate-100/90 dark:bg-slate-950/90 border-b-2 border-slate-200 dark:border-slate-800">
+                <th className="whitespace-nowrap px-4 py-3.5">PRODUCT NAME</th>
+                <th className="whitespace-nowrap px-4 py-3.5">MASTER SKU</th>
+                <th className="whitespace-nowrap px-4 py-3.5">SUPPLIER</th>
+                <th className="whitespace-nowrap px-4 py-3.5">SUPPLIER STOCK</th>
+                <th className="whitespace-nowrap px-4 py-3.5">SAFETY BUFFER</th>
+                <th className="whitespace-nowrap px-4 py-3.5">AVAILABLE STOCK</th>
+                <th className="whitespace-nowrap px-4 py-3.5">STOREFRONT STOCK</th>
+                <th className="whitespace-nowrap px-4 py-3.5">VARIANCE</th>
+                <th className="whitespace-nowrap px-4 py-3.5">SYNC STATUS</th>
+                <th className="whitespace-nowrap px-4 py-3.5">LAST SYNC</th>
+                <th className="whitespace-nowrap px-4 py-3.5 text-right pr-4">ACTION</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filteredItems.length === 0 ? (
                 <tr>
                   <td colSpan={11} className="py-12 text-center text-slate-400">
-                    No inventory records match your current search and filter criteria.
+                    No inventory records match your search and filter criteria.
                   </td>
                 </tr>
               ) : (
                 filteredItems.map(row => {
-                  const isSyncingRow = syncingItemId === row.id
-                  const { availableStock, variance, syncStatus, buffer } = getItemMetrics(row)
+                  const isSyncingRow = syncingItemId === row.id || row.syncStatus === 'Syncing' || syncingAll
+                  const { availableStock, variance, buffer } = getItemCalculations(row)
 
                   return (
-                    <tr key={row.id}>
-                      <td data-label="Product">
-                        <p className="font-bold text-slate-800 dark:text-slate-100 text-xs leading-normal max-w-xs">{row.name}</p>
+                    <tr key={row.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                      <td data-label="Product Name" className="whitespace-nowrap px-4 py-3.5">
+                        <p className="font-bold text-slate-900 dark:text-slate-100 text-xs leading-normal max-w-xs truncate">{row.name}</p>
                       </td>
-                      <td data-label="Master SKU">
+                      <td data-label="Master SKU" className="whitespace-nowrap px-4 py-3.5">
                         <code className="mono text-xs">{row.sku}</code>
                       </td>
-                      <td data-label="Supplier">
-                        <span className="text-xs text-slate-600 dark:text-slate-300 font-semibold whitespace-nowrap">{row.supplier}</span>
+                      <td data-label="Supplier" className="whitespace-nowrap px-4 py-3.5">
+                        <span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{row.supplier}</span>
                       </td>
-                      <td data-label="Supplier Stock">
-                        <span className="font-bold text-slate-700 dark:text-slate-300">{row.supplierStock.toLocaleString()}</span>
+                      <td data-label="Supplier Stock" className="whitespace-nowrap px-4 py-3.5">
+                        <span className="font-bold text-slate-800 dark:text-slate-200">{row.supplierStock.toLocaleString()}</span>
                       </td>
-                      <td data-label="Safety Buffer">
+                      <td data-label="Safety Buffer" className="whitespace-nowrap px-4 py-3.5">
                         <button
                           onClick={() => handleOpenEditBuffer(row)}
                           className="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 px-2 py-0.5 rounded-md font-bold hover:bg-amber-100 cursor-pointer"
-                          title="Click to configure Safety Buffer"
+                          title="Configure SKU Safety Reserve Buffer"
                         >
                           {buffer} units
                         </button>
                       </td>
-                      <td data-label="Available Stock">
-                        <span className="font-bold text-slate-900 dark:text-slate-100">{availableStock.toLocaleString()}</span>
+                      <td data-label="Available Stock" className="whitespace-nowrap px-4 py-3.5">
+                        <span className="font-extrabold text-slate-900 dark:text-slate-100">{availableStock.toLocaleString()}</span>
                       </td>
-                      <td data-label="Shift4Shop Live Stock">
-                        <span className={`font-bold ${row.websiteStock === availableStock ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'}`}>
-                          {row.websiteStock.toLocaleString()}
+                      <td data-label="Storefront Stock" className="whitespace-nowrap px-4 py-3.5">
+                        <span className={`font-bold ${row.storefrontStock === availableStock ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                          {row.storefrontStock.toLocaleString()}
                         </span>
                       </td>
-                      <td data-label="Variance">
-                        <span className={`flex items-center gap-1 text-xs font-bold whitespace-nowrap ${variance > 0 ? 'text-amber-600 dark:text-amber-400' : variance < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-slate-400'}`}>
+                      <td data-label="Variance" className="whitespace-nowrap px-4 py-3.5">
+                        {/* Strictly Color-Coded: Positive = Green, Negative = Red, Zero = Neutral */}
+                        <span className={`inline-flex items-center gap-1 text-xs font-extrabold ${
+                          variance > 0
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : variance < 0
+                            ? 'text-rose-600 dark:text-rose-400'
+                            : 'text-slate-400 dark:text-slate-500'
+                        }`}>
                           {variance > 0 ? <TrendingUp size={13} /> : variance < 0 ? <TrendingDown size={13} /> : null}
                           {variance > 0 ? `+${variance}` : variance === 0 ? '0' : variance}
                         </span>
                       </td>
-                      <td data-label="Sync Status" className="whitespace-nowrap">
-                        {syncStatus === 'synced' && <Badge variant="success" dot>Synced</Badge>}
-                        {syncStatus === 'pending' && <Badge variant="warning" dot>Pending Push</Badge>}
-                        {syncStatus === 'out_of_sync' && <Badge variant="warning" dot>Out of Sync</Badge>}
-                        {syncStatus === 'error' && <Badge variant="danger" dot>Error</Badge>}
+                      <td data-label="Sync Status" className="whitespace-nowrap px-4 py-3.5">
+                        {row.syncStatus === 'Synced' && <Badge variant="success" dot>Synced</Badge>}
+                        {row.syncStatus === 'Pending Push' && <Badge variant="warning" dot>Pending Push</Badge>}
+                        {row.syncStatus === 'Out of Sync' && <Badge variant="warning" dot>Out of Sync</Badge>}
+                        {row.syncStatus === 'Error' && <Badge variant="danger" dot>Error</Badge>}
+                        {row.syncStatus === 'Syncing' && <Badge variant="info" dot>Syncing...</Badge>}
                       </td>
-                      <td data-label="Last Sync" className="whitespace-nowrap">
+                      <td data-label="Last Sync" className="whitespace-nowrap px-4 py-3.5">
                         <span className="text-2xs text-slate-500 dark:text-slate-400 font-mono">{row.lastSync}</span>
                       </td>
-                      <td className="text-right whitespace-nowrap">
-                        <button
-                          onClick={() => handleSyncSingle(row.id, row.name)}
-                          disabled={isSyncingRow}
-                          className="btn-secondary btn-sm inline-flex items-center gap-1 font-bold text-2xs py-1 px-2.5 cursor-pointer"
-                          title="Force sync stock level to Shift4Shop"
-                        >
-                          <RefreshCw size={12} className={isSyncingRow ? 'animate-spin text-primary-600' : ''} />
-                          <span>{isSyncingRow ? 'Syncing...' : 'Sync Stock'}</span>
-                        </button>
+                      <td className="whitespace-nowrap px-4 py-3.5 text-right pr-4">
+                        {/* Workflow Action Buttons */}
+                        {row.syncStatus === 'Synced' ? (
+                          <button
+                            onClick={() => setViewItem(row)}
+                            className="btn-secondary btn-sm inline-flex items-center gap-1 font-bold text-2xs py-1 px-2.5 cursor-pointer"
+                            title="View Stock Breakdown"
+                          >
+                            <Eye size={12} /> View
+                          </button>
+                        ) : row.syncStatus === 'Error' ? (
+                          <button
+                            onClick={() => handleSyncSingle(row.id, row.name)}
+                            disabled={isSyncingRow}
+                            className="btn-secondary btn-sm inline-flex items-center gap-1 font-bold text-2xs py-1 px-2.5 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/60 hover:bg-rose-50 cursor-pointer"
+                            title="Retry Storefront Stock Sync"
+                          >
+                            <RotateCcw size={12} className={isSyncingRow ? 'animate-spin' : ''} />
+                            <span>{isSyncingRow ? 'Syncing...' : 'Retry'}</span>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleSyncSingle(row.id, row.name)}
+                            disabled={isSyncingRow}
+                            className="btn-secondary btn-sm inline-flex items-center gap-1 font-bold text-2xs py-1 px-2.5 cursor-pointer"
+                            title="Sync Stock to Storefront"
+                          >
+                            <RefreshCw size={12} className={isSyncingRow ? 'animate-spin text-primary-600' : ''} />
+                            <span>{isSyncingRow ? 'Syncing...' : 'Sync Stock'}</span>
+                          </button>
+                        )}
                       </td>
                     </tr>
                   )
@@ -508,12 +568,54 @@ export const InventorySync: React.FC = () => {
         </div>
       </div>
 
+      {/* --- VIEW STOCK BREAKDOWN MODAL --- */}
+      {viewItem && (
+        <Modal
+          open
+          onClose={() => setViewItem(null)}
+          title={`Stock Telemetry: ${viewItem.sku}`}
+          subtitle={`Product: ${viewItem.name}`}
+          size="md"
+          footer={
+            <button onClick={() => setViewItem(null)} className="btn-secondary">Close</button>
+          }
+        >
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                <p className="text-2xs text-slate-400 font-semibold uppercase">Supplier Stock</p>
+                <p className="text-base font-bold text-slate-900 dark:text-slate-100">{viewItem.supplierStock.toLocaleString()} Units</p>
+              </div>
+              <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl">
+                <p className="text-2xs text-amber-600 font-semibold uppercase">Safety Reserve Buffer</p>
+                <p className="text-base font-bold text-amber-700 dark:text-amber-400">{viewItem.buffer} Units</p>
+              </div>
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl">
+                <p className="text-2xs text-emerald-600 font-semibold uppercase">Calculated Available Stock</p>
+                <p className="text-base font-bold text-emerald-700 dark:text-emerald-400">{Math.max(0, viewItem.supplierStock - viewItem.buffer).toLocaleString()} Units</p>
+              </div>
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl">
+                <p className="text-2xs text-indigo-600 font-semibold uppercase">Storefront Live Stock</p>
+                <p className="text-base font-bold text-indigo-700 dark:text-indigo-400">{viewItem.storefrontStock.toLocaleString()} Units</p>
+              </div>
+            </div>
+
+            <div className="p-3.5 bg-slate-900 text-slate-200 rounded-xl font-mono text-2xs space-y-1">
+              <p className="text-slate-400 font-bold">Calculation Formula:</p>
+              <p>Available Stock = max(0, Supplier Stock - Safety Buffer)</p>
+              <p>Available Stock = max(0, {viewItem.supplierStock} - {viewItem.buffer}) = <span className="text-emerald-400 font-bold">{Math.max(0, viewItem.supplierStock - viewItem.buffer)}</span></p>
+              <p>Variance = Available Stock - Storefront Stock = {Math.max(0, viewItem.supplierStock - viewItem.buffer) - viewItem.storefrontStock}</p>
+            </div>
+          </div>
+        </Modal>
+      )}
+
       {/* Global Safety Stock Buffer Modal */}
       <Modal
         open={bufferModalOpen}
         onClose={() => setBufferModalOpen(false)}
-        title="Safety Stock Buffer Rules"
-        subtitle="Configure safety stock reservation buffers to prevent overselling on Shift4Shop storefronts"
+        title="Safety Stock Reserve Buffer Rules"
+        subtitle="Configure safety stock reservation buffers to prevent overselling on connected storefronts"
         size="md"
         footer={
           <>
@@ -529,8 +631,8 @@ export const InventorySync: React.FC = () => {
           <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 rounded-xl text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2">
             <AlertTriangle size={16} className="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-bold">Overselling Protection active</p>
-              <p className="mt-0.5">Available Stock is calculated as Supplier Stock − Safety Buffer before publishing to Shift4Shop storefronts.</p>
+              <p className="font-bold">Overselling Protection Active</p>
+              <p className="mt-0.5">Available Stock is calculated as Supplier Stock − Safety Buffer before publishing to storefronts.</p>
             </div>
           </div>
 
@@ -556,7 +658,7 @@ export const InventorySync: React.FC = () => {
         <Modal
           open
           onClose={() => setEditingItem(null)}
-          title={`Configure Buffer: ${editingItem.sku}`}
+          title={`Configure SKU Buffer: ${editingItem.sku}`}
           subtitle={`Product: ${editingItem.name}`}
           size="md"
         >
