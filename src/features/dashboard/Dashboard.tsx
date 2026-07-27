@@ -24,6 +24,16 @@ import type { UserRole } from '../../types'
 
 
 const ROLE_DESCRIPTIONS: Record<UserRole, { title: string; subtitle: string; focus: string }> = {
+  platform_owner: {
+    title: 'Platform Owner Control Center',
+    subtitle: 'Complete strategic platform control, system governance & full operational status',
+    focus: 'Platform Owner',
+  },
+  administrator: {
+    title: 'Business Operations Overview',
+    subtitle: 'Daily platform administration, supplier inventory, pricing & catalog performance',
+    focus: 'Business Administrator',
+  },
   super_admin: {
     title: 'Super Admin Control Center',
     subtitle: 'Complete platform control, system architecture health & full operational status',
@@ -48,6 +58,11 @@ const ROLE_DESCRIPTIONS: Record<UserRole, { title: string; subtitle: string; foc
     title: 'Operations & Monitoring Console',
     subtitle: 'Real-time operational monitoring, validation review, failed sync retries & logs',
     focus: 'Operations Specialist',
+  },
+  read_only: {
+    title: 'Audit & Compliance Dashboard',
+    subtitle: 'Read-only operational monitoring, audit trails, and system reporting',
+    focus: 'Platform Auditor',
   },
 }
 

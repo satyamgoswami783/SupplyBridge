@@ -6,11 +6,14 @@ import { getInitials } from '../../utils'
 import type { UserRole } from '../../types'
 
 const ROLE_LABELS: Record<UserRole, string> = {
+  platform_owner:      'Platform Owner',
+  administrator:       'Administrator',
   super_admin:         'Super Admin',
   admin:               'Admin',
   catalog_manager:     'Catalog Manager',
   integration_manager: 'Integration Manager',
   operations_staff:    'Operations Staff',
+  read_only:           'Read Only',
 }
 
 interface HeaderProps {

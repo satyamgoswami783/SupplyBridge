@@ -10,19 +10,25 @@ import { useAuth } from '../../context/AuthContext'
 import type { User, UserRole } from '../../types'
 
 const ROLE_LABELS: Record<UserRole, string> = {
+  platform_owner:      'Platform Owner',
+  administrator:       'Administrator',
   super_admin:         'Super Admin',
   admin:               'Admin',
   catalog_manager:     'Catalog Manager',
   integration_manager: 'Integration Manager',
   operations_staff:    'Operations Staff',
+  read_only:           'Read Only',
 }
 
 const ROLE_COLORS: Record<UserRole, string> = {
+  platform_owner:      'purple',
+  administrator:       'primary',
   super_admin:         'purple',
   admin:               'primary',
   catalog_manager:     'info',
   integration_manager: 'warning',
   operations_staff:    'neutral',
+  read_only:           'neutral',
 } as any
 
 export const Users: React.FC = () => {
