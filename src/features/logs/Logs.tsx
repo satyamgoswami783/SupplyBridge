@@ -15,7 +15,7 @@ export interface LogEntryItem {
   logType: 'API Logs' | 'FTP Logs' | 'Import Logs' | 'Sync Logs' | 'User Activity Logs' | 'Error Logs'
   supplier: string
   store: string
-  module: 'Catalog' | 'Inventory' | 'Pricing' | 'Validation' | 'Storefront' | 'System'
+  module: 'Catalog' | 'Inventory' | 'Pricing' | 'Validation' | 'Storefront' | 'System' | 'Images'
   severity: 'Info' | 'Warning' | 'Error'
   message: string
   status: 'Success' | 'Failed' | 'Pending' | 'Warning'

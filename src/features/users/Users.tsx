@@ -10,25 +10,17 @@ import { useAuth } from '../../context/AuthContext'
 import type { User, UserRole } from '../../types'
 
 const ROLE_LABELS: Record<UserRole, string> = {
-  platform_owner:      'Platform Owner',
-  administrator:       'Administrator',
-  catalog_manager:     'Catalog Manager',
-  read_only:           'Read Only',
-  super_admin:         'Platform Owner',
-  admin:               'Administrator',
-  integration_manager: 'Catalog Manager',
-  operations_staff:    'Read Only',
+  platform_owner:  'Platform Owner',
+  administrator:   'Administrator',
+  catalog_manager: 'Catalog Manager',
+  read_only:       'Read Only',
 }
 
 const ROLE_COLORS: Record<UserRole, string> = {
-  platform_owner:      'purple',
-  administrator:       'primary',
-  catalog_manager:     'info',
-  read_only:           'neutral',
-  super_admin:         'purple',
-  admin:               'primary',
-  integration_manager: 'info',
-  operations_staff:    'neutral',
+  platform_owner:  'purple',
+  administrator:   'primary',
+  catalog_manager: 'info',
+  read_only:       'neutral',
 } as any
 
 const ROLE_DESCRIPTIONS: Record<string, string> = {
@@ -70,7 +62,7 @@ export const Users: React.FC = () => {
 
   // Platform Owner Reserved Role Check
   const existingOwnersCount = usersList.filter(
-    u => (u.role === 'platform_owner' || u.role === 'super_admin') && u.status !== 'inactive'
+    u => u.role === 'platform_owner' && u.status !== 'inactive'
   ).length
   const isOwnerReserved = inviteRole === 'platform_owner' && existingOwnersCount >= 1
 

@@ -38,8 +38,8 @@ export const MasterCatalog: React.FC = () => {
   const { role } = useAuth()
   const { suppliersList } = useSuppliers()
   const { productsList, setProductsList } = useProducts()
-  const canManageCatalog = role === 'super_admin' || role === 'admin' || role === 'catalog_manager'
-  const canDelete = role === 'super_admin' || role === 'admin'
+  const canManageCatalog = role === 'platform_owner' || role === 'administrator' || role === 'catalog_manager'
+  const canDelete = role === 'platform_owner' || role === 'administrator'
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')

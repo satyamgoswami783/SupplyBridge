@@ -9,14 +9,10 @@ import { getInitials } from '../../utils'
 import type { UserRole } from '../../types'
 
 const ROLE_LABELS: Record<UserRole, string> = {
-  platform_owner:      'Platform Owner',
-  administrator:       'Administrator',
-  catalog_manager:     'Catalog Manager',
-  read_only:           'Read Only',
-  super_admin:         'Platform Owner',
-  admin:               'Administrator',
-  integration_manager: 'Catalog Manager',
-  operations_staff:    'Read Only',
+  platform_owner:  'Platform Owner',
+  administrator:   'Administrator',
+  catalog_manager: 'Catalog Manager',
+  read_only:       'Read Only',
 }
 
 interface SearchItem {

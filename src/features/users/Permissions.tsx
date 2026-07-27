@@ -64,7 +64,7 @@ export const Permissions: React.FC = () => {
   }
 
   const handleToggle = (targetRole: UserRole, moduleKey: string, currentAccess: boolean) => {
-    if (targetRole === 'platform_owner' || targetRole === 'super_admin') {
+    if (targetRole === 'platform_owner') {
       showNotification('Platform Owner maintains root access (*) across all modules.')
       return
     }
@@ -73,7 +73,7 @@ export const Permissions: React.FC = () => {
   }
 
   const handleGrantAll = (targetRole: UserRole) => {
-    if (targetRole === 'platform_owner' || targetRole === 'super_admin') return
+    if (targetRole === 'platform_owner') return
     const allModuleKeys = MODULE_LIST.map(m => m.key)
     setBulkRolePermissions(targetRole, allModuleKeys)
     showNotification(`Granted all module permissions to ${targetRole.replace(/_/g, ' ')}`)
@@ -145,8 +145,8 @@ export const Permissions: React.FC = () => {
       {/* Role Summary Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {ROLE_METADATA.map(r => {
-          const isOwner = r.role === 'platform_owner' || r.role === 'super_admin'
-          const perms = permissionsConfig[r.role] || permissionsConfig['super_admin'] || []
+          const isOwner = r.role === 'platform_owner'
+          const perms = permissionsConfig[r.role] || []
           const grantedCount = isOwner ? MODULE_LIST.length : perms.length
 
           return (
@@ -247,8 +247,8 @@ export const Permissions: React.FC = () => {
                     </span>
                   </td>
                   {ROLE_METADATA.map(r => {
-                    const isOwner = r.role === 'platform_owner' || r.role === 'super_admin'
-                    const rolePerms = permissionsConfig[r.role] || permissionsConfig[r.role === 'administrator' ? 'admin' : r.role === 'read_only' ? 'operations_staff' : r.role] || []
+                    const isOwner = r.role === 'platform_owner'
+                    const rolePerms = permissionsConfig[r.role] || []
                     const hasAccess = isOwner || rolePerms.includes('*') || rolePerms.includes(module.key)
 
                     return (

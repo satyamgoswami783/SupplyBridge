@@ -516,7 +516,7 @@ export const ValidationCenter: React.FC = () => {
                       <Eye size={13} /> View Details
                     </button>
 
-                    {role !== 'operations_staff' && (
+                    {role !== 'read_only' && (
                       <>
                         <button
                           onClick={() => handleApproveSingle(item.id, item.productName)}
@@ -553,7 +553,7 @@ export const ValidationCenter: React.FC = () => {
               <button onClick={() => setReviewItem(null)} className="btn-secondary">
                 Close
               </button>
-              {role === 'operations_staff' ? (
+              {role === 'read_only' ? (
                 <button
                   onClick={() => {
                     setToastMessage({ text: `Issue for "${reviewItem.productName}" escalated to Catalog Manager.`, type: 'info' })

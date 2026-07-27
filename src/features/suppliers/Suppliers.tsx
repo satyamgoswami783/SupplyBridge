@@ -45,7 +45,7 @@ const connTypeIcon: Record<ConnectionType, string> = {
 
 export const Suppliers: React.FC = () => {
   const { role } = useAuth()
-  const canManageSuppliers = role === 'super_admin' || role === 'admin' || role === 'integration_manager'
+  const canManageSuppliers = role === 'platform_owner' || role === 'administrator'
   const { suppliersList, setSuppliersList } = useSuppliers()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')

@@ -77,26 +77,19 @@ export const SupplierOnboardingWizard: React.FC = () => {
       name: formData.name.trim() || 'New Supplier Company',
       code: (formData.code.trim() || `SUP-${Date.now().toString().slice(-4)}`).toUpperCase(),
       connectionType: formData.connectionType,
-      status: 'active',
-      totalProducts: 1240,
-      activeProducts: 1180,
-      failedProducts: 0,
-      outOfStockProducts: 60,
+      status: 'connected',
+      productCount: 1240,
+      errorCount: 0,
+      country: 'United States',
       lastSync: new Date().toISOString(),
-      syncSchedule: formData.inventorySyncFreq === '15min' ? 'Every 15 mins' : formData.inventorySyncFreq === 'hourly' ? 'Hourly' : 'Every 4 Hours',
       contactEmail: formData.contactEmail || 'contact@supplier.com',
       contactName: formData.contactName || 'Account Manager',
-      country: 'USA',
-      config: {
+      createdAt: new Date().toISOString(),
+      credentials: {
         apiUrl: formData.apiUrl,
         apiKey: formData.apiKey,
         ftpHost: formData.ftpHost,
         ftpUsername: formData.ftpUsername,
-      },
-      stats: {
-        totalImports: 1,
-        successRate: 100,
-        avgSyncDurationSeconds: 12,
       },
     }
 

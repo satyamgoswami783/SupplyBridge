@@ -327,7 +327,7 @@ export const SyncJobs: React.FC = () => {
             >
               <RotateCcw size={14} /> Retry Failed Jobs {failedCount > 0 && `(${failedCount})`}
             </button>
-            {role !== 'operations_staff' && (
+            {role !== 'read_only' && (
               <>
                 <button
                   onClick={handleSyncSelectedSuppliers}
@@ -526,7 +526,7 @@ export const SyncJobs: React.FC = () => {
                       >
                         <Eye size={13} /> View
                       </button>
-                      {role !== 'operations_staff' && (job.status === 'running' || job.status === 'queued' || job.status === 'paused') && (
+                      {role !== 'read_only' && (job.status === 'running' || job.status === 'queued' || job.status === 'paused') && (
                         <button
                           onClick={() => handleCancelSingleJob(job.id, job.name)}
                           className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1 font-bold cursor-pointer text-xs"
@@ -535,7 +535,7 @@ export const SyncJobs: React.FC = () => {
                           <XCircle size={13} /> Cancel
                         </button>
                       )}
-                      {role !== 'operations_staff' && job.status === 'failed' && (
+                      {role !== 'read_only' && job.status === 'failed' && (
                         <button
                           onClick={() => handleRetryJob(job.id, job.name)}
                           className="btn-secondary btn-sm flex items-center gap-1 font-bold cursor-pointer text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-xs border-amber-300"
@@ -564,7 +564,7 @@ export const SyncJobs: React.FC = () => {
           footer={
             <>
               <button onClick={() => setDetailJob(null)} className="btn-secondary">Close</button>
-              {role !== 'operations_staff' && detailJob.status === 'failed' && (
+              {role !== 'read_only' && detailJob.status === 'failed' && (
                 <button
                   onClick={() => { handleRetryJob(detailJob.id, detailJob.name); setDetailJob(null); }}
                   className="btn-primary flex items-center gap-1.5 cursor-pointer font-bold"

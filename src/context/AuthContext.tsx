@@ -18,27 +18,24 @@ interface AuthContextType {
 }
 
 export const DEFAULT_ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  super_admin:         ['*'],
-  admin:               ['dashboard', 'suppliers', 'catalog', 'products', 'categories', 'brands', 'manufacturers', 'variants', 'media', 'mapping', 'validation', 'inventory_sync', 'pricing_sync', 'image_sync', 'store_management', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports'],
-  catalog_manager:     ['dashboard', 'catalog', 'products', 'categories', 'brands', 'manufacturers', 'variants', 'media', 'mapping', 'validation', 'reports'],
-  integration_manager: ['dashboard', 'suppliers', 'integrations', 'mapping', 'inventory_sync', 'pricing_sync', 'image_sync', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports'],
-  operations_staff:    ['dashboard', 'validation', 'monitoring', 'reports', 'logs', 'sync_jobs', 'import_queue'],
+  platform_owner:  ['*'],
+  administrator:   ['dashboard', 'suppliers', 'catalog', 'products', 'categories', 'brands', 'manufacturers', 'variants', 'media', 'mapping', 'validation', 'inventory_sync', 'pricing_sync', 'image_sync', 'store_management', 'website_sync', 'sync_jobs', 'import_queue', 'logs', 'monitoring', 'reports'],
+  catalog_manager: ['dashboard', 'catalog', 'products', 'categories', 'brands', 'manufacturers', 'variants', 'media', 'mapping', 'validation', 'reports'],
+  read_only:       ['dashboard', 'validation', 'monitoring', 'reports', 'logs', 'sync_jobs', 'import_queue'],
 }
 
 const demoUsers: Record<UserRole, User> = {
-  super_admin:         { id: 'u1', name: 'Alex Morrison', email: 'alex@supplybridge.io', role: 'super_admin', status: 'active', createdAt: '2024-01-01T00:00:00Z', department: 'Executive Management' },
-  admin:               { id: 'u2', name: 'Sarah Kim', email: 'sarah@supplybridge.io', role: 'admin', status: 'active', createdAt: '2024-02-15T00:00:00Z', department: 'Platform Operations' },
-  catalog_manager:     { id: 'u3', name: 'James Patel', email: 'jpatel@supplybridge.io', role: 'catalog_manager', status: 'active', createdAt: '2024-04-01T00:00:00Z', department: 'Catalog & Merchandising' },
-  integration_manager: { id: 'u4', name: 'Emily Chen', email: 'echen@supplybridge.io', role: 'integration_manager', status: 'active', createdAt: '2024-05-10T00:00:00Z', department: 'Supplier Integration' },
-  operations_staff:    { id: 'u5', name: 'Marcus Johnson', email: 'mjohnson@supplybridge.io', role: 'operations_staff', status: 'active', createdAt: '2024-07-20T00:00:00Z', department: 'System Monitoring' },
+  platform_owner:  { id: 'u1', name: 'Alex Morrison', email: 'alex@supplybridge.io', role: 'platform_owner', status: 'active', createdAt: '2024-01-01T00:00:00Z', department: 'Executive Management' },
+  administrator:   { id: 'u2', name: 'Sarah Kim', email: 'sarah@supplybridge.io', role: 'administrator', status: 'active', createdAt: '2024-02-15T00:00:00Z', department: 'Platform Operations' },
+  catalog_manager: { id: 'u3', name: 'James Patel', email: 'jpatel@supplybridge.io', role: 'catalog_manager', status: 'active', createdAt: '2024-04-01T00:00:00Z', department: 'Catalog & Merchandising' },
+  read_only:       { id: 'u5', name: 'Marcus Johnson', email: 'mjohnson@supplybridge.io', role: 'read_only', status: 'active', createdAt: '2024-07-20T00:00:00Z', department: 'System Monitoring' },
 }
 
 const ROLE_PRESETS: { role: UserRole; label: string; email: string; desc: string; color: string }[] = [
-  { role: 'super_admin',         label: 'Super Admin',         email: 'alex@supplybridge.io',     desc: 'Full Platform Access & Control',   color: 'from-purple-600 to-indigo-600' },
-  { role: 'admin',               label: 'Admin',               email: 'sarah@supplybridge.io',    desc: 'Daily Platform Operations',        color: 'from-indigo-600 to-blue-600' },
-  { role: 'catalog_manager',     label: 'Catalog Manager',     email: 'jpatel@supplybridge.io',   desc: 'PIM, Products & Validation',       color: 'from-blue-600 to-cyan-600' },
-  { role: 'integration_manager', label: 'Integration Manager', email: 'echen@supplybridge.io',    desc: 'Suppliers, FTP/API & Sync Jobs',    color: 'from-cyan-600 to-teal-600' },
-  { role: 'operations_staff',    label: 'Operations Staff',    email: 'mjohnson@supplybridge.io', desc: 'Monitoring, Logs & Reports',       color: 'from-emerald-600 to-slate-700' },
+  { role: 'platform_owner',  label: 'Platform Owner',  email: 'alex@supplybridge.io',     desc: 'Full Platform Access & Control (*)', color: 'from-purple-600 to-indigo-600' },
+  { role: 'administrator',   label: 'Administrator',   email: 'sarah@supplybridge.io',    desc: 'Daily Platform & Operational Admin', color: 'from-indigo-600 to-blue-600' },
+  { role: 'catalog_manager', label: 'Catalog Manager', email: 'jpatel@supplybridge.io',   desc: 'PIM, Products, Media & Validation',   color: 'from-blue-600 to-cyan-600' },
+  { role: 'read_only',       label: 'Read Only',       email: 'mjohnson@supplybridge.io', desc: 'Monitoring, Read-Only Audit & Logs', color: 'from-emerald-600 to-slate-700' },
 ]
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -46,14 +43,18 @@ const AuthContext = createContext<AuthContextType | null>(null)
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [role, setRoleState] = useState<UserRole>(() => {
     const savedRole = localStorage.getItem('supplybridge_role') as UserRole
-    return (savedRole && demoUsers[savedRole]) ? savedRole : 'super_admin'
+    return (savedRole && demoUsers[savedRole]) ? savedRole : 'platform_owner'
   })
 
   const [permissionsConfig, setPermissionsConfig] = useState<Record<UserRole, string[]>>(() => {
     const saved = localStorage.getItem('supplybridge_permissions_config')
     if (saved) {
       try {
-        return JSON.parse(saved)
+        const parsed = JSON.parse(saved)
+        return {
+          ...DEFAULT_ROLE_PERMISSIONS,
+          ...parsed,
+        }
       } catch (e) {
         return DEFAULT_ROLE_PERMISSIONS
       }
@@ -69,10 +70,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Login form states
   const [email, setEmail] = useState('alex@supplybridge.io')
   const [password, setPassword] = useState('••••••••••••')
-  const [selectedRole, setSelectedRole] = useState<UserRole>('super_admin')
+  const [selectedRole, setSelectedRole] = useState<UserRole>('platform_owner')
   const [isLoggingIn, setIsLoggingIn] = useState(false)
 
-  const currentUser = demoUsers[role]
+  const currentUser = demoUsers[role] || demoUsers['platform_owner']
 
   const setRole = (newRole: UserRole) => {
     localStorage.setItem('supplybridge_role', newRole)
@@ -108,7 +109,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const hasPermission = (moduleKey: string): boolean => {
-    const perms = permissionsConfig[role] || []
+    // Platform Owner ALWAYS has root access to all modules
+    if (role === 'platform_owner') {
+      return true
+    }
+
+    const perms = permissionsConfig[role] || DEFAULT_ROLE_PERMISSIONS[role] || ['*']
+    if (!perms || perms.length === 0) return true
+
     return perms.includes('*') || perms.includes(moduleKey)
   }
 

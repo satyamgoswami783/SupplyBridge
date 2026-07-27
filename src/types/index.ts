@@ -7,7 +7,11 @@ export type ValidationStatus = 'passed' | 'failed' | 'pending' | 'review'
 export type SupplierStatus = 'connected' | 'disconnected' | 'error' | 'syncing'
 
 // ─── Auth / RBAC ─────────────────────────────────────────
-export type UserRole = 'super_admin' | 'admin' | 'catalog_manager' | 'integration_manager' | 'operations_staff'
+export type UserRole =
+  | 'platform_owner'
+  | 'administrator'
+  | 'catalog_manager'
+  | 'read_only'
 
 export interface User {
   id: string
@@ -289,36 +293,7 @@ export interface Store {
 
 // ─── Logs ─────────────────────────────────────────────────
 export type LogLevel = 'info' | 'warning' | 'error' | 'debug' | 'success'
-export type UserRole = 'platform_owner' | 'administrator' | 'catalog_manager' | 'read_only' | 'super_admin' | 'admin' | 'integration_manager' | 'operations_staff'
-
-export interface User {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-  avatar?: string
-  status: 'active' | 'inactive' | 'invited'
-  lastLogin?: string
-  createdAt: string
-  department?: string
-}
-
-export interface Permission {
-  id: string
-  module: string
-  action: 'view' | 'create' | 'edit' | 'delete' | 'approve' | 'sync' | 'export'
-  roles: UserRole[]
-}
-
-export interface Role {
-  id: string
-  name: string
-  slug: UserRole
-  description: string
-  userCount: number
-  permissions: string[]
-  createdAt: string
-}
+export type LogType = 'import' | 'sync' | 'api' | 'ftp' | 'audit' | 'error' | 'user_activity' | 'validation' | 'system' | 'API Logs' | 'FTP Logs' | 'Import Logs' | 'Sync Logs' | 'User Activity Logs' | 'Error Logs'
 
 export interface LogEntry {
   id: string

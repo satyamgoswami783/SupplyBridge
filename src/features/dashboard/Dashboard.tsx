@@ -24,32 +24,27 @@ import type { UserRole } from '../../types'
 
 
 const ROLE_DESCRIPTIONS: Record<UserRole, { title: string; subtitle: string; focus: string }> = {
-  super_admin: {
-    title: 'Super Admin Control Center',
+  platform_owner: {
+    title: 'Platform Owner Control Center',
     subtitle: 'Complete platform control, system architecture health & full operational status',
     focus: 'Platform Owner',
   },
-  admin: {
+  administrator: {
     title: 'Business Operations Overview',
     subtitle: 'Daily platform administration, supplier inventory, pricing & catalog performance',
-    focus: 'Business Administrator',
+    focus: 'Administrator',
   },
   catalog_manager: {
     title: 'Catalog & PIM Dashboard',
     subtitle: 'Product information management, attribute mapping, and validation queue status',
-    focus: 'PIM Manager',
+    focus: 'Catalog Manager',
   },
-  integration_manager: {
-    title: 'Supplier Integration Hub',
-    subtitle: 'Supplier API connections, FTP file pipelines, import queues and sync jobs',
-    focus: 'Integration Manager',
+  read_only: {
+    title: 'Read Only Monitoring Console',
+    subtitle: 'Real-time operational monitoring, validation review, and system logs',
+    focus: 'Read Only Specialist',
   },
-  operations_staff: {
-    title: 'Operations & Monitoring Console',
-    subtitle: 'Real-time operational monitoring, validation review, failed sync retries & logs',
-    focus: 'Operations Specialist',
-  },
-} as any
+}
 
 const stagger = {
   parent: { transition: { staggerChildren: 0.05 } },
@@ -79,7 +74,7 @@ export const Dashboard: React.FC = () => {
 
   const { role, currentUser } = useAuth()
   const { suppliersList } = useSuppliers()
-  const roleInfo = ROLE_DESCRIPTIONS[role] || ROLE_DESCRIPTIONS.integration_manager
+  const roleInfo = ROLE_DESCRIPTIONS[role] || ROLE_DESCRIPTIONS.platform_owner
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [lastUpdated, setLastUpdated] = useState('Updated just now')
 

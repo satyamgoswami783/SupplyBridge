@@ -265,13 +265,13 @@ export const mockLogs: LogEntry[] = [
 
 // ─── Users ────────────────────────────────────────────────
 export const mockUsers: User[] = [
-  { id: 'u1', name: 'Alex Morrison', email: 'alex@supplybridge.io', role: 'super_admin', status: 'active', lastLogin: '2026-07-24T05:00:00Z', createdAt: '2024-01-01T00:00:00Z', department: 'Technology' },
-  { id: 'u2', name: 'Sarah Kim', email: 'sarah@supplybridge.io', role: 'admin', status: 'active', lastLogin: '2026-07-24T04:30:00Z', createdAt: '2024-02-15T00:00:00Z', department: 'Operations' },
+  { id: 'u1', name: 'Alex Morrison', email: 'alex@supplybridge.io', role: 'platform_owner', status: 'active', lastLogin: '2026-07-24T05:00:00Z', createdAt: '2024-01-01T00:00:00Z', department: 'Technology' },
+  { id: 'u2', name: 'Sarah Kim', email: 'sarah@supplybridge.io', role: 'administrator', status: 'active', lastLogin: '2026-07-24T04:30:00Z', createdAt: '2024-02-15T00:00:00Z', department: 'Operations' },
   { id: 'u3', name: 'James Patel', email: 'jpatel@supplybridge.io', role: 'catalog_manager', status: 'active', lastLogin: '2026-07-23T16:00:00Z', createdAt: '2024-04-01T00:00:00Z', department: 'Catalog' },
-  { id: 'u4', name: 'Emily Chen', email: 'echen@supplybridge.io', role: 'integration_manager', status: 'active', lastLogin: '2026-07-24T03:00:00Z', createdAt: '2024-05-10T00:00:00Z', department: 'Integrations' },
-  { id: 'u5', name: 'Marcus Johnson', email: 'mjohnson@supplybridge.io', role: 'operations_staff', status: 'active', lastLogin: '2026-07-23T09:00:00Z', createdAt: '2024-07-20T00:00:00Z', department: 'Operations' },
+  { id: 'u4', name: 'Emily Chen', email: 'echen@supplybridge.io', role: 'administrator', status: 'active', lastLogin: '2026-07-24T03:00:00Z', createdAt: '2024-05-10T00:00:00Z', department: 'Integrations' },
+  { id: 'u5', name: 'Marcus Johnson', email: 'mjohnson@supplybridge.io', role: 'read_only', status: 'active', lastLogin: '2026-07-23T09:00:00Z', createdAt: '2024-07-20T00:00:00Z', department: 'Operations' },
   { id: 'u6', name: 'Priya Sharma', email: 'psharma@supplybridge.io', role: 'catalog_manager', status: 'invited', createdAt: '2026-07-20T00:00:00Z', department: 'Catalog' },
-  { id: 'u7', name: 'Tom Walker', email: 'twalker@supplybridge.io', role: 'operations_staff', status: 'inactive', lastLogin: '2026-06-15T00:00:00Z', createdAt: '2024-09-01T00:00:00Z', department: 'Operations' },
+  { id: 'u7', name: 'Tom Walker', email: 'twalker@supplybridge.io', role: 'read_only', status: 'inactive', lastLogin: '2026-06-15T00:00:00Z', createdAt: '2024-09-01T00:00:00Z', department: 'Operations' },
 ]
 
 // ─── Roles ────────────────────────────────────────────────

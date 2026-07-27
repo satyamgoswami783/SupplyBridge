@@ -441,7 +441,7 @@ export const MediaLibrary: React.FC = () => {
             <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Status</label>
             <select
               value={editForm.status}
-              onChange={e => setEditForm({ ...form, status: e.target.value as 'active' | 'pending' })}
+              onChange={e => setEditForm({ ...editForm, status: e.target.value as 'active' | 'pending' })}
               className="select"
             >
               <option value="active">Active</option>

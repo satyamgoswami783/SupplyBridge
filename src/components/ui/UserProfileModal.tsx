@@ -7,11 +7,10 @@ import { getInitials, formatDate, timeAgo } from '../../utils'
 import type { UserRole } from '../../types'
 
 const ROLE_LABELS: Record<UserRole, string> = {
-  super_admin:         'Super Admin',
-  admin:               'Admin',
-  catalog_manager:     'Catalog Manager',
-  integration_manager: 'Integration Manager',
-  operations_staff:    'Operations Staff',
+  platform_owner:  'Platform Owner',
+  administrator:   'Administrator',
+  catalog_manager: 'Catalog Manager',
+  read_only:       'Read Only',
 }
 
 export const UserProfileModal: React.FC = () => {

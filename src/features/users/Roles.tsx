@@ -165,7 +165,7 @@ export const Roles: React.FC = () => {
                   <button className="btn-icon" onClick={() => handleOpenEdit(role)} title="Edit Role">
                     <Edit size={13} />
                   </button>
-                  {role.slug !== 'super_admin' && (
+                  {role.slug !== 'platform_owner' && (
                     <button
                       className="btn-icon text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/60"
                       onClick={() => setDeleteConfirmRole(role)}
@@ -184,7 +184,7 @@ export const Roles: React.FC = () => {
               <Users size={13} className="text-slate-400" />
               <span className="text-xs text-slate-500 font-medium">{role.userCount} active user{role.userCount !== 1 ? 's' : ''}</span>
               <div className="ml-auto">
-                <Badge variant={role.slug === 'super_admin' ? 'purple' : 'neutral'}>
+                <Badge variant={role.slug === 'platform_owner' ? 'purple' : 'neutral'}>
                   {role.permissions.length === 1 && role.permissions[0] === '*' ? 'Full Access (*)' : `${role.permissions.length} modules`}
                 </Badge>
               </div>
