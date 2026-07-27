@@ -402,23 +402,6 @@ export const MasterCatalog: React.FC = () => {
         }
       />
 
-      {/* Summary KPI Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
-        {[
-          { label: 'Total Products',  value: productsList.length.toLocaleString(), color: 'text-slate-800 dark:text-slate-100', bg: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800' },
-          { label: 'Published',       value: productsList.filter(p => p.status === 'published').length.toLocaleString(), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/50' },
-          { label: 'Needs Validation',value: productsList.filter(p => p.validationStatus === 'failed').length.toLocaleString(), color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/50' },
-          { label: 'Failed Sync',     value: productsList.filter(p => p.status === 'failed').length.toLocaleString(), color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/50' },
-          { label: 'Suppliers',       value: '27', color: 'text-primary-600 dark:text-primary-400', bg: 'bg-primary-50/70 dark:bg-primary-950/40 border border-primary-200/80 dark:border-primary-900/50' },
-          { label: 'Connected Stores',value: '7', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50/70 dark:bg-violet-950/40 border border-violet-200/80 dark:border-violet-900/50' },
-        ].map(s => (
-          <div key={s.label} className={`card p-3 sm:p-4 text-center rounded-2xl ${s.bg}`}>
-            <p className={`text-xl sm:text-2xl font-black ${s.color}`}>{s.value}</p>
-            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-semibold mt-0.5">{s.label}</p>
-          </div>
-        ))}
-      </div>
-
       <Tabs tabs={tabs} active={tab} onChange={setTab} />
 
       <FilterBar search={search} onSearch={v => { setSearch(v); setCurrentPage(1); }} placeholder="Search by product name, SKU, or brand...">

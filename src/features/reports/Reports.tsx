@@ -273,14 +273,38 @@ export const Reports: React.FC = () => {
   }
 
   const tabs = [
-    { id: 'import_summary',      label: 'Import Summary' },
-    { id: 'failed_imports',      label: 'Failed Imports' },
+    { id: 'import_summary',       label: 'Import Summary' },
+    { id: 'failed_imports',       label: 'Failed Imports' },
     { id: 'supplier_performance', label: 'Supplier Performance' },
-    { id: 'price_changes',       label: 'Price Changes' },
-    { id: 'inventory_changes',   label: 'Inventory Changes' },
-    { id: 'new_products',        label: 'New Products' },
-    { id: 'publishing_activity',  label: 'Publishing Activity' },
-    { id: 'sync_performance',    label: 'Sync Performance' },
+    { id: 'price_changes',        label: 'Price Changes' },
+    { id: 'inventory_changes',    label: 'Inventory Changes' },
+    { id: 'new_products',         label: 'New Products' },
+    { id: 'publishing_activity',   label: 'Publishing Activity' },
+    { id: 'sync_performance',     label: 'Sync Performance' },
+  ]
+
+  // Mock Report Data Tables for specific sections
+  const mockPriceChanges = [
+    { sku: 'CPU-AMD-7950X', name: 'AMD Ryzen 9 7950X Processor', supplier: 'TechParts Int.', oldPrice: '$549.00', newPrice: '$529.00', change: '-3.6%', date: '2026-07-27 10:15' },
+    { sku: 'GPU-NV-4090', name: 'NVIDIA RTX 4090 24GB', supplier: 'TechParts Int.', oldPrice: '$1,599.00', newPrice: '$1,649.00', change: '+3.1%', date: '2026-07-27 09:30' },
+    { sku: 'RAM-DDR5-001', name: 'DDR5 32GB 6000MHz RAM Kit', supplier: 'GlobalSource Ltd.', oldPrice: '$129.00', newPrice: '$119.00', change: '-7.7%', date: '2026-07-26 18:20' },
+  ]
+
+  const mockInventoryChanges = [
+    { sku: 'SSD-990P-2TB', name: 'Samsung 990 Pro 2TB SSD', supplier: 'GlobalSource Ltd.', oldStock: 120, newStock: 195, change: '+75 units', date: '2026-07-27 11:05' },
+    { sku: 'PSU-COR-1000W', name: 'Corsair RM1000x 1000W PSU', supplier: 'PrimeSupply Corp', oldStock: 45, newStock: 0, change: '-45 (Out of stock)', date: '2026-07-27 08:40' },
+    { sku: 'MON-ASUS-27', name: 'ASUS ROG Swift 27" Monitor', supplier: 'PrimeSupply Corp', oldStock: 50, newStock: 82, change: '+32 units', date: '2026-07-26 21:10' },
+  ]
+
+  const mockNewProducts = [
+    { sku: 'KEY-Q1PRO', name: 'Keychron Q1 Pro Wireless Keyboard', category: 'Peripherals', supplier: 'QuickShip LLC', price: '$199.00', added: '2026-07-27 07:00' },
+    { sku: 'CASE-NZXT-H9', name: 'NZXT H9 Flow Dual-Chamber Case', category: 'Components', supplier: 'AcmeDistributors', price: '$159.00', added: '2026-07-26 16:45' },
+  ]
+
+  const mockPublishingActivity = [
+    { sku: 'CPU-AMD-7950X', name: 'AMD Ryzen 9 7950X', store: 'Main Shift4Shop Storefront', status: 'Published', date: '2026-07-27 11:30' },
+    { sku: 'GPU-NV-4090', name: 'NVIDIA RTX 4090 24GB', store: 'US East Storefront', status: 'Published', date: '2026-07-27 11:15' },
+    { sku: 'KEY-Q1PRO', name: 'Keychron Q1 Pro Keyboard', store: 'EU Storefront', status: 'Staged for Publish', date: '2026-07-27 10:50' },
   ]
 
   return (
@@ -301,17 +325,17 @@ export const Reports: React.FC = () => {
       </AnimatePresence>
 
       <SectionHeader
-        title="Operational Analytics & Reports"
-        subtitle="Comprehensive operational reports across supplier feeds, PIM catalog health, inventory buffers, and Shift4Shop sync throughput"
+        title="Operational Reports"
+        subtitle="Detailed operational activity, feed import summaries, supplier metrics, and store publishing activity"
         actions={
-          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5">
               <Calendar size={14} className="text-slate-400" />
               <select
                 value={dateRange}
                 onChange={e => {
                   setDateRange(e.target.value)
-                  showNotification(`Date range changed to ${e.target.value}`)
+                  showNotification(`Date range set to ${e.target.value}`)
                 }}
                 className="text-xs text-slate-700 dark:text-slate-200 bg-transparent outline-none cursor-pointer font-bold"
               >
@@ -325,29 +349,64 @@ export const Reports: React.FC = () => {
         }
       />
 
-      <Tabs tabs={tabs} active={tab === 'supplier' ? 'supplier_performance' : tab === 'catalog' ? 'import_summary' : tab === 'inventory' ? 'inventory_changes' : tab === 'sync' ? 'sync_performance' : tab} onChange={setTab} />
+      <Tabs tabs={tabs} active={tab} onChange={setTab} />
 
-      {/* 1. SUPPLIER PERFORMANCE & IMPORT SUMMARY TAB */}
-      {(tab === 'supplier' || tab === 'supplier_performance' || tab === 'import_summary') && (
-        <div className="space-y-4 sm:space-y-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            {[
-              { label: 'Configured Suppliers', value: '27', delta: '+3 this month', up: true },
-              { label: 'Active Connections', value: '23', delta: '+2 this month', up: true },
-              { label: 'Total Catalog SKUs', value: '84,329', delta: '+1.2K this week', up: true },
-              { label: 'Avg Feed Parse Duration', value: '27 min', delta: '-4 min improved', up: true },
-            ].map(s => (
-              <div key={s.label} className="card p-3.5 sm:p-4">
-                <p className="text-[11px] sm:text-xs text-slate-400 font-medium mb-1 truncate">{s.label}</p>
-                <p className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">{s.value}</p>
-                <p className={`text-[10px] sm:text-xs mt-1 flex items-center gap-1 font-bold ${s.up ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}`}>
-                  <TrendingUp size={10} /> {s.delta}
-                </p>
-              </div>
-            ))}
+      {/* 1. IMPORT SUMMARY TAB */}
+      {tab === 'import_summary' && (
+        <div className="space-y-4">
+          <div className="card p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Feed Import Volume & Master Catalog Category Share</h3>
+            <ResponsiveContainer width="100%" height={240}>
+              <PieChart>
+                <Pie data={catalogPie} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
+                  {catalogPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                </Pie>
+                <Tooltip formatter={(v) => (v as number).toLocaleString()} contentStyle={{ borderRadius: '12px', fontSize: '12px' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      {/* 2. FAILED IMPORTS TAB */}
+      {tab === 'failed_imports' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="card p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Failed Import Error Category Share</h3>
+            <ResponsiveContainer width="100%" height={240}>
+              <PieChart>
+                <Pie data={validationErrorsPie} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, value }) => `${name} (${value})`} labelLine={false}>
+                  {validationErrorsPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                </Pie>
+                <Tooltip contentStyle={{ borderRadius: '12px', fontSize: '12px' }} />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
 
-          <div className="card p-4 sm:p-5">
+          <div className="card p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Failed Import Diagnostics Index</h3>
+            <div className="space-y-4 text-xs">
+              <div className="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                <span className="font-bold text-emerald-800 dark:text-emerald-300">Resolved & Approved Products</span>
+                <span className="font-black text-emerald-700 dark:text-emerald-400 text-sm">1,247 Items</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800">
+                <span className="font-bold text-amber-800 dark:text-amber-300">Pending Review Queue</span>
+                <span className="font-black text-amber-700 dark:text-amber-400 text-sm">84 Items</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-rose-50 dark:bg-rose-950/40 rounded-xl border border-rose-200 dark:border-rose-800">
+                <span className="font-bold text-rose-800 dark:text-rose-300">Rejected & Returned to Supplier</span>
+                <span className="font-black text-rose-700 dark:text-rose-400 text-sm">12 Items</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. SUPPLIER PERFORMANCE TAB */}
+      {tab === 'supplier_performance' && (
+        <div className="space-y-4 sm:space-y-6">
+          <div className="card p-4 sm:p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Supplier Products & Error Rate Breakdown</h3>
             <div className="w-full overflow-x-auto">
               <ResponsiveContainer width="100%" height={240} minWidth={300}>
@@ -364,7 +423,6 @@ export const Reports: React.FC = () => {
             </div>
           </div>
 
-          {/* Supplier Performance Table */}
           <div className="card overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-card w-full">
             <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Supplier Feed Performance Index</h3>
@@ -386,13 +444,13 @@ export const Reports: React.FC = () => {
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {supplierData.map(s => (
                     <tr key={s.name} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                      <td data-label="Supplier Partner" className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-800 dark:text-slate-200">{s.name}</td>
-                      <td data-label="Protocol" className="whitespace-nowrap px-4 py-3.5"><span className="text-2xs font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">{s.type}</span></td>
-                      <td data-label="Total SKUs" className="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-800 dark:text-slate-200">{s.products.toLocaleString()}</td>
-                      <td data-label="Synced SKUs" className="whitespace-nowrap px-4 py-3.5 text-emerald-600 dark:text-emerald-400 font-bold">{s.synced.toLocaleString()}</td>
-                      <td data-label="Validation Pass" className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-700 dark:text-slate-300">{s.passRate}%</td>
-                      <td data-label="Connection Uptime" className="whitespace-nowrap px-4 py-3.5 text-xs text-slate-500 dark:text-slate-400 font-mono">{s.uptime}</td>
-                      <td data-label="Status" className="whitespace-nowrap px-4 py-3.5">
+                      <td className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-800 dark:text-slate-200">{s.name}</td>
+                      <td className="whitespace-nowrap px-4 py-3.5"><span className="text-2xs font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">{s.type}</span></td>
+                      <td className="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-800 dark:text-slate-200">{s.products.toLocaleString()}</td>
+                      <td className="whitespace-nowrap px-4 py-3.5 text-emerald-600 dark:text-emerald-400 font-bold">{s.synced.toLocaleString()}</td>
+                      <td className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-700 dark:text-slate-300">{s.passRate}%</td>
+                      <td className="whitespace-nowrap px-4 py-3.5 text-xs text-slate-500 dark:text-slate-400 font-mono">{s.uptime}</td>
+                      <td className="whitespace-nowrap px-4 py-3.5">
                         <Badge variant={s.errors === 0 ? 'success' : 'warning'}>
                           {s.errors === 0 ? 'Optimal' : `${s.errors} Errors`}
                         </Badge>
@@ -406,132 +464,153 @@ export const Reports: React.FC = () => {
         </div>
       )}
 
-      {/* 2. CATALOG & NEW PRODUCTS TAB */}
-      {(tab === 'catalog' || tab === 'new_products' || tab === 'publishing_activity') && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="card p-5">
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Master Catalog Category Share</h3>
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie data={catalogPie} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
-                    {catalogPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                  </Pie>
-                  <Tooltip formatter={(v) => (v as number).toLocaleString()} contentStyle={{ borderRadius: '12px', fontSize: '12px' }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="card p-5">
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Catalog Quality & Completeness Index</h3>
-              <div className="space-y-3.5">
-                {[
-                  { label: 'Products With High-Res Images', pct: 97.2, color: 'bg-emerald-500' },
-                  { label: 'Products With Full Description', pct: 91.5, color: 'bg-indigo-500' },
-                  { label: 'Mapped To Category Tree', pct: 99.1, color: 'bg-emerald-500' },
-                  { label: 'Products With Retail Pricing', pct: 98.8, color: 'bg-emerald-500' },
-                  { label: 'Shift4Shop Storefront Published', pct: 98.1, color: 'bg-cyan-500' },
-                ].map(s => (
-                  <div key={s.label}>
-                    <div className="flex justify-between mb-1 text-xs">
-                      <span className="text-slate-600 dark:text-slate-300 font-semibold">{s.label}</span>
-                      <span className="font-bold text-slate-800 dark:text-slate-100">{s.pct}%</span>
-                    </div>
-                    <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full ${s.color}`} style={{ width: `${s.pct}%` }} />
-                    </div>
-                  </div>
+      {/* 4. PRICE CHANGES TAB */}
+      {tab === 'price_changes' && (
+        <div className="card overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-card w-full">
+          <div className="p-4 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Price Change Audit Log</h3>
+          </div>
+          <div className="table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Product SKU & Name</th>
+                  <th>Supplier Source</th>
+                  <th>Previous Price</th>
+                  <th>Updated Price</th>
+                  <th>Change (%)</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockPriceChanges.map(p => (
+                  <tr key={p.sku} className="hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                    <td className="font-semibold text-slate-800 dark:text-slate-100">{p.name} <span className="text-2xs font-mono text-slate-400 block">{p.sku}</span></td>
+                    <td className="text-slate-600 dark:text-slate-300 font-medium">{p.supplier}</td>
+                    <td className="text-slate-500 font-mono">{p.oldPrice}</td>
+                    <td className="font-bold text-slate-800 dark:text-slate-100 font-mono">{p.newPrice}</td>
+                    <td><span className={`px-2 py-0.5 rounded text-2xs font-bold ${p.change.startsWith('-') ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60' : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60'}`}>{p.change}</span></td>
+                    <td className="text-xs text-slate-400 font-mono">{p.date}</td>
+                  </tr>
                 ))}
-              </div>
-            </div>
+              </tbody>
+            </table>
           </div>
         </div>
       )}
 
-      {/* 3. INVENTORY & PRICE CHANGES TAB */}
-      {(tab === 'inventory' || tab === 'inventory_changes' || tab === 'price_changes') && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { label: 'In-Stock SKUs', value: '78,420', color: 'text-emerald-600' },
-              { label: 'Low Stock Threshold', value: '4,109', color: 'text-amber-600' },
-              { label: 'Out of Stock', value: '1,800', color: 'text-rose-600' },
-              { label: 'Reserved Stock', value: '12,450', color: 'text-primary-600' },
-            ].map(s => (
-              <div key={s.label} className="card p-4 text-center">
-                <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-                <p className="text-xs text-slate-400 font-medium mt-0.5">{s.label}</p>
-              </div>
-            ))}
+      {/* 5. INVENTORY CHANGES TAB */}
+      {tab === 'inventory_changes' && (
+        <div className="card overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-card w-full">
+          <div className="p-4 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Stock Level Inventory Change Report</h3>
           </div>
-
-          <div className="card p-5">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Inventory Buffer & Stock Health Ratio</h3>
-            <p className="text-xs text-slate-500 mb-4">Stock buffer maintained across 27 suppliers to prevent overselling on Shift4Shop storefronts.</p>
-            <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
-              <div className="bg-emerald-500 h-full" style={{ width: '85%' }} title="In-Stock (85%)" />
-              <div className="bg-amber-500 h-full" style={{ width: '10%' }} title="Low-Stock (10%)" />
-              <div className="bg-rose-500 h-full" style={{ width: '5%' }} title="Out-of-Stock (5%)" />
-            </div>
-            <div className="flex justify-between text-2xs text-slate-400 mt-2 font-bold uppercase">
-              <span className="text-emerald-600">85% Healthy Stock</span>
-              <span className="text-amber-600">10% Low Stock Alert</span>
-              <span className="text-rose-600">5% Out of Stock</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 4. SYNC PIPELINE & PERFORMANCE TAB */}
-      {(tab === 'sync' || tab === 'sync_performance') && (
-        <div className="space-y-4">
-          <div className="card p-5">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Sync Pipeline Success Rate (%) & Duration (Mins) — Last 6 Months</h3>
-            <ResponsiveContainer width="100%" height={240}>
-              <LineChart data={syncTrend} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis domain={[95, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }} />
-                <Line type="monotone" dataKey="success" name="Sync Success Rate %" stroke="#10b981" strokeWidth={2.5} dot={{ fill: '#10b981', r: 4 }} />
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Product SKU & Name</th>
+                  <th>Supplier Source</th>
+                  <th>Previous Stock</th>
+                  <th>New Stock</th>
+                  <th>Stock Change</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockInventoryChanges.map(i => (
+                  <tr key={i.sku} className="hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                    <td className="font-semibold text-slate-800 dark:text-slate-100">{i.name} <span className="text-2xs font-mono text-slate-400 block">{i.sku}</span></td>
+                    <td className="text-slate-600 dark:text-slate-300 font-medium">{i.supplier}</td>
+                    <td className="text-slate-500 font-mono">{i.oldStock}</td>
+                    <td className="font-bold text-slate-800 dark:text-slate-100 font-mono">{i.newStock}</td>
+                    <td><span className={`px-2 py-0.5 rounded text-2xs font-bold ${i.change.includes('-') ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/60' : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60'}`}>{i.change}</span></td>
+                    <td className="text-xs text-slate-400 font-mono">{i.date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
 
-      {/* 5. FAILED IMPORTS TAB */}
-      {tab === 'failed_imports' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="card p-5">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Pre-Publish Validation Error Share</h3>
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie data={validationErrorsPie} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, value }) => `${name} (${value})`} labelLine={false}>
-                  {validationErrorsPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                </Pie>
-                <Tooltip contentStyle={{ borderRadius: '12px', fontSize: '12px' }} />
-              </PieChart>
-            </ResponsiveContainer>
+      {/* 6. NEW PRODUCTS TAB */}
+      {tab === 'new_products' && (
+        <div className="card overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-card w-full">
+          <div className="p-4 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Newly Onboarded Products Report</h3>
           </div>
+          <div className="table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Product SKU & Title</th>
+                  <th>Category</th>
+                  <th>Supplier Source</th>
+                  <th>Retail Price</th>
+                  <th>Onboarded Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockNewProducts.map(n => (
+                  <tr key={n.sku} className="hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                    <td className="font-semibold text-slate-800 dark:text-slate-100">{n.name} <span className="text-2xs font-mono text-slate-400 block">{n.sku}</span></td>
+                    <td className="text-slate-600 dark:text-slate-300">{n.category}</td>
+                    <td className="text-slate-600 dark:text-slate-300 font-medium">{n.supplier}</td>
+                    <td className="font-bold text-slate-800 dark:text-slate-100 font-mono">{n.price}</td>
+                    <td className="text-xs text-slate-400 font-mono">{n.added}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
-          <div className="card p-5">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Failed Import Diagnostics Index</h3>
-            <div className="space-y-4 text-xs">
-              <div className="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800">
-                <span className="font-bold text-emerald-800 dark:text-emerald-300">Resolved & Approved Products</span>
-                <span className="font-black text-emerald-700 dark:text-emerald-400 text-sm">1,247 Items</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800">
-                <span className="font-bold text-amber-800 dark:text-amber-300">Pending Review Queue</span>
-                <span className="font-black text-amber-700 dark:text-amber-400 text-sm">84 Items</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-rose-50 dark:bg-rose-950/40 rounded-xl border border-rose-200 dark:border-rose-800">
-                <span className="font-bold text-rose-800 dark:text-rose-300">Rejected & Returned to Supplier</span>
-                <span className="font-black text-rose-700 dark:text-rose-400 text-sm">12 Items</span>
-              </div>
-            </div>
+      {/* 7. PUBLISHING ACTIVITY TAB */}
+      {tab === 'publishing_activity' && (
+        <div className="card overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-card w-full">
+          <div className="p-4 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Shift4Shop Storefront Publishing Activity</h3>
           </div>
+          <div className="table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Product SKU & Name</th>
+                  <th>Target Storefront</th>
+                  <th>Publishing Status</th>
+                  <th>Publish Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockPublishingActivity.map(pub => (
+                  <tr key={pub.sku} className="hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                    <td className="font-semibold text-slate-800 dark:text-slate-100">{pub.name} <span className="text-2xs font-mono text-slate-400 block">{pub.sku}</span></td>
+                    <td className="text-slate-600 dark:text-slate-300 font-medium">{pub.store}</td>
+                    <td><Badge variant={pub.status === 'Published' ? 'success' : 'info'}>{pub.status}</Badge></td>
+                    <td className="text-xs text-slate-400 font-mono">{pub.date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* 8. SYNC PERFORMANCE TAB */}
+      {tab === 'sync_performance' && (
+        <div className="card p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Sync Pipeline Success Rate (%) & Throughput Trends — Last 6 Months</h3>
+          <ResponsiveContainer width="100%" height={240}>
+            <LineChart data={syncTrend} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <YAxis domain={[95, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }} />
+              <Line type="monotone" dataKey="success" name="Sync Success Rate %" stroke="#10b981" strokeWidth={2.5} dot={{ fill: '#10b981', r: 4 }} />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       )}
     </div>

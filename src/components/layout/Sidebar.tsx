@@ -63,13 +63,7 @@ const NAV_ITEMS: NavItem[] = [
     ],
   },
   { id: 'reports', label: 'Reports', icon: <BarChart3 size={18} />, path: '/reports', module: 'reports' },
-  {
-    id: 'activity-logs', label: 'Activity & Logs', icon: <FileText size={18} />, module: 'logs',
-    children: [
-      { id: 'activity-feed', label: 'Activity Feed', icon: <Activity size={16} />, path: '/logs?view=activity', module: 'logs' },
-      { id: 'system-logs',   label: 'System Logs',   icon: <FileText size={16} />, path: '/logs?view=system',   module: 'logs' },
-    ],
-  },
+  { id: 'activity-logs', label: 'Activity & Logs', icon: <FileText size={18} />, path: '/logs', module: 'logs' },
   {
     id: 'administration', label: 'Administration', icon: <UserCog size={18} />, module: 'users',
     children: [
@@ -95,7 +89,10 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
   const visibleChildren = item.children?.filter(c => !c.module || hasPermission(c.module)) || []
   if (visibleChildren.length === 0) return null
 
-  const isChildActive = visibleChildren.some(c => c.path && location.pathname.startsWith(c.path))
+  const isChildActive = visibleChildren.some(c => {
+    if (!c.path) return false
+    return c.path === '/suppliers' ? location.pathname === '/suppliers' : location.pathname.startsWith(c.path)
+  })
 
   return (
     <div>
@@ -128,6 +125,7 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
                 <NavLink
                   key={child.id}
                   to={child.path!}
+                  end={child.path === '/suppliers'}
                   onClick={onClose}
                   className={({ isActive }) =>
                     cn('sidebar-item text-xs', isActive && 'sidebar-item-active')

@@ -344,6 +344,17 @@ export const Categories: React.FC = () => {
           </div>
 
           <div>
+            <label className="text-xs font-semibold text-slate-600 block mb-1.5">Description</label>
+            <textarea
+              className="input"
+              rows={3}
+              placeholder="Enter category description..."
+              value={formData.description}
+              onChange={e => setFormData({ ...formData, description: e.target.value })}
+            />
+          </div>
+
+          <div>
             <label className="text-xs font-semibold text-slate-600 block mb-1.5">Status</label>
             <select
               className="select"

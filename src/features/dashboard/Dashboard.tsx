@@ -143,15 +143,15 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="relative space-y-6">
-      {/* Static Header Banner */}
+      {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-card">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge variant="purple" dot>{roleInfo.focus}</Badge>
             <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-semibold">• Logged in as <strong className="text-slate-800 dark:text-slate-200">{currentUser.name}</strong></span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{roleInfo.title}</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{roleInfo.subtitle}</p>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">SupplyBridge Control Center</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Real-time catalog middleware, supplier feed pipelines, and Shift4Shop storefront sync</p>
         </div>
 
         {/* Header Action Controls */}
@@ -180,11 +180,11 @@ export const Dashboard: React.FC = () => {
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 cursor-pointer disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-xs cursor-pointer disabled:opacity-50"
             title="Click to refresh dashboard metrics"
           >
             <RefreshCw size={13} className={isRefreshing ? 'animate-spin text-primary-600' : 'text-slate-500'} />
-            <span className="hidden sm:inline">{isRefreshing ? 'Refreshing...' : lastUpdated}</span>
+            <span>{isRefreshing ? 'Refreshing...' : lastUpdated}</span>
           </button>
         </div>
       </div>
@@ -204,48 +204,49 @@ export const Dashboard: React.FC = () => {
 
       {/* Static Top KPI Grid */}
       <motion.div
-        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4"
+        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5"
         variants={stagger.parent}
         initial="initial"
         animate="animate"
       >
-
-        {cards.map((card) => {
-          const isSelected = activeCard === card.id;
-          return (
-            <motion.div
-              key={card.id}
-              variants={stagger.child}
-              transition={{ duration: 0.3 }}
-              onClick={() => setActiveCard(prev => (prev === card.id ? null : card.id))}
-              className={`kpi-card group cursor-pointer transition-all duration-200 ${isSelected ? card.activeClass : 'border-surface-border'
-                }`}
-            >
-              <div className="flex items-start justify-between">
-                <div className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 ${card.iconBg}`}>
-                  {card.icon}
+        {cards
+          .filter(c => c.id !== 'published-products' && c.id !== 'failed-products')
+          .map((card) => {
+            const isSelected = activeCard === card.id;
+            return (
+              <motion.div
+                key={card.id}
+                variants={stagger.child}
+                transition={{ duration: 0.3 }}
+                onClick={() => setActiveCard(prev => (prev === card.id ? null : card.id))}
+                className={`kpi-card group cursor-pointer transition-all duration-200 ${isSelected ? card.activeClass : 'border-surface-border'
+                  }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 ${card.iconBg}`}>
+                    {card.icon}
+                  </div>
+                  {card.change && (
+                    <span className={`text-2xs font-semibold px-1.5 py-0.5 rounded-full ${card.changeType === 'positive' ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800' : 'text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800'
+                      }`}>
+                      {card.change}
+                    </span>
+                  )}
                 </div>
-                {card.change && (
-                  <span className={`text-2xs font-semibold px-1.5 py-0.5 rounded-full ${card.changeType === 'positive' ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800' : 'text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800'
+                <div>
+                  <p className="kpi-label">{card.label}</p>
+                  <p className={`kpi-value mt-0.5 transition-colors duration-200 ${isSelected ? card.activeNumberClass : 'text-slate-900 dark:text-slate-100'
                     }`}>
-                    {card.change}
-                  </span>
-                )}
-              </div>
-              <div>
-                <p className="kpi-label">{card.label}</p>
-                <p className={`kpi-value mt-0.5 transition-colors duration-200 ${isSelected ? card.activeNumberClass : 'text-slate-900 dark:text-slate-100'
-                  }`}>
-                  {typeof card.value === 'number' ? card.value.toLocaleString() : card.value}
-                </p>
-              </div>
-            </motion.div>
-          );
-        })}
+                    {typeof card.value === 'number' ? card.value.toLocaleString() : card.value}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
       </motion.div>
 
-      {/* Static Sync Status + Jobs Summary + System Health */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      {/* Static Sync Status + Jobs Summary */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Sync Channels */}
         <div className="card p-5 border border-slate-200 dark:border-slate-800">
           <p className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
@@ -295,105 +296,6 @@ export const Dashboard: React.FC = () => {
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">{j.label}</p>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* System Infrastructure */}
-        <div className="card p-5 border border-slate-200 dark:border-slate-800">
-          <p className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-            <Server size={16} className="text-primary-600 dark:text-primary-400" /> System Infrastructure
-          </p>
-          <div className="space-y-3">
-            {[
-              { label: 'API Gateway', status: m.apiStatus, icon: <Wifi size={14} /> },
-              { label: 'FTP Service', status: m.ftpStatus, icon: <Server size={14} /> },
-              { label: 'Import Queue', status: 'operational', icon: <Database size={14} /> },
-              { label: 'Stores Online', status: m.storesSynced === m.totalStores ? 'operational' : 'degraded', icon: <Globe size={14} /> },
-            ].map(s => (
-              <div key={s.label} className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
-                <div className="flex items-center gap-2">
-                  <span className="text-slate-400">{s.icon}</span>
-                  {s.label}
-                </div>
-                <HealthIndicator status={s.status as any} label={s.status === 'operational' ? 'OK' : 'Degraded'} />
-              </div>
-            ))}
-            {/* Health bar */}
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
-              <div className="flex justify-between mb-1.5">
-                <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Overall System Health</span>
-                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{m.systemHealth}%</span>
-              </div>
-              <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full rounded-full bg-emerald-500"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${m.systemHealth}%` }}
-                  transition={{ duration: 1, delay: 0.3 }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-        {/* Sync Jobs Area Chart */}
-        <div className="xl:col-span-2 card p-4 sm:p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Synchronization Activity Trend</p>
-              <p className="text-xs text-slate-400 font-medium">Daily synchronized jobs across Inventory, Pricing & Images</p>
-            </div>
-            <Badge variant="primary" dot>Real-time</Badge>
-          </div>
-          <div className="w-full h-[240px] min-h-[240px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={mockSyncChartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colInv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0.0} />
-                  </linearGradient>
-                  <linearGradient id="colPri" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
-                  </linearGradient>
-                  <linearGradient id="colImg" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.25} />
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis domain={[0, 'auto']} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: '1px solid #334155', color: '#f8fafc', fontSize: '12px', boxShadow: '0 8px 16px rgba(0,0,0,0.3)' }} />
-                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }} />
-                <Area type="monotone" dataKey="inventory" name="Inventory Sync" stroke="#6366f1" strokeWidth={2.5} fill="url(#colInv)" />
-                <Area type="monotone" dataKey="pricing" name="Pricing Sync" stroke="#10b981" strokeWidth={2.5} fill="url(#colPri)" />
-                <Area type="monotone" dataKey="image" name="Image Sync" stroke="#06b6d4" strokeWidth={2.5} fill="url(#colImg)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Products by Supplier Bar Chart */}
-        <div className="card p-4 sm:p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-          <div className="mb-4">
-            <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Products by Supplier</p>
-            <p className="text-xs text-slate-400 font-medium">Top supplier distribution by catalog count</p>
-          </div>
-          <div className="w-full h-[240px] min-h-[240px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={[...mockProductsBySupplier].reverse()} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.25} horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} width={95} />
-                <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: '1px solid #334155', color: '#f8fafc', fontSize: '12px', boxShadow: '0 8px 16px rgba(0,0,0,0.3)' }} />
-                <Bar dataKey="products" name="Products" fill="#6366f1" radius={[0, 6, 6, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
           </div>
         </div>
       </div>

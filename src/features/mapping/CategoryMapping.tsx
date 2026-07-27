@@ -1,40 +1,39 @@
 import React, { useState } from 'react'
-import { Edit2, Trash2, Link2, CheckCircle2 } from 'lucide-react'
+import { Edit2, Trash2 } from 'lucide-react'
 import { SectionHeader, FilterBar, Select, ConfirmDialog } from '../../components/ui'
 import { Badge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 
-interface ProductMappingItem {
+interface CategoryMappingItem {
   id: string
-  supplierSku: string
+  supplierCategory: string
   supplierName: string
-  masterSku: string
+  masterCategory: string
   status: 'mapped' | 'unmapped'
 }
 
-const INITIAL_DATA: ProductMappingItem[] = [
-  { id: '1', supplierSku: 'ASUS-ROG-X570-E', supplierName: 'TechParts Int.', masterSku: 'MB-X570-001', status: 'mapped' },
-  { id: '2', supplierSku: 'CMK32GX5M2B6000C36', supplierName: 'TechParts Int.', masterSku: 'RAM-DDR5-001', status: 'mapped' },
-  { id: '3', supplierSku: 'ASUS-TUF-4090-OC', supplierName: 'TechParts Int.', masterSku: '', status: 'unmapped' },
-  { id: '4', supplierSku: 'MZ-V8P2T0B/AM', supplierName: 'GlobalSource Ltd.', masterSku: 'SSD-980P-001', status: 'mapped' },
-  { id: '5', supplierSku: 'LOG-MX-M3S-GR', supplierName: 'GlobalSource Ltd.', masterSku: 'MOUSE-MX3S-001', status: 'mapped' },
-  { id: '6', supplierSku: 'ACME-CMK-50-BLK', supplierName: 'AcmeDistributors', masterSku: '', status: 'unmapped' },
+const INITIAL_DATA: CategoryMappingItem[] = [
+  { id: '1', supplierCategory: 'PC Components > Motherboards', supplierName: 'TechParts Int.', masterCategory: 'Electronics > Computers > Motherboards', status: 'mapped' },
+  { id: '2', supplierCategory: 'Memory & Storage > RAM', supplierName: 'TechParts Int.', masterCategory: 'Electronics > Computers > Memory', status: 'mapped' },
+  { id: '3', supplierCategory: 'Peripherals > Input Devices', supplierName: 'GlobalSource Ltd.', masterCategory: 'Electronics > Peripherals', status: 'mapped' },
+  { id: '4', supplierCategory: 'Industrial > Cooling', supplierName: 'AcmeDistributors', masterCategory: '', status: 'unmapped' },
+  { id: '5', supplierCategory: 'Power > Modular PSUs', supplierName: 'TechParts Int.', masterCategory: 'Electronics > Power Supplies', status: 'mapped' },
 ]
 
-export const ProductMapping: React.FC = () => {
-  const [items, setItems] = useState<ProductMappingItem[]>(INITIAL_DATA)
+export const CategoryMapping: React.FC = () => {
+  const [items, setItems] = useState<CategoryMappingItem[]>(INITIAL_DATA)
   const [search, setSearch] = useState('')
   const [supplierFilter, setSupplierFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
 
-  const [editingItem, setEditingItem] = useState<ProductMappingItem | null>(null)
+  const [editingItem, setEditingItem] = useState<CategoryMappingItem | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [editMasterSku, setEditMasterSku] = useState('')
+  const [editMasterCategory, setEditMasterCategory] = useState('')
 
   const filtered = items.filter(item => {
     const matchesSearch =
-      item.supplierSku.toLowerCase().includes(search.toLowerCase()) ||
-      item.masterSku.toLowerCase().includes(search.toLowerCase()) ||
+      item.supplierCategory.toLowerCase().includes(search.toLowerCase()) ||
+      item.masterCategory.toLowerCase().includes(search.toLowerCase()) ||
       item.supplierName.toLowerCase().includes(search.toLowerCase())
     const matchesSupplier = supplierFilter === 'all' || item.supplierName === supplierFilter
     const matchesStatus = statusFilter === 'all' || item.status === statusFilter
@@ -43,22 +42,22 @@ export const ProductMapping: React.FC = () => {
 
   const suppliers = Array.from(new Set(items.map(i => i.supplierName)))
 
-  const handleOpenEdit = (item: ProductMappingItem) => {
+  const handleOpenEdit = (item: CategoryMappingItem) => {
     setEditingItem(item)
-    setEditMasterSku(item.masterSku)
+    setEditMasterCategory(item.masterCategory)
   }
 
   const handleSaveEdit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!editingItem) return
-    const updatedSku = editMasterSku.trim()
+    const updated = editMasterCategory.trim()
     setItems(prev =>
       prev.map(i =>
         i.id === editingItem.id
           ? {
               ...i,
-              masterSku: updatedSku,
-              status: updatedSku ? 'mapped' : 'unmapped',
+              masterCategory: updated,
+              status: updated ? 'mapped' : 'unmapped',
             }
           : i
       )
@@ -76,12 +75,12 @@ export const ProductMapping: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <SectionHeader
-        title="Product Mapping"
-        subtitle="Map supplier product SKUs to Master Catalog SKUs"
+        title="Category Mapping"
+        subtitle="Map supplier category names to Master Catalog categories"
       />
 
       {/* Filter & Search Bar */}
-      <FilterBar search={search} onSearch={setSearch} placeholder="Search supplier SKU or master SKU...">
+      <FilterBar search={search} onSearch={setSearch} placeholder="Search supplier category or master category...">
         <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto">
           <Select
             className="w-full sm:w-44"
@@ -105,15 +104,15 @@ export const ProductMapping: React.FC = () => {
         </div>
       </FilterBar>
 
-      {/* Product Mapping Table */}
+      {/* Category Mapping Table */}
       <div className="card overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card">
         <div className="table-container">
           <table className="table">
             <thead>
               <tr>
-                <th>Supplier SKU</th>
+                <th>Supplier Category</th>
                 <th>Supplier</th>
-                <th>Master SKU</th>
+                <th>Master Category</th>
                 <th>Status</th>
                 <th className="text-right">Action</th>
               </tr>
@@ -123,8 +122,8 @@ export const ProductMapping: React.FC = () => {
                 filtered.map(item => (
                   <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                     <td>
-                      <span className="font-mono text-xs font-bold text-slate-800 dark:text-slate-100">
-                        {item.supplierSku}
+                      <span className="font-bold text-slate-800 dark:text-slate-100 text-xs">
+                        {item.supplierCategory}
                       </span>
                     </td>
                     <td>
@@ -133,9 +132,9 @@ export const ProductMapping: React.FC = () => {
                       </span>
                     </td>
                     <td>
-                      {item.masterSku ? (
-                        <span className="font-mono text-2xs bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 text-amber-700 dark:text-amber-400 px-2.5 py-1 rounded font-bold">
-                          {item.masterSku}
+                      {item.masterCategory ? (
+                        <span className="text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 px-2.5 py-1 rounded">
+                          {item.masterCategory}
                         </span>
                       ) : (
                         <span className="text-2xs italic text-slate-400">Unassigned</span>
@@ -169,7 +168,7 @@ export const ProductMapping: React.FC = () => {
               ) : (
                 <tr>
                   <td colSpan={5} className="py-12 text-center text-slate-400">
-                    <p className="font-medium text-sm">No product mappings found matching your search</p>
+                    <p className="font-medium text-sm">No category mappings found matching your search</p>
                   </td>
                 </tr>
               )}
@@ -182,18 +181,18 @@ export const ProductMapping: React.FC = () => {
       <Modal
         open={editingItem !== null}
         onClose={() => setEditingItem(null)}
-        title="Edit Product Mapping"
-        subtitle={`Supplier SKU: ${editingItem?.supplierSku}`}
+        title="Edit Category Mapping"
+        subtitle={`Supplier Category: ${editingItem?.supplierCategory}`}
         size="md"
       >
         <form onSubmit={handleSaveEdit} className="space-y-4">
           <div>
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Supplier SKU</label>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Supplier Category</label>
             <input
               type="text"
               disabled
-              value={editingItem?.supplierSku || ''}
-              className="input font-mono bg-slate-100 dark:bg-slate-800 text-slate-500 cursor-not-allowed"
+              value={editingItem?.supplierCategory || ''}
+              className="input bg-slate-100 dark:bg-slate-800 text-slate-500 cursor-not-allowed"
             />
           </div>
 
@@ -208,14 +207,14 @@ export const ProductMapping: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Master SKU *</label>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">Master Category *</label>
             <input
               type="text"
               required
-              value={editMasterSku}
-              onChange={e => setEditMasterSku(e.target.value)}
-              placeholder="e.g. MB-X570-001"
-              className="input font-mono uppercase"
+              value={editMasterCategory}
+              onChange={e => setEditMasterCategory(e.target.value)}
+              placeholder="e.g. Electronics > Computers > Memory"
+              className="input"
             />
           </div>
 
@@ -232,7 +231,7 @@ export const ProductMapping: React.FC = () => {
         onClose={() => setDeletingId(null)}
         onConfirm={handleDelete}
         title="Delete Mapping"
-        message="Are you sure you want to delete this product mapping rule?"
+        message="Are you sure you want to delete this category mapping rule?"
         confirmLabel="Yes, Delete"
         danger
       />

@@ -242,9 +242,10 @@ export const Users: React.FC = () => {
               value={inviteRole}
               onChange={e => setInviteRole(e.target.value as UserRole)}
             >
-              {Object.entries(ROLE_LABELS).map(([k, v]) => (
-                <option key={k} value={k}>{v}</option>
-              ))}
+              <option value="platform_owner">Platform Owner</option>
+              <option value="administrator">Administrator</option>
+              <option value="catalog_manager">Catalog Manager</option>
+              <option value="read_only">Read Only</option>
             </select>
           </div>
 

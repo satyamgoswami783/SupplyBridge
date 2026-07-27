@@ -182,21 +182,6 @@ export const Variants: React.FC = () => {
         }
       />
 
-      {/* Summary KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {[
-          { label: 'Variant Dimensions', value: totalDimensions, color: 'text-slate-900' },
-          { label: 'Total Value Chips',  value: totalOptionValues, color: 'text-violet-600' },
-          { label: 'Products Using',      value: totalProductsCovered.toLocaleString(), color: 'text-emerald-600' },
-          { label: 'Auto-Mapped Rules',  value: '99.4%', color: 'text-primary-600' },
-        ].map(s => (
-          <div key={s.label} className="card p-4 text-center">
-            <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-400 font-semibold mt-0.5">{s.label}</p>
-          </div>
-        ))}
-      </div>
-
       <FilterBar search={search} onSearch={setSearch} placeholder="Search variant types by name..." />
 
       {filtered.length === 0 ? (

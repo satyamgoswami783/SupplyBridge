@@ -14,6 +14,10 @@ import { Variants } from '../features/catalog/Variants'
 import { MediaLibrary } from '../features/catalog/MediaLibrary'
 import { SupplierOnboardingWizard } from '../features/suppliers/SupplierOnboardingWizard'
 import { ProductMapping } from '../features/mapping/ProductMapping'
+import { CategoryMapping } from '../features/mapping/CategoryMapping'
+import { BrandMapping } from '../features/mapping/BrandMapping'
+import { VariantMapping } from '../features/mapping/VariantMapping'
+import { AttributeMapping } from '../features/mapping/AttributeMapping'
 import { ValidationCenter } from '../features/validation/ValidationCenter'
 import { InventorySync } from '../features/sync/InventorySync'
 import { PricingSync } from '../features/sync/PricingSync'
@@ -51,10 +55,10 @@ export const AppRouter: React.FC = () => (
         <Route path="mapping">
           <Route index element={<ProtectedRoute module="mapping" moduleName="Product Mapping"><ProductMapping /></ProtectedRoute>} />
           <Route path="products" element={<ProtectedRoute module="mapping" moduleName="Product Mapping"><ProductMapping /></ProtectedRoute>} />
-          <Route path="categories" element={<ProtectedRoute module="mapping" moduleName="Category Mapping"><ProductMapping /></ProtectedRoute>} />
-          <Route path="variants" element={<ProtectedRoute module="mapping" moduleName="Variant Mapping"><ProductMapping /></ProtectedRoute>} />
-          <Route path="attributes" element={<ProtectedRoute module="mapping" moduleName="Attribute Mapping"><ProductMapping /></ProtectedRoute>} />
-          <Route path="suppliers" element={<ProtectedRoute module="mapping" moduleName="Supplier Mapping"><ProductMapping /></ProtectedRoute>} />
+          <Route path="categories" element={<ProtectedRoute module="mapping" moduleName="Category Mapping"><CategoryMapping /></ProtectedRoute>} />
+          <Route path="brands" element={<ProtectedRoute module="mapping" moduleName="Brand Mapping"><BrandMapping /></ProtectedRoute>} />
+          <Route path="variants" element={<ProtectedRoute module="mapping" moduleName="Variant Mapping"><VariantMapping /></ProtectedRoute>} />
+          <Route path="attributes" element={<ProtectedRoute module="mapping" moduleName="Attribute Mapping"><AttributeMapping /></ProtectedRoute>} />
         </Route>
         <Route path="validation" element={<ProtectedRoute module="validation" moduleName="Validation Center"><ValidationCenter /></ProtectedRoute>} />
         <Route path="sync">

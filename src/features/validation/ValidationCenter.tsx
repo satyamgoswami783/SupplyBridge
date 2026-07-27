@@ -10,16 +10,14 @@ import type { ValidationItem, ValidationStatus } from '../../types'
 import { useAuth } from '../../context/AuthContext'
 
 const errorTypeLabel: Record<string, string> = {
-  duplicate_sku: 'Duplicate SKU',
-  duplicate_upc: 'Duplicate UPC',
+  duplicate_sku: 'Duplicate SKUs',
+  duplicate_upc: 'Duplicate UPCs',
   missing_image: 'Missing Images',
   missing_price: 'Missing Pricing',
   missing_inventory: 'Missing Inventory',
   invalid_category: 'Missing Categories',
   missing_attribute: 'Missing Attributes',
   invalid_variant: 'Invalid Variants',
-  duplicate_product: 'Duplicate Product',
-  missing_description: 'Missing Description',
 }
 
 export const ValidationCenter: React.FC = () => {
@@ -206,24 +204,26 @@ export const ValidationCenter: React.FC = () => {
         <div className="flex items-center gap-2">
           <AlertTriangle size={16} className="text-amber-500 flex-shrink-0" />
           <span className="font-bold">Publishing Guard Active:</span>
-          <span>Products with validation issues (Duplicate SKU, Missing Pricing, Invalid Variants) are blocked from publishing.</span>
+          <span>Products with validation issues cannot be published until resolved.</span>
         </div>
         <Badge variant="warning" dot>PUBLISH BLOCKED</Badge>
       </div>
 
       {/* Error Summary KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5 mb-6">
         {[
-          { label: 'Pending Review', value: items.filter(v => v.status === 'pending').length, color: 'text-amber-600', bg: 'bg-amber-50' },
-          { label: 'In Review', value: items.filter(v => v.status === 'review').length, color: 'text-cyan-600', bg: 'bg-cyan-50' },
-          { label: 'Missing Images', value: getErrorCount('missing_image'), color: 'text-rose-600', bg: 'bg-rose-50' },
-          { label: 'Duplicate SKU', value: getErrorCount('duplicate_sku'), color: 'text-violet-600', bg: 'bg-violet-50' },
-          { label: 'Missing Price', value: getErrorCount('missing_price'), color: 'text-amber-600', bg: 'bg-amber-50' },
-          { label: 'Invalid Cat.', value: getErrorCount('invalid_category'), color: 'text-orange-600', bg: 'bg-orange-50' },
+          { label: 'Duplicate SKUs', value: getErrorCount('duplicate_sku'), color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-950/60' },
+          { label: 'Duplicate UPCs', value: getErrorCount('duplicate_upc'), color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-950/60' },
+          { label: 'Missing Images', value: getErrorCount('missing_image'), color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/60' },
+          { label: 'Missing Pricing', value: getErrorCount('missing_price'), color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/60' },
+          { label: 'Missing Inventory', value: getErrorCount('missing_inventory'), color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-950/60' },
+          { label: 'Missing Categories', value: getErrorCount('invalid_category'), color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-950/60' },
+          { label: 'Missing Attributes', value: getErrorCount('missing_attribute'), color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-950/60' },
+          { label: 'Invalid Variants', value: getErrorCount('invalid_variant'), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/60' },
         ].map(s => (
-          <div key={s.label} className={`${s.bg} rounded-xl p-3 text-center`}>
-            <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-500 mt-0.5 font-medium">{s.label}</p>
+          <div key={s.label} className={`${s.bg} rounded-xl p-2.5 text-center border border-slate-100 dark:border-slate-800`}>
+            <p className={`text-lg font-black ${s.color}`}>{s.value}</p>
+            <p className="text-2xs text-slate-500 dark:text-slate-400 mt-0.5 font-bold leading-tight">{s.label}</p>
           </div>
         ))}
       </div>
@@ -242,18 +242,19 @@ export const ValidationCenter: React.FC = () => {
             ))}
           </select>
           <select
-            className="select input-sm w-[130px] font-medium"
+            className="select input-sm w-[160px] font-medium"
             value={selectedErrorType}
             onChange={e => setSelectedErrorType(e.target.value)}
           >
             <option value="All Error Types">All Error Types</option>
-            <option value="Missing Image">Missing Image</option>
-            <option value="Duplicate SKU">Duplicate SKU</option>
-            <option value="Missing Price">Missing Price</option>
-            <option value="Invalid Category">Invalid Category</option>
-            <option value="Missing Description">Missing Description</option>
-            <option value="Invalid Attribute">Invalid Attribute</option>
-            <option value="Duplicate Product">Duplicate Product</option>
+            <option value="Duplicate SKUs">Duplicate SKUs</option>
+            <option value="Duplicate UPCs">Duplicate UPCs</option>
+            <option value="Missing Images">Missing Images</option>
+            <option value="Missing Pricing">Missing Pricing</option>
+            <option value="Missing Inventory">Missing Inventory</option>
+            <option value="Missing Categories">Missing Categories</option>
+            <option value="Missing Attributes">Missing Attributes</option>
+            <option value="Invalid Variants">Invalid Variants</option>
           </select>
         </div>
       </FilterBar>

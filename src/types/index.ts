@@ -245,7 +245,7 @@ export interface ValidationItem {
 
 export interface ValidationError {
   field: string
-  type: 'missing_image' | 'duplicate_sku' | 'invalid_category' | 'missing_price' | 'invalid_attribute' | 'duplicate_product' | 'missing_description'
+  type: 'duplicate_sku' | 'duplicate_upc' | 'missing_image' | 'missing_price' | 'missing_inventory' | 'invalid_category' | 'missing_attribute' | 'invalid_variant'
   message: string
   severity: 'error' | 'warning'
 }
