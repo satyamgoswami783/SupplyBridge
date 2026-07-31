@@ -263,15 +263,13 @@ export const mockLogs: LogEntry[] = [
   { id: 'l10', type: 'error', level: 'error', message: 'Image download failed: 404 Not Found', details: 'URL: https://cdn.acmedist.com/images/product_47823.jpg — Product SKU: ACME-IF-120', timestamp: '2026-07-24T02:45:00Z' },
 ]
 
-// ─── Users ────────────────────────────────────────────────
 export const mockUsers: User[] = [
   { id: 'u1', name: 'Alex Morrison', email: 'alex@supplybridge.io', role: 'platform_owner', status: 'active', lastLogin: '2026-07-24T05:00:00Z', createdAt: '2024-01-01T00:00:00Z', department: 'Technology' },
   { id: 'u2', name: 'Sarah Kim', email: 'sarah@supplybridge.io', role: 'administrator', status: 'active', lastLogin: '2026-07-24T04:30:00Z', createdAt: '2024-02-15T00:00:00Z', department: 'Operations' },
   { id: 'u3', name: 'James Patel', email: 'jpatel@supplybridge.io', role: 'catalog_manager', status: 'active', lastLogin: '2026-07-23T16:00:00Z', createdAt: '2024-04-01T00:00:00Z', department: 'Catalog' },
-  { id: 'u4', name: 'Emily Chen', email: 'echen@supplybridge.io', role: 'administrator', status: 'active', lastLogin: '2026-07-24T03:00:00Z', createdAt: '2024-05-10T00:00:00Z', department: 'Integrations' },
-  { id: 'u5', name: 'Marcus Johnson', email: 'mjohnson@supplybridge.io', role: 'read_only', status: 'active', lastLogin: '2026-07-23T09:00:00Z', createdAt: '2024-07-20T00:00:00Z', department: 'Operations' },
-  { id: 'u6', name: 'Priya Sharma', email: 'psharma@supplybridge.io', role: 'catalog_manager', status: 'invited', createdAt: '2026-07-20T00:00:00Z', department: 'Catalog' },
-  { id: 'u7', name: 'Tom Walker', email: 'twalker@supplybridge.io', role: 'read_only', status: 'inactive', lastLogin: '2026-06-15T00:00:00Z', createdAt: '2024-09-01T00:00:00Z', department: 'Operations' },
+  { id: 'u4', name: 'Elena Rostova', email: 'elena@supplybridge.io', role: 'integration_manager', status: 'active', lastLogin: '2026-07-24T03:00:00Z', createdAt: '2024-05-10T00:00:00Z', department: 'Integrations' },
+  { id: 'u6', name: 'David Vance', email: 'dvance@supplybridge.io', role: 'operations_staff', status: 'active', lastLogin: '2026-07-23T09:00:00Z', createdAt: '2024-07-20T00:00:00Z', department: 'Store Operations' },
+  { id: 'u5', name: 'Priya Sharma', email: 'psharma@supplybridge.io', role: 'catalog_manager', status: 'invited', createdAt: '2026-07-20T00:00:00Z', department: 'Catalog' },
 ]
 
 // ─── Roles ────────────────────────────────────────────────
@@ -279,8 +277,10 @@ export const mockRoles: Role[] = [
   { id: 'r1', name: 'Platform Owner', slug: 'platform_owner', description: 'Full platform owner access. Can manage all modules, users, roles, and settings.', userCount: 1, permissions: ['*'], createdAt: '2024-01-01T00:00:00Z' },
   { id: 'r2', name: 'Administrator', slug: 'administrator', description: 'Daily platform administration, supplier inventory, pricing & catalog performance.', userCount: 1, permissions: ['dashboard', 'suppliers', 'integrations', 'catalog', 'mapping', 'validation', 'sync', 'logs', 'monitoring', 'reports', 'users'], createdAt: '2024-01-01T00:00:00Z' },
   { id: 'r3', name: 'Catalog Manager', slug: 'catalog_manager', description: 'Manages products, categories, variants, mapping, and validation queue.', userCount: 2, permissions: ['dashboard', 'catalog', 'categories', 'brands', 'variants', 'mapping', 'validation'], createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'r4', name: 'Read Only', slug: 'read_only', description: 'Read-only access to monitoring, reports, system logs, and validation status.', userCount: 2, permissions: ['dashboard', 'monitoring', 'reports', 'logs', 'validation_review'], createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'r4', name: 'Integration Manager', slug: 'integration_manager', description: 'Manages supplier feeds, API & SFTP protocols, data mapping, and sync queue pipelines.', userCount: 1, permissions: ['dashboard', 'suppliers', 'mapping', 'inventory_sync', 'pricing_sync', 'sync_jobs', 'logs'], createdAt: '2024-05-01T00:00:00Z' },
+  { id: 'r5', name: 'Operations Staff', slug: 'operations_staff', description: 'Storefront sync execution, product validation error review, and order fulfillment status.', userCount: 1, permissions: ['dashboard', 'products', 'validation', 'sync_jobs', 'logs', 'reports'], createdAt: '2024-06-01T00:00:00Z' },
 ]
+
 
 // ─── Activity Feed ────────────────────────────────────────
 export const mockActivities = [

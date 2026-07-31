@@ -416,13 +416,13 @@ export const Suppliers: React.FC = () => {
                     onClick={() => setSelected(supplier)}
                   >
                     <td data-label="Supplier">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-end gap-3 text-right">
+                        <div className="text-right">
+                          <p className="font-bold text-slate-900 dark:text-slate-100 text-sm leading-snug">{supplier.name}</p>
+                          <p className="text-xs text-slate-400 dark:text-slate-400 font-medium">{supplier.code} · {supplier.country}</p>
+                        </div>
                         <div className="w-9 h-9 rounded-xl bg-primary-50 dark:bg-primary-950/60 border border-primary-100 dark:border-primary-900/60 flex items-center justify-center text-base flex-shrink-0">
                           {connTypeIcon[supplier.connectionType]}
-                        </div>
-                        <div>
-                          <p className="font-bold text-slate-900 dark:text-slate-100 text-sm">{supplier.name}</p>
-                          <p className="text-xs text-slate-400 dark:text-slate-400 font-medium">{supplier.code} · {supplier.country}</p>
                         </div>
                       </div>
                     </td>

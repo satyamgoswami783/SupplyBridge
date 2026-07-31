@@ -10,18 +10,22 @@ import { useAuth } from '../../context/AuthContext'
 import type { User, UserRole } from '../../types'
 
 const ROLE_LABELS: Record<UserRole, string> = {
-  platform_owner:  'Platform Owner',
-  administrator:   'Administrator',
-  catalog_manager: 'Catalog Manager',
-  read_only:       'Read Only',
+  platform_owner:      'Platform Owner',
+  administrator:       'Administrator',
+  catalog_manager:     'Catalog Manager',
+  integration_manager: 'Integration Manager',
+  operations_staff:    'Operations Staff',
 }
 
 const ROLE_COLORS: Record<UserRole, string> = {
-  platform_owner:  'purple',
-  administrator:   'primary',
-  catalog_manager: 'info',
-  read_only:       'neutral',
+  platform_owner:      'purple',
+  administrator:       'primary',
+  catalog_manager:     'info',
+  integration_manager: 'cyan',
+  operations_staff:    'amber',
 } as any
+
+
 
 const ROLE_DESCRIPTIONS: Record<string, string> = {
   platform_owner:  'Full unrestricted control over system configuration, user management, security, and global middleware settings.',

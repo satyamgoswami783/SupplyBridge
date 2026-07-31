@@ -476,7 +476,7 @@ export const InventorySync: React.FC = () => {
                   return (
                     <tr key={row.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                       <td data-label="Product Name" className="whitespace-nowrap px-4 py-3.5">
-                        <p className="font-bold text-slate-900 dark:text-slate-100 text-xs leading-normal max-w-xs truncate">{row.name}</p>
+                        <p className="font-bold text-slate-900 dark:text-slate-100 text-xs leading-snug break-words">{row.name}</p>
                       </td>
                       <td data-label="Master SKU" className="whitespace-nowrap px-4 py-3.5">
                         <code className="mono text-xs">{row.sku}</code>
@@ -527,7 +527,7 @@ export const InventorySync: React.FC = () => {
                       <td data-label="Last Sync" className="whitespace-nowrap px-4 py-3.5">
                         <span className="text-2xs text-slate-500 dark:text-slate-400 font-mono">{row.lastSync}</span>
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3.5 text-right pr-4">
+                      <td data-label="Action" className="whitespace-nowrap px-4 py-3.5 text-right pr-4">
                         {/* Workflow Action Buttons */}
                         {row.syncStatus === 'Synced' ? (
                           <button

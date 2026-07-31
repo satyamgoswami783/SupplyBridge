@@ -1,19 +1,23 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import {
   Bell, Search, ChevronDown, Menu, Sun, Moon, Zap, User, LogOut, X,
-  Package, Truck, FileText, Layers, ShieldCheck, Briefcase, Award, Tag, AlertTriangle
+  Package, Truck, FileText, Layers, ShieldCheck, Briefcase, Award, Tag, AlertTriangle, Star
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { useFavorites } from '../../context/FavoritesContext'
 import { getInitials } from '../../utils'
 import type { UserRole } from '../../types'
 
 const ROLE_LABELS: Record<UserRole, string> = {
-  platform_owner:  'Platform Owner',
-  administrator:   'Administrator',
-  catalog_manager: 'Catalog Manager',
-  read_only:       'Read Only',
+  platform_owner:      'Platform Owner',
+  administrator:       'Administrator',
+  catalog_manager:     'Catalog Manager',
+  integration_manager: 'Integration Manager',
+  operations_staff:    'Operations Staff',
 }
+
+
 
 interface SearchItem {
   id: string
@@ -68,15 +72,40 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleDark }) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { currentUser, role, logout, openCurrentUserProfile } = useAuth()
+  const { favorites, isFavorite, toggleFavorite, removeFavorite } = useFavorites()
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [showFavoritesDropdown, setShowFavoritesDropdown] = useState(false)
   const [showSearchModal, setShowSearchModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchCategory, setSearchCategory] = useState('all')
 
   const notifRef = useRef<HTMLDivElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
+  const favRef = useRef<HTMLDivElement>(null)
+
+  // Map active route to page item label
+  const currentPath = location.pathname
+  const isCurrentPinned = isFavorite(currentPath)
+
+  const getActivePageItem = () => {
+    if (currentPath === '/') return { id: 'dashboard', label: 'Dashboard', path: '/' }
+    if (currentPath.startsWith('/catalog/products')) return { id: 'products', label: 'Products Catalog', path: '/catalog/products' }
+    if (currentPath.startsWith('/catalog/categories')) return { id: 'categories', label: 'Categories Taxonomy', path: '/catalog/categories' }
+    if (currentPath.startsWith('/catalog/brands')) return { id: 'brands', label: 'Brands Directory', path: '/catalog/brands' }
+    if (currentPath.startsWith('/catalog/manufacturers')) return { id: 'manufacturers', label: 'Manufacturers', path: '/catalog/manufacturers' }
+    if (currentPath.startsWith('/validation')) return { id: 'validation', label: 'Validation Center', path: '/validation' }
+    if (currentPath.startsWith('/sync/jobs')) return { id: 'sync-jobs', label: 'Sync Queue Management', path: '/sync/jobs' }
+    if (currentPath.startsWith('/sync/inventory')) return { id: 'inventory-sync', label: 'Inventory Sync', path: '/sync/inventory' }
+    if (currentPath.startsWith('/reports')) return { id: 'reports', label: 'Reports & Analytics', path: '/reports' }
+    if (currentPath.startsWith('/logs')) return { id: 'logs', label: 'Activity Logs', path: '/logs' }
+    if (currentPath.startsWith('/settings')) return { id: 'settings', label: 'Platform Settings', path: '/settings' }
+    return { id: currentPath.replace('/', '') || 'root', label: currentPath === '/' ? 'Dashboard' : currentPath.split('/')[1], path: currentPath }
+  }
+
+  const activePageItem = getActivePageItem()
 
   // ⌘K Shortcut Listener
   useEffect(() => {
@@ -101,6 +130,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
       }
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
         setShowProfileMenu(false)
+      }
+      if (favRef.current && !favRef.current.contains(e.target as Node)) {
+        setShowFavoritesDropdown(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -152,19 +184,12 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
                 <Zap size={15} className="text-amber-400 fill-amber-400/20 animate-pulse" />
               </div>
             </div>
-            <div>
-              <div className="flex items-center gap-1">
-                <span className="font-black text-slate-900 dark:text-white text-sm tracking-tight">SupplyBridge</span>
-                <span className="text-[8px] font-black bg-amber-500 text-white px-1 py-0.2 rounded-full uppercase">PRO</span>
-              </div>
-              <span className="text-[9px] font-black text-amber-600 dark:text-cyan-400 uppercase tracking-wider block leading-none">Enterprise PIM</span>
-            </div>
           </div>
         </div>
 
         {/* Search Bar Trigger */}
         <div
-          className="relative flex-1 max-w-md hidden sm:block cursor-pointer"
+          className="relative flex-1 max-w-sm hidden sm:block cursor-pointer"
           onClick={() => setShowSearchModal(true)}
         >
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
@@ -172,12 +197,112 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, darkMode, onToggleD
             type="text"
             readOnly
             placeholder="Search products, suppliers, brands, SKUs, jobs..."
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-transparent dark:border-slate-700/60 focus:bg-white dark:focus:bg-slate-900 focus:border-slate-200 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all placeholder-slate-400 dark:placeholder-slate-500 dark:text-slate-100 cursor-pointer"
+            className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-transparent dark:border-slate-700/60 focus:bg-white dark:focus:bg-slate-900 focus:border-slate-200 dark:focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all placeholder-slate-400 dark:placeholder-slate-500 dark:text-slate-100 cursor-pointer"
           />
-          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden lg:inline-block px-1.5 py-0.5 text-2xs font-medium text-slate-400 dark:text-slate-500 bg-slate-200 dark:bg-slate-700/80 rounded">⌘K</kbd>
+          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden xl:inline-block px-1.5 py-0.5 text-2xs font-medium text-slate-400 dark:text-slate-500 bg-slate-200 dark:bg-slate-700/80 rounded">⌘K</kbd>
         </div>
 
+        {/* ⭐ Front-End Quick Access Favorites Button Pills Bar */}
+        <div className="hidden lg:flex items-center gap-1.5 overflow-x-auto scrollbar-hide max-w-md py-1">
+          {favorites.map(fav => {
+            const isActive = currentPath === fav.path || (fav.path !== '/' && currentPath.startsWith(fav.path))
+            return (
+              <Link
+                key={fav.id}
+                to={fav.path}
+                className={`px-2.5 py-1 rounded-xl text-2xs font-bold flex items-center gap-1.5 transition-all flex-shrink-0 cursor-pointer shadow-2xs border ${
+                  isActive
+                    ? 'bg-amber-500 text-white border-amber-600 shadow-amber-500/20 font-black'
+                    : 'bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700/80 hover:border-amber-400 hover:text-amber-600 dark:hover:text-amber-400'
+                }`}
+                title={`Go to ${fav.label}`}
+              >
+                <Star size={11} className={isActive ? 'fill-white text-white' : 'fill-amber-400 text-amber-400'} />
+                <span className="truncate max-w-[110px]">{fav.label}</span>
+                <span
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    removeFavorite(fav.id)
+                  }}
+                  className="hover:text-rose-500 p-0.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700/80 transition-colors"
+                  title="Unpin Favorite"
+                >
+                  <X size={10} />
+                </span>
+              </Link>
+            )
+          })}
+        </div>
+
+
         <div className="flex items-center gap-1 ml-auto">
+          {/* ⭐ Pin Active Page Button */}
+          <button
+            type="button"
+            onClick={() => toggleFavorite(activePageItem)}
+            className={`btn-icon transition-colors relative cursor-pointer ${
+              isCurrentPinned
+                ? 'text-amber-400 bg-amber-500/10 border-amber-400/30'
+                : 'text-slate-400 dark:text-slate-500 hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+            title={isCurrentPinned ? `Unpin ${activePageItem.label} from Favorites` : `Pin ${activePageItem.label} to Favorites`}
+          >
+            <Star size={18} className={isCurrentPinned ? 'fill-amber-400 text-amber-400' : ''} />
+          </button>
+
+          {/* ⭐ Favorites Dropdown Quick Menu */}
+          <div className="relative" ref={favRef}>
+            <button
+              onClick={() => setShowFavoritesDropdown(!showFavoritesDropdown)}
+              className="btn-icon relative dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer"
+              title="Favorite Pinned Pages"
+            >
+              <Star size={18} className={favorites.length > 0 ? 'fill-amber-400/20 text-amber-400' : 'text-slate-400'} />
+              {favorites.length > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-white dark:ring-slate-900" />
+              )}
+            </button>
+            {showFavoritesDropdown && (
+              <div className="fixed inset-x-3 top-14 sm:absolute sm:inset-x-auto sm:right-0 sm:top-10 sm:w-72 card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card-lg z-50 overflow-hidden">
+                <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                  <span className="font-bold text-xs text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                    <Star size={14} className="fill-amber-400 text-amber-400" /> Favorites ({favorites.length})
+                  </span>
+                  <span className="text-2xs text-slate-400 font-mono">User Pinned</span>
+                </div>
+                <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-64 overflow-y-auto">
+                  {favorites.length === 0 ? (
+                    <div className="p-4 text-center text-xs text-slate-400 italic">
+                      No pinned pages yet. Click the ⭐ icon on top header to pin any page!
+                    </div>
+                  ) : (
+                    favorites.map(fav => (
+                      <div key={fav.id} className="px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between group">
+                        <Link
+                          to={fav.path}
+                          onClick={() => setShowFavoritesDropdown(false)}
+                          className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-amber-500 truncate"
+                        >
+                          <Star size={13} className="fill-amber-400 text-amber-400 flex-shrink-0" />
+                          <span className="truncate">{fav.label}</span>
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => removeFavorite(fav.id)}
+                          className="p-1 text-slate-400 hover:text-rose-500 rounded cursor-pointer"
+                          title="Unpin"
+                        >
+                          <X size={13} />
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Dark mode toggle */}
           <button
             onClick={onToggleDark}

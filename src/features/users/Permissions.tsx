@@ -43,12 +43,16 @@ const MODULE_LIST: ModuleDef[] = [
   { key: 'settings',         label: 'Platform Settings',        category: 'Security & Settings', desc: 'Global platform configuration & environment' },
 ]
 
-const ROLE_METADATA: { role: UserRole; name: string; badgeVariant: 'purple' | 'primary' | 'info' | 'neutral'; desc: string }[] = [
-  { role: 'platform_owner',  name: 'Platform Owner',  badgeVariant: 'purple',  desc: 'Full System Owner (*)' },
-  { role: 'administrator',   name: 'Administrator',   badgeVariant: 'primary', desc: 'Business Operations Manager' },
-  { role: 'catalog_manager', name: 'Catalog Manager', badgeVariant: 'info',    desc: 'PIM & Merchandising' },
-  { role: 'read_only',       name: 'Read Only',       badgeVariant: 'neutral', desc: 'Monitoring & Review Specialist' },
+const ROLE_METADATA: { role: UserRole; name: string; badgeVariant: 'purple' | 'primary' | 'info' | 'warning'; desc: string }[] = [
+  { role: 'platform_owner',      name: 'Platform Owner',      badgeVariant: 'purple',  desc: 'Full System Owner (*)' },
+  { role: 'administrator',       name: 'Administrator',       badgeVariant: 'primary', desc: 'Business Operations Manager' },
+  { role: 'catalog_manager',     name: 'Catalog Manager',     badgeVariant: 'info',    desc: 'PIM & Merchandising' },
+  { role: 'integration_manager', name: 'Integration Manager', badgeVariant: 'info',    desc: 'Feeds & Data Pipelines' },
+  { role: 'operations_staff',    name: 'Operations Staff',    badgeVariant: 'warning', desc: 'Validation & Store Sync' },
 ]
+
+
+
 
 export const Permissions: React.FC = () => {
   const { permissionsConfig, updateRolePermission, setBulkRolePermissions, resetPermissionsToDefault } = useAuth()

@@ -114,13 +114,13 @@ export const VariantMapping: React.FC = () => {
               {filtered.length > 0 ? (
                 filtered.map(item => (
                   <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                    <td>
+                    <td data-label="Supplier Variant">
                       <span className="font-bold text-slate-800 dark:text-slate-100 text-xs">{item.supplierVariant}</span>
                     </td>
-                    <td>
+                    <td data-label="Supplier">
                       <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">{item.supplierName}</span>
                     </td>
-                    <td>
+                    <td data-label="Master Variant">
                       {item.masterVariant ? (
                         <span className="text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 px-2.5 py-1 rounded">
                           {item.masterVariant}
@@ -129,10 +129,10 @@ export const VariantMapping: React.FC = () => {
                         <span className="text-2xs italic text-slate-400">Unassigned</span>
                       )}
                     </td>
-                    <td>
+                    <td data-label="Status">
                       <Badge variant={item.status === 'mapped' ? 'success' : 'warning'} dot>{item.status}</Badge>
                     </td>
-                    <td className="text-right">
+                    <td data-label="Action" className="text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button onClick={() => handleOpenEdit(item)} className="btn-icon" title="Edit Mapping"><Edit2 size={14} /></button>
                         <button onClick={() => setDeletingId(item.id)} className="btn-icon text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40" title="Delete Mapping"><Trash2 size={14} /></button>

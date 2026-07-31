@@ -193,25 +193,27 @@ export const Notifications: React.FC = () => {
             filtered.map(item => (
               <div
                 key={item.id}
-                className={`p-5 flex items-start gap-4 transition-colors hover:bg-slate-50 ${
-                  !item.read ? 'bg-primary-50/20 border-l-2 border-primary-500' : 'border-l-2 border-transparent'
+                className={`p-3.5 sm:p-5 flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60 ${
+                  !item.read ? 'bg-primary-50/20 dark:bg-primary-950/20 border-l-2 border-primary-500' : 'border-l-2 border-transparent'
                 }`}
               >
-                <div className="flex-shrink-0 mt-1">{getStatusIcon(item.type)}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className={`text-sm font-semibold truncate ${!item.read ? 'text-slate-950 font-bold' : 'text-slate-700'}`}>
-                      {item.title}
+                <div className="flex items-start gap-3 min-w-0 w-full flex-1">
+                  <div className="flex-shrink-0 mt-0.5">{getStatusIcon(item.type)}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <p className={`text-sm leading-snug ${!item.read ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-700 dark:text-slate-300 font-semibold'}`}>
+                        {item.title}
+                      </p>
+                      <Badge variant={getBadgeVariant(item.type)}>{item.type}</Badge>
+                      {!item.read && <span className="w-1.5 h-1.5 rounded-full bg-primary-600 flex-shrink-0" />}
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-1.5 leading-relaxed">{item.message}</p>
+                    <p className="text-2xs font-mono text-slate-400 dark:text-slate-500">
+                      {format(new Date(item.timestamp), 'yyyy-MM-dd HH:mm:ss')}
                     </p>
-                    <Badge variant={getBadgeVariant(item.type)}>{item.type}</Badge>
-                    {!item.read && <span className="w-1.5 h-1.5 rounded-full bg-primary-600" />}
                   </div>
-                  <p className="text-xs text-slate-500 mb-2 leading-relaxed">{item.message}</p>
-                  <p className="text-xxs text-slate-400">
-                    {format(new Date(item.timestamp), 'yyyy-MM-dd HH:mm:ss')}
-                  </p>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-1.5 flex-shrink-0 self-end sm:self-center pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800 w-full sm:w-auto justify-end">
                   <button
                     onClick={() => {
                       handleMarkAsRead(item.id)

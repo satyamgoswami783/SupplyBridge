@@ -6,9 +6,10 @@ import {
   Layers, ArrowLeftRight, ShieldCheck, RefreshCw, DollarSign,
   Image, Store, Globe, Briefcase, Download, FileText, Activity,
   BarChart3, Users, UserCog, Lock, Settings, ChevronDown,
-  ChevronRight, Zap, X, Menu, User, LogOut, Sliders, Plus
+  ChevronRight, Zap, X, Menu, User, LogOut, Sliders, Plus, Star
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { useFavorites } from '../../context/FavoritesContext'
 import { cn, getInitials } from '../../utils'
 
 interface NavItem {
@@ -19,6 +20,7 @@ interface NavItem {
   module?: string
   children?: NavItem[]
 }
+
 
 const NAV_ITEMS: NavItem[] = [
   { id: 'dashboard',    label: 'Dashboard',          icon: <LayoutDashboard size={18} />, path: '/',           module: 'dashboard' },
@@ -145,6 +147,7 @@ const NavGroup: React.FC<{ item: NavItem; onClose: () => void }> = ({ item, onCl
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const { hasPermission, currentUser, openCurrentUserProfile, logout } = useAuth()
+  const { favorites, removeFavorite } = useFavorites()
 
   const visibleItems = NAV_ITEMS.filter(item => {
     if (item.module && !hasPermission(item.module)) return false
@@ -212,7 +215,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
         {/* Nav list */}
         <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-1 scrollbar-hide">
+
+
           {visibleItems.map(item => {
+
             if (item.children) {
               return <NavGroup key={item.id} item={item} onClose={onClose} />
             }

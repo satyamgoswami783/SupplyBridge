@@ -11,7 +11,10 @@ export type UserRole =
   | 'platform_owner'
   | 'administrator'
   | 'catalog_manager'
-  | 'read_only'
+  | 'integration_manager'
+  | 'operations_staff'
+
+
 
 export interface User {
   id: string
@@ -341,3 +344,14 @@ export interface DashboardMetrics {
   storesSynced: number
   totalStores: number
 }
+
+export type WidgetSize = 'sm' | 'md' | 'lg' | 'full'
+
+export interface DashboardWidgetSetting {
+  id: string
+  label: string
+  visible: boolean
+  order: number
+  size: WidgetSize
+}
+

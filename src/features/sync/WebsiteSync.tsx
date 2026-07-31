@@ -578,10 +578,10 @@ export const WebsiteSync: React.FC = () => {
                         </Badge>
                       </td>
                       <td className="whitespace-nowrap px-4 py-3.5 text-right pr-4">
-                        <div className="flex items-center justify-end gap-1.5" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-end gap-1.5 flex-wrap" onClick={e => e.stopPropagation()}>
                           <button
                             onClick={() => setViewStore(store)}
-                            className="btn-secondary btn-sm flex items-center gap-1 font-bold text-2xs py-1 px-2 cursor-pointer"
+                            className="btn-secondary btn-sm flex items-center gap-1 font-bold text-2xs py-1 px-2 cursor-pointer whitespace-nowrap"
                             title="View Store Details"
                           >
                             <Eye size={12} /> View
@@ -589,7 +589,7 @@ export const WebsiteSync: React.FC = () => {
 
                           <button
                             onClick={() => handleOpenSettings(store)}
-                            className="btn-secondary btn-sm flex items-center gap-1 font-bold text-2xs py-1 px-2 cursor-pointer"
+                            className="btn-secondary btn-sm flex items-center gap-1 font-bold text-2xs py-1 px-2 cursor-pointer whitespace-nowrap"
                             title="Store API Settings"
                           >
                             <Settings size={12} /> Settings
@@ -599,7 +599,7 @@ export const WebsiteSync: React.FC = () => {
                             <button
                               onClick={() => handleSyncSingleStore(store.id, store.name)}
                               disabled={isSyncingStore}
-                              className="btn-secondary btn-sm inline-flex items-center gap-1 font-bold text-2xs py-1 px-2.5 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/60 hover:bg-rose-50 cursor-pointer"
+                              className="btn-secondary btn-sm inline-flex items-center gap-1 font-bold text-2xs py-1 px-2.5 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/60 hover:bg-rose-50 cursor-pointer whitespace-nowrap"
                               title={`Retry sync for ${store.name}`}
                             >
                               <RotateCcw size={12} className={isSyncingStore ? 'animate-spin' : ''} />
@@ -609,7 +609,7 @@ export const WebsiteSync: React.FC = () => {
                             <button
                               onClick={() => handleSyncSingleStore(store.id, store.name)}
                               disabled={isSyncingStore}
-                              className="btn-secondary btn-sm inline-flex items-center gap-1 font-bold text-2xs py-1 px-2.5 cursor-pointer"
+                              className="btn-secondary btn-sm inline-flex items-center gap-1 font-bold text-2xs py-1 px-2.5 cursor-pointer whitespace-nowrap"
                               title={`Sync catalog to ${store.name}`}
                             >
                               <RefreshCw size={12} className={isSyncingStore ? 'animate-spin text-primary-600' : ''} />

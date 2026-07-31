@@ -279,18 +279,18 @@ export const PricingSync: React.FC = () => {
       />
 
       {/* Dynamic Summary Telemetry KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
         {[
           { label: 'Avg Catalog Margin', value: `${avgMargin}%`, color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50', trend: 'Calculated margin' },
           { label: 'Pending Price Updates', value: `${pendingUpdatesCount} SKUs`, color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50/80 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50', trend: 'Awaiting sync' },
           { label: 'Active Rules', value: activeRulesCount.toString(), color: 'text-primary-700 dark:text-primary-400', bg: 'bg-primary-50/80 dark:bg-primary-950/30 border border-primary-100 dark:border-primary-900/50', trend: 'Formulas active' },
           { label: 'Last Price Sync', value: latestSyncTime, color: 'text-slate-800 dark:text-slate-200', bg: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800', trend: 'Latest update' },
         ].map(s => (
-          <div key={s.label} className={`card p-4 border ${s.bg}`}>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mb-1">{s.label}</p>
-            <div className="flex items-end justify-between">
-              <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
-              {s.trend && <span className="text-2xs text-slate-500 dark:text-slate-400 font-medium">{s.trend}</span>}
+          <div key={s.label} className={`card p-2.5 sm:p-4 border ${s.bg}`}>
+            <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold mb-1 leading-tight">{s.label}</p>
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-0.5 sm:gap-1">
+              <p className={`text-base sm:text-2xl font-black ${s.color} whitespace-nowrap leading-tight`}>{s.value}</p>
+              {s.trend && <span className="text-[9px] sm:text-2xs text-slate-500 dark:text-slate-400 font-medium leading-tight">{s.trend}</span>}
             </div>
           </div>
         ))}
@@ -307,36 +307,36 @@ export const PricingSync: React.FC = () => {
           </div>
           <div className="space-y-3">
             {rulesList.map(rule => (
-              <div key={rule.id} className="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/70 hover:border-slate-200 dark:hover:border-slate-700 transition-all">
-                <div>
-                  <div className="flex items-center gap-2">
+              <div key={rule.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/70 hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{rule.name}</p>
                     {!rule.active && <Badge variant="neutral">Disabled</Badge>}
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-2">
                     <code className="mono font-semibold px-2 py-0.5 bg-slate-200/70 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md">{rule.formula}</code>
                     <span>• {rule.products.toLocaleString()} SKUs</span>
                   </p>
                 </div>
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-2 flex-wrap sm:justify-end pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-slate-700/60">
                   <Badge variant={rule.active ? 'success' : 'neutral'}>{rule.applies}</Badge>
                   <button
                     onClick={() => handleToggleRuleActive(rule.id)}
-                    className="btn-ghost btn-sm text-2xs font-bold"
+                    className="btn-ghost btn-sm text-2xs font-bold whitespace-nowrap"
                     title={rule.active ? 'Disable Rule' : 'Enable Rule'}
                   >
                     {rule.active ? 'Disable' : 'Enable'}
                   </button>
                   <button
                     onClick={() => handleOpenEditRule(rule)}
-                    className="btn-icon text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    className="btn-icon text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex-shrink-0"
                     title="Edit Rule"
                   >
                     <Edit2 size={13} />
                   </button>
                   <button
                     onClick={() => { setDeletingRule(rule); setDeleteDialogOpen(true); }}
-                    className="btn-icon text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                    className="btn-icon text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex-shrink-0"
                     title="Delete Rule"
                   >
                     <Trash2 size={13} />

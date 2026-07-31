@@ -581,17 +581,17 @@ export const ImageSync: React.FC = () => {
                       </td>
                       <td data-label="CDN Actions" className="whitespace-nowrap px-4 py-3.5">
                         {/* Enterprise Action Suite instead of raw URLs */}
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <button
                             onClick={() => setPreviewItem(row)}
-                            className="btn-secondary btn-sm py-0.5 px-2 text-2xs cursor-pointer flex items-center gap-1 font-semibold"
+                            className="btn-secondary btn-sm py-0.5 px-2 text-2xs cursor-pointer flex items-center gap-1 font-semibold whitespace-nowrap"
                             title="Preview Image Asset"
                           >
                             <Eye size={12} /> View
                           </button>
                           <button
                             onClick={() => handleCopyUrl(row.cdnUrl || row.rawUrl)}
-                            className="btn-secondary btn-sm py-0.5 px-2 text-2xs cursor-pointer flex items-center gap-1 font-semibold"
+                            className="btn-secondary btn-sm py-0.5 px-2 text-2xs cursor-pointer flex items-center gap-1 font-semibold whitespace-nowrap"
                             title="Copy Published CDN URL to Clipboard"
                           >
                             <Copy size={12} /> Copy URL
@@ -601,7 +601,7 @@ export const ImageSync: React.FC = () => {
                               href={row.cdnUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="btn-secondary btn-sm py-0.5 px-2 text-2xs cursor-pointer inline-flex items-center gap-1 font-semibold"
+                              className="btn-secondary btn-sm py-0.5 px-2 text-2xs cursor-pointer inline-flex items-center gap-1 font-semibold whitespace-nowrap"
                               title="Open CDN Image in New Tab"
                             >
                               <ExternalLink size={12} /> Open
@@ -613,32 +613,32 @@ export const ImageSync: React.FC = () => {
                         {row.lastSync}
                       </td>
                       <td className="whitespace-nowrap px-4 py-3.5 text-right pr-4">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex items-center justify-end gap-1 flex-wrap">
                           <button
                             onClick={() => handleRetryImage(row)}
                             disabled={isSyncingRow}
-                            className="btn-secondary btn-sm py-1 px-2 text-2xs font-bold cursor-pointer"
+                            className="btn-secondary btn-sm py-1 px-2 text-2xs font-bold cursor-pointer whitespace-nowrap"
                             title="Retry Download & WebP Processing"
                           >
                             <RefreshCw size={12} className={isSyncingRow ? 'animate-spin text-primary-600' : ''} /> Retry
                           </button>
                           <button
                             onClick={() => handleOptimizeImage(row)}
-                            className="btn-secondary btn-sm py-1 px-2 text-2xs font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer"
+                            className="btn-secondary btn-sm py-1 px-2 text-2xs font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer whitespace-nowrap"
                             title="Force WebP Re-Optimization"
                           >
                             <Zap size={12} /> Optimize
                           </button>
                           <button
                             onClick={() => setReplaceItem(row)}
-                            className="btn-secondary btn-sm py-1 px-2 text-2xs font-bold text-amber-600 dark:text-amber-400 cursor-pointer"
+                            className="btn-secondary btn-sm py-1 px-2 text-2xs font-bold text-amber-600 dark:text-amber-400 cursor-pointer whitespace-nowrap"
                             title="Replace Image Asset"
                           >
                             <FileUp size={12} /> Replace
                           </button>
                           <button
                             onClick={() => setHistoryItem(row)}
-                            className="btn-icon"
+                            className="btn-icon whitespace-nowrap"
                             title="View Image Audit History"
                           >
                             <History size={13} />

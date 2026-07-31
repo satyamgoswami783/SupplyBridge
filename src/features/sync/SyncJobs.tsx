@@ -327,29 +327,26 @@ export const SyncJobs: React.FC = () => {
             >
               <RotateCcw size={14} /> Retry Failed Jobs {failedCount > 0 && `(${failedCount})`}
             </button>
-            {role !== 'read_only' && (
-              <>
-                <button
-                  onClick={handleSyncSelectedSuppliers}
-                  disabled={selectedJobIds.length === 0}
-                  className={`btn-secondary btn-sm flex items-center gap-1 font-bold ${
-                    selectedJobIds.length === 0 ? 'opacity-50 cursor-not-allowed text-slate-400' : 'cursor-pointer'
-                  }`}
-                  title={selectedJobIds.length === 0 ? 'Select one or more jobs/suppliers to sync' : 'Sync Selected Jobs'}
-                >
-                  <Layers size={14} className="text-cyan-500" /> Sync Selected {selectedJobIds.length > 0 && `(${selectedJobIds.length})`}
-                </button>
-                <button onClick={handleSyncAllSuppliers} className="btn-secondary btn-sm flex items-center gap-1 font-bold cursor-pointer">
-                  <PlayCircle size={14} className="text-amber-500" /> Sync All Suppliers
-                </button>
-                <button onClick={handleRebuildCatalog} className="btn-secondary btn-sm font-bold cursor-pointer">
-                  Rebuild Catalog
-                </button>
-                <button onClick={handleTriggerSync} className="btn-primary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 shadow-md shadow-amber-500/25 cursor-pointer flex-1 sm:flex-initial px-2 sm:px-3 text-xs whitespace-nowrap">
-                  <PlayCircle size={14} /> Trigger Sync
-                </button>
-              </>
-            )}
+            <button
+              onClick={handleSyncSelectedSuppliers}
+              disabled={selectedJobIds.length === 0}
+              className={`btn-secondary btn-sm flex items-center gap-1 font-bold ${
+                selectedJobIds.length === 0 ? 'opacity-50 cursor-not-allowed text-slate-400' : 'cursor-pointer'
+              }`}
+              title={selectedJobIds.length === 0 ? 'Select one or more jobs/suppliers to sync' : 'Sync Selected Jobs'}
+            >
+              <Layers size={14} className="text-cyan-500" /> Sync Selected {selectedJobIds.length > 0 && `(${selectedJobIds.length})`}
+            </button>
+            <button onClick={handleSyncAllSuppliers} className="btn-secondary btn-sm flex items-center gap-1 font-bold cursor-pointer">
+              <PlayCircle size={14} className="text-amber-500" /> Sync All Suppliers
+            </button>
+            <button onClick={handleRebuildCatalog} className="btn-secondary btn-sm font-bold cursor-pointer">
+              Rebuild Catalog
+            </button>
+            <button onClick={handleTriggerSync} className="btn-primary btn-sm flex items-center justify-center gap-1 sm:gap-1.5 shadow-md shadow-amber-500/25 cursor-pointer flex-1 sm:flex-initial px-2 sm:px-3 text-xs whitespace-nowrap">
+              <PlayCircle size={14} /> Trigger Sync
+            </button>
+
           </div>
         }
       />
@@ -479,10 +476,12 @@ export const SyncJobs: React.FC = () => {
                     />
                   </td>
                   <td data-label="Job Name" className="whitespace-nowrap px-4 py-3.5">
-                    <p className="font-bold text-slate-900 dark:text-slate-100 text-xs leading-normal">{job.name}</p>
-                    <p className="text-2xs text-slate-400 font-mono mt-0.5">ID: {job.id}</p>
-                    {job.supplierName && <p className="text-2xs text-slate-500 font-medium mt-0.5">Supplier: {job.supplierName}</p>}
-                    {job.storeName && <p className="text-2xs text-slate-500 font-medium mt-0.5">Store: {job.storeName}</p>}
+                    <div className="flex flex-col items-end sm:items-start text-right sm:text-left">
+                      <p className="font-bold text-slate-900 dark:text-slate-100 text-xs leading-snug">{job.name}</p>
+                      <p className="text-2xs text-slate-400 font-mono mt-0.5">ID: {job.id}</p>
+                      {job.supplierName && <p className="text-2xs text-slate-500 font-medium mt-0.5">Supplier: {job.supplierName}</p>}
+                      {job.storeName && <p className="text-2xs text-slate-500 font-medium mt-0.5">Store: {job.storeName}</p>}
+                    </div>
                   </td>
                   <td data-label="Type" className="whitespace-nowrap px-4 py-3.5">
                     <span className={`px-2.5 py-1 rounded-lg text-2xs font-bold uppercase tracking-wider border ${jobTypeColor[job.type] || 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'}`}>
@@ -517,7 +516,7 @@ export const SyncJobs: React.FC = () => {
                     </span>
                   </td>
                   <td data-label="Triggered By" className="whitespace-nowrap px-4 py-3.5"><span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{job.triggeredBy}</span></td>
-                  <td className="whitespace-nowrap px-4 py-3.5 text-right pr-4">
+                  <td data-label="Actions" className="whitespace-nowrap px-4 py-3.5 text-right pr-4">
                     <div className="flex justify-end items-center gap-1.5" onClick={e => e.stopPropagation()}>
                       <button
                         onClick={() => setDetailJob(job)}
@@ -526,7 +525,7 @@ export const SyncJobs: React.FC = () => {
                       >
                         <Eye size={13} /> View
                       </button>
-                      {role !== 'read_only' && (job.status === 'running' || job.status === 'queued' || job.status === 'paused') && (
+                      {(job.status === 'running' || job.status === 'queued' || job.status === 'paused') && (
                         <button
                           onClick={() => handleCancelSingleJob(job.id, job.name)}
                           className="btn-ghost btn-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1 font-bold cursor-pointer text-xs"
@@ -535,7 +534,7 @@ export const SyncJobs: React.FC = () => {
                           <XCircle size={13} /> Cancel
                         </button>
                       )}
-                      {role !== 'read_only' && job.status === 'failed' && (
+                      {job.status === 'failed' && (
                         <button
                           onClick={() => handleRetryJob(job.id, job.name)}
                           className="btn-secondary btn-sm flex items-center gap-1 font-bold cursor-pointer text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-xs border-amber-300"
@@ -564,13 +563,14 @@ export const SyncJobs: React.FC = () => {
           footer={
             <>
               <button onClick={() => setDetailJob(null)} className="btn-secondary">Close</button>
-              {role !== 'read_only' && detailJob.status === 'failed' && (
+              {detailJob.status === 'failed' && (
                 <button
                   onClick={() => { handleRetryJob(detailJob.id, detailJob.name); setDetailJob(null); }}
                   className="btn-primary flex items-center gap-1.5 cursor-pointer font-bold"
                 >
                   <RotateCcw size={14} /> Retry Execution
                 </button>
+
               )}
             </>
           }

@@ -105,25 +105,25 @@ export const Manufacturers: React.FC = () => {
               {filtered.length > 0 ? (
                 filtered.map(m => (
                   <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                    <td>
-                      <div className="flex items-center gap-2.5">
+                    <td data-label="Manufacturer Name">
+                      <div className="flex items-center justify-end gap-2.5 text-right">
+                        <span className="font-bold text-slate-800 dark:text-slate-100 text-sm leading-snug">{m.name}</span>
                         <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900 flex items-center justify-center flex-shrink-0">
                           <Building2 size={15} className="text-amber-600 dark:text-amber-400" />
                         </div>
-                        <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">{m.name}</span>
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Description">
                       <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                         {m.description || <span className="italic text-slate-400">No description</span>}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="Status">
                       <Badge variant={m.status === 'active' ? 'success' : 'neutral'} dot>
                         {m.status}
                       </Badge>
                     </td>
-                    <td className="text-right">
+                    <td data-label="Actions" className="text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => handleOpenEdit(m)}

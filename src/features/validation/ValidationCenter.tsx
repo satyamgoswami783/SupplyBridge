@@ -516,22 +516,18 @@ export const ValidationCenter: React.FC = () => {
                       <Eye size={13} /> View Details
                     </button>
 
-                    {role !== 'read_only' && (
-                      <>
-                        <button
-                          onClick={() => handleApproveSingle(item.id, item.productName)}
-                          className={`btn-sm flex items-center justify-center gap-1 text-xs font-bold flex-1 md:flex-none ${
-                            hasErrors
-                              ? 'bg-slate-100 text-slate-400 dark:bg-slate-800/80 dark:text-slate-500 cursor-not-allowed border border-slate-200 dark:border-slate-800'
-                              : 'btn-primary shadow-md shadow-indigo-500/20 cursor-pointer'
-                          }`}
-                          disabled={item.status === 'approved' || hasErrors}
-                          title={hasErrors ? 'Approval blocked: Resolve validation errors first' : 'Approve product'}
-                        >
-                          <CheckCircle2 size={13} /> Approve
-                        </button>
-                      </>
-                    )}
+                    <button
+                      onClick={() => handleApproveSingle(item.id, item.productName)}
+                      className={`btn-sm flex items-center justify-center gap-1 text-xs font-bold flex-1 md:flex-none ${
+                        hasErrors
+                          ? 'bg-slate-100 text-slate-400 dark:bg-slate-800/80 dark:text-slate-500 cursor-not-allowed border border-slate-200 dark:border-slate-800'
+                          : 'btn-primary shadow-md shadow-indigo-500/20 cursor-pointer'
+                      }`}
+                      disabled={item.status === 'approved' || hasErrors}
+                      title={hasErrors ? 'Approval blocked: Resolve validation errors first' : 'Approve product'}
+                    >
+                      <CheckCircle2 size={13} /> Approve
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -553,47 +549,35 @@ export const ValidationCenter: React.FC = () => {
               <button onClick={() => setReviewItem(null)} className="btn-secondary">
                 Close
               </button>
-              {role === 'read_only' ? (
+              <button
+                onClick={() => {
+                  handleRejectSingle(reviewItem.id, reviewItem.productName)
+                  setReviewItem(null)
+                }}
+                className="btn-secondary text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900 hover:bg-rose-50 flex items-center gap-1.5 cursor-pointer text-xs font-bold"
+              >
+                <XCircle size={14} /> Reject Item
+              </button>
+
+              {reviewItem.errors.length > 0 ? (
+                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3 py-1.5 rounded-lg border border-amber-200 dark:border-amber-900/60">
+                  <AlertTriangle size={14} />
+                  <span>Approval Blocked (Resolve issues first)</span>
+                </div>
+              ) : (
                 <button
                   onClick={() => {
-                    setToastMessage({ text: `Issue for "${reviewItem.productName}" escalated to Catalog Manager.`, type: 'info' })
+                    handleApproveSingle(reviewItem.id, reviewItem.productName)
                     setReviewItem(null)
                   }}
-                  className="btn-secondary flex items-center gap-1.5 text-amber-700 border-amber-300 hover:bg-amber-50"
+                  className="btn-primary flex items-center gap-1.5 text-xs font-bold cursor-pointer shadow-md shadow-indigo-500/20"
                 >
-                  <PhoneForwarded size={14} /> Escalate Issue
+                  <CheckCircle2 size={14} /> Approve Product
                 </button>
-              ) : (
-                <>
-                  <button
-                    onClick={() => {
-                      handleRejectSingle(reviewItem.id, reviewItem.productName)
-                      setReviewItem(null)
-                    }}
-                    className="btn-secondary text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900 hover:bg-rose-50 flex items-center gap-1.5 cursor-pointer text-xs font-bold"
-                  >
-                    <XCircle size={14} /> Reject Item
-                  </button>
-                  {reviewItem.errors.length > 0 ? (
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3 py-1.5 rounded-lg border border-amber-200 dark:border-amber-900/60">
-                      <AlertTriangle size={14} />
-                      <span>Approval Blocked (Resolve issues first)</span>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        handleApproveSingle(reviewItem.id, reviewItem.productName)
-                        setReviewItem(null)
-                      }}
-                      className="btn-primary flex items-center gap-1.5 text-xs font-bold cursor-pointer shadow-md shadow-indigo-500/20"
-                    >
-                      <CheckCircle2 size={14} /> Approve Product
-                    </button>
-                  )}
-                </>
               )}
             </>
           }
+
         >
           <div className="space-y-4 text-xs">
             {reviewItem.errors.length > 0 ? (
